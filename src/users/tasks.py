@@ -8,7 +8,6 @@ from django.core.mail import send_mail
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from config import settings
-from src.users.models import PasswordResetToken, User
 
 #
 # @shared_task

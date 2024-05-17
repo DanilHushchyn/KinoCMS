@@ -3,9 +3,6 @@
     In this module described models for application users
     Their purpose is storing data for users
     and access control system in our site
-    Models:
-       User
-       PasswordResetToken
 """
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
