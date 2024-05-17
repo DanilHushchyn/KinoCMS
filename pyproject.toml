@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "kinocms"
+version = "0.1.0"
+description = ""
+authors = ["dhushchyn <dhushchyn@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django-environ = "^0.11.2"
+psycopg2-binary = "^2.9.9"
+pillow = "^10.2.0"
+django-meta = "^2.4.2"
+gunicorn = "^21.2.0"
+django-cors-headers = "^4.3.1"
+pydantic = {extras = ["email"], version = "^2.6.3"}
+django-ninja-jwt = "^5.3.0"
+celery = "^5.3.6"
+redis = "^5.0.2"
+django-cleanup = "^8.1.0"
+pre-commit = "^3.6.2"
+django-modeltranslation = "^0.18.11"
+openapi = "^1.1.0"
+django-imagekit = "^5.0.0"
+faker = "^24.4.0"
+django-extensions = "^3.2.3"
+pytest = "^8.1.1"
+pytest-django = "^4.8.0"
+loguru = "^0.7.2"
+django-redis = "^5.4.0"
+pendulum = "^3.0.0"
+django-debug-toolbar = "^4.3.0"
+translate = "^3.6.1"
+django-phonenumber-field = {extras = ["phonenumberslite"], version = "^7.3.0"}
+pydantic-extra-types = "^2.7.0"
+pyjwt = "^2.8.0"
+django-ninja-extra = "^0.20.7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

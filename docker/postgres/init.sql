@@ -1,0 +1,4 @@
+CREATE USER danil WITH PASSWORD 'danil';
+
+CREATE DATABASE kino_cms;
+GRANT ALL PRIVILEGES ON DATABASE kino_cms TO danil;
