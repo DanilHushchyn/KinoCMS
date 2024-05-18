@@ -145,12 +145,12 @@ class CustomUserManager(UserManager):
                             "(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")
         if re.match(password_pattern, password) is None:
             raise HttpError(403, _(
-                "Password have to correspond:"
-                "* At least one uppercase letter"
-                "* At least one lowercase letter"
-                "* At least one digit"
-                "* At least one special character from the set #?!@$%^&*-"
-                "* Minimum length of 8 characters"
+                "Пароль повинен відповідати:"
+                "* Хоча б одній великій літері, "
+                "* Хоч би одній малій літері, "
+                "* Хоча б одній цифрі, "
+                "* Хоча б одному спеціальному символу з набору ?!@%^&- "
+                "* Мінімальна довжина 8 символів"
             ))
 
     def register(self, user_body: 'UserRegisterSchema') -> None:

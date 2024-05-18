@@ -4,6 +4,7 @@
 
 """
 import re
+from typing import Tuple, List
 
 import loguru
 from django.core.exceptions import ValidationError
@@ -36,6 +37,16 @@ class UserService:
         return user
 
     @staticmethod
+    def get_cities() -> List:
+        """
+        Get user's choices for cities.
+
+        :return: list of cities
+        """
+        cities = User.CITIES_CHOICES
+        return cities
+
+    @staticmethod
     def delete_by_id(user_id: int) -> MessageOutSchema:
         """
         Get user personal data by id.
@@ -48,7 +59,7 @@ class UserService:
 
     @staticmethod
     def validate_fio(fio: str) -> bool:
-        pattern = r"^[А-ЯЇІЄҐ][а-яїієґ'-]+$"
+        pattern = r"^[A-ZА-ЯЇІЄҐ][a-zа-яїієґ'-]+$"
         if fio is None or re.match(pattern, fio):
             return True
         else:
@@ -67,12 +78,12 @@ class UserService:
             raise HttpError(403, _("Введено некоректний номер телефону."))
         if not self.validate_fio(user_body.first_name):
             msg = _("Ім'я повинно починатися з великої літери"
-                    "(наступні маленькі), доступна кирилиця, "
+                    "(наступні маленькі), доступна кирилиця та латиниця, "
                     "доступні спецсимволи('-)")
             raise HttpError(403, msg)
         if not self.validate_fio(user_body.last_name):
             msg = _("Прізвище повинно починатися з великої літери"
-                    "(наступні маленькі), доступна кирилиця, "
+                    "(наступні маленькі), доступна кирилиця та латиниця, "
                     "доступні спецсимволи('-)")
             raise HttpError(403, msg)
         User.objects.register(user_body=user_body)
@@ -88,23 +99,28 @@ class UserService:
         :param user_body: user's personal data
         :return: info about registration status
         """
-        try:
-            phone = user_body.phone_number
-            if phone is not None and not phone:
-                raise ValidationError('')
-            validate_international_phonenumber(user_body.phone_number)
-        except ValidationError:
-            raise HttpError(403, _("Введено некоректний номер телефону."))
-        if not self.validate_fio(user_body.first_name):
-            msg = _("Ім'я повинно починатися з великої літери"
-                    "(наступні маленькі), доступна кирилиця, "
-                    "доступні спецсимволи('-)")
-            raise HttpError(403, msg)
-        if not self.validate_fio(user_body.last_name):
-            msg = _("Прізвище повинно починатися з великої літери"
-                    "(наступні маленькі), доступна кирилиця, "
-                    "доступні спецсимволи('-)")
-            raise HttpError(403, msg)
+        if hasattr(user_body, 'phone_number'):
+            try:
+                phone = user_body.phone_number
+                if phone is not None and not phone:
+                    raise ValidationError('')
+                validate_international_phonenumber(user_body.phone_number)
+            except ValidationError:
+                raise HttpError(403, _("Введено некоректний номер телефону."))
+
+        if hasattr(user_body, 'first_name'):
+            if not self.validate_fio(user_body.first_name):
+                msg = _("Ім'я повинно починатися з великої літери"
+                        "(наступні маленькі), доступна кирилиця та латиниця, "
+                        "доступні спецсимволи('-)")
+                raise HttpError(403, msg)
+        if hasattr(user_body, 'last_name'):
+
+            if not self.validate_fio(user_body.last_name):
+                msg = _("Прізвище повинно починатися з великої літери"
+                        "(наступні маленькі), доступна кирилиця та латиниця, "
+                        "доступні спецсимволи('-)")
+                raise HttpError(403, msg)
         user = User.objects.update_by_id(user_id=user_id,
                                          user_body=user_body)
         return user

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest
 from ninja import Header
@@ -10,7 +12,8 @@ from ninja_jwt.authentication import JWTAuth
 
 from src.core.schemas import LangEnum, MessageOutSchema
 from src.users.models import User
-from src.users.schemas import UserRegisterSchema, UserUpdateSchema, UserOutSchema, UsersAllSchema
+from src.users.schemas import (UserRegisterSchema, UserUpdateSchema,
+                               UserOutSchema, UsersAllSchema)
 from src.users.services.user_service import UserService
 from ninja_extra import http_delete, http_get, http_patch, http_post
 
@@ -57,7 +60,9 @@ class UsersKinoController(ControllerBase):
             self,
             request: HttpRequest,
             user_body: UserRegisterSchema,
-            # accept_lang: LangEnum = Header(alias="Accept-Language"),
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
     ) -> MessageOutSchema:
         """
         Register new user.
@@ -132,7 +137,9 @@ class UsersAdminController(ControllerBase):
             request: HttpRequest,
             user_id: int,
             user_body: UserUpdateSchema,
-            # accept_lang: LangEnum = Header(alias="Accept-Language"),
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
     ) -> User:
         """
         Update user by id.
@@ -163,6 +170,7 @@ class UsersAdminController(ControllerBase):
         "/detail/{user_id}/",
         response=UserOutSchema,
         auth=JWTAuth(),
+
         permissions=[IsAdminUser()],
         openapi_extra={
             "responses": {
@@ -182,7 +190,9 @@ class UsersAdminController(ControllerBase):
             self,
             request: HttpRequest,
             user_id: int,
-            # accept_lang: LangEnum = Header(alias="Accept-Language"),
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
     ) -> User:
         """
         Register new user.
@@ -225,7 +235,9 @@ class UsersAdminController(ControllerBase):
             self,
             request: HttpRequest,
             user_id: int,
-            # accept_lang: LangEnum = Header(alias="Accept-Language"),
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
     ) -> MessageOutSchema:
         """
         Register new user.
@@ -266,6 +278,9 @@ class UsersAdminController(ControllerBase):
             request: HttpRequest,
             page: int,
             page_size: int,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
     ) -> dict:
         """
         Endpoint gets all users.
@@ -307,6 +322,9 @@ class UsersAdminController(ControllerBase):
             search_line: str,
             page: int,
             page_size: int,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
     ) -> dict:
         """
         Endpoint gets all users.
@@ -325,3 +343,4 @@ class UsersAdminController(ControllerBase):
 
         result = self.user_service.search(search_line, page, page_size)
         return result
+

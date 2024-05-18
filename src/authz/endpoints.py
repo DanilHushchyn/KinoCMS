@@ -1,3 +1,5 @@
+from typing import Tuple, List
+
 from django.http import HttpRequest
 from ninja_extra import http_post, http_get, http_patch
 from ninja_extra.controllers.base import ControllerBase, api_controller
@@ -9,6 +11,8 @@ from src.authz.schemas import LoginSchema, LoginResponseSchema
 from src.users.models import User
 from src.users.schemas import UserOutSchema, UserUpdateSchema
 from src.users.services.user_service import UserService
+from src.core.schemas import LangEnum
+from ninja import Header
 
 schema = SchemaControl(api_settings)
 
@@ -43,7 +47,12 @@ class CustomTokenObtainPairController(ControllerBase):
             },
         },
     )
-    def obtain_token(self, request: HttpRequest, user_token: LoginSchema):
+    def obtain_token(self, request: HttpRequest,
+                     user_token: LoginSchema,
+                     accept_lang: LangEnum =
+                     Header(alias="Accept-Language",
+                            default="uk"),
+                     ):
         """
         Get user's token by provided credentials.
 
@@ -83,6 +92,10 @@ class CustomTokenObtainPairController(ControllerBase):
             self,
             request: HttpRequest,
             refresh_token: schema.obtain_pair_refresh_schema,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+
     ):
         """
         Get user's new access token by provided refresh token.
@@ -100,6 +113,38 @@ class CustomTokenObtainPairController(ControllerBase):
         return refresh_token.to_response_schema()
 
     @http_get(
+        "/cities/choices/",
+        response=List,
+        # auth=JWTAuth(),
+        openapi_extra={
+            "responses": {
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    def get_cities(
+            self,
+            request: HttpRequest,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> List:
+        """
+        Endpoint gets cities for user to choose.
+        Returns:
+          - **200**: Success response with the data.
+          - **422**: Error: Unprocessable Entity.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.user_service.get_cities()
+        return result
+
+    @http_get(
         "/my-profile/",
         response=UserOutSchema,
         auth=JWTAuth(),
@@ -112,7 +157,7 @@ class CustomTokenObtainPairController(ControllerBase):
                     "description": "Error: Unprocessable Entity",
                 },
                 500: {
-                    "description": "Internal server error if" " an unexpected error occurs.",
+                    "description": "Internal server error if an unexpected error occurs.",
                 },
             },
         },
@@ -120,7 +165,9 @@ class CustomTokenObtainPairController(ControllerBase):
     def get_my_profile(
             self,
             request: HttpRequest,
-            # accept_lang: LangEnum = Header(alias="Accept-Language"),
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
     ) -> User:
         """
         Get user's personal data by token.
@@ -150,7 +197,7 @@ class CustomTokenObtainPairController(ControllerBase):
                     "description": "Error: Unprocessable Entity",
                 },
                 500: {
-                    "description": "Internal server error if" " an unexpected error occurs.",
+                    "description": "Internal server error if an unexpected error occurs.",
                 },
             },
         },
@@ -159,7 +206,9 @@ class CustomTokenObtainPairController(ControllerBase):
             self,
             request: HttpRequest,
             user_body: UserUpdateSchema,
-            # accept_lang: LangEnum = Header(alias="Accept-Language"),
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
     ) -> User:
         """
         Get user's personal data by token.

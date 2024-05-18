@@ -34,7 +34,7 @@ admin_api.register_controllers(UsersAdminController)
 def user_unauthorized(request, exc):
     return admin_api.create_response(
         request,
-        {"message": _("Unauthorized")},
+        {"message": _("Не авторизований")},
         status=status.HTTP_401_UNAUTHORIZED,
     )
 

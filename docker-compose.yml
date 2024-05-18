@@ -53,8 +53,6 @@ services:
       - redis
       - web1
       - web2
-#      - web-admin
-#      - web-kino
   nginx:
     build: ./docker/nginx/
     volumes:
@@ -67,8 +65,6 @@ services:
     depends_on:
       - web1
       - web2
-#      - web-admin
-#      - web-kino
 volumes:
   postgres_data:
   static_volume:

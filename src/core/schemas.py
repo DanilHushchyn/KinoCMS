@@ -1,5 +1,5 @@
 from enum import Enum
-from ninja import Field, ModelSchema, Schema
+from ninja import Schema
 
 
 class MessageOutSchema(Schema):
@@ -16,3 +16,7 @@ class MessageOutSchema(Schema):
 class LangEnum(Enum):
     Ukrainian = "uk"
     Russian = "ru"
+
+    @classmethod
+    def _missing_(cls, value):
+        return cls.Ukrainian
