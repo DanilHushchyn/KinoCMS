@@ -28,6 +28,7 @@ from src.users.endpoints import UsersAdminController
 admin_api = NinjaExtraAPI(title='Admin', description='ADMIN API')
 admin_api.register_controllers(CustomTokenObtainPairController)
 admin_api.register_controllers(UsersAdminController)
+# admin_api.register_controllers(UsersKinoController)
 
 
 @admin_api.exception_handler(AuthenticationError)

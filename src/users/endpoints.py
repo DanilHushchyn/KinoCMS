@@ -19,81 +19,81 @@ from src.users.services.user_service import UserService
 from ninja_extra import http_delete, http_get, http_patch, http_post
 
 
-@api_controller("/users", tags=["users"])
-class UsersKinoController(ControllerBase):
-    """
-    A controller class for managing user's personal data.
+# @api_controller("/users", tags=["users"])
+# class UsersKinoController(ControllerBase):
+#     """
+#     A controller class for managing user's personal data.
+#
+#     This class provides endpoints for
+#     get, post, update, create users in the site
+#     """
+#
+#     def __init__(self, user_service: UserService):
+#         """
+#         Use this method to inject "services" to UsersController.
+#
+#         :param user_service: variable for managing access control system
+#         """
+#         self.user_service = user_service
 
-    This class provides endpoints for
-    get, post, update, create users in the site
-    """
-
-    def __init__(self, user_service: UserService):
-        """
-        Use this method to inject "services" to UsersController.
-
-        :param user_service: variable for managing access control system
-        """
-        self.user_service = user_service
-
-    @http_post(
-        "/register/",
-        response=MessageOutSchema,
-        openapi_extra={
-            "responses": {
-                409: {
-                    "description": "Error: Conflict",
-                },
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
-        },
-    )
-    def register(
-            self,
-            request: HttpRequest,
-            user_body: UserRegisterSchema,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
-    ) -> MessageOutSchema:
-        """
-        Register new user.
-
-        Please provide:
-          - **Request body**  data for registration new user
-
-        Returns:
-          - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
-              Причини:
-              1) Паролі не співпадають
-              2) Пароль повинен бути:
-                 * Принаймні одна велика літера
-                 * Принаймні одна мала літера
-                 * Принаймні одна цифра
-                 * Принаймні один спеціальний символ із набору ?!@%^&-
-                 * Мінімальна довжина 8 символів
-              3) Введено некоректний номер телефону
-              4) Ім'я та прізвище повинно починатися з великої літери"
-                 (наступні маленькі), доступна кирилиця,
-                 доступні спецсимволи('-)
-          - **409**: Error: Conflict. \n
-              Причини:
-              1) Ця електронна адреса вже використовується
-          - **422**: Error: Unprocessable Entity.
-          - **500**: Internal server error if an unexpected error occurs.
-        """
-        result = self.user_service.register(user_body=user_body)
-        return result
+    # @http_post(
+    #     "/register/",
+    #     response=MessageOutSchema,
+    #     openapi_extra={
+    #         "responses": {
+    #             409: {
+    #                 "description": "Error: Conflict",
+    #             },
+    #             403: {
+    #                 "description": "Error: Forbidden",
+    #             },
+    #             422: {
+    #                 "description": "Error: Unprocessable Entity",
+    #             },
+    #             500: {
+    #                 "description": "Internal server error "
+    #                                "if an unexpected error occurs.",
+    #             },
+    #         },
+    #     },
+    # )
+    # def register(
+    #         self,
+    #         request: HttpRequest,
+    #         user_body: UserRegisterSchema,
+    #         accept_lang: LangEnum =
+    #         Header(alias="Accept-Language",
+    #                default="uk"),
+    # ) -> MessageOutSchema:
+    #     """
+    #     Register new user.
+    #
+    #     Please provide:
+    #       - **Request body**  data for registration new user
+    #
+    #     Returns:
+    #       - **200**: Success response with the data.
+    #       - **403**: Error: Forbidden. \n
+    #           Причини:
+    #           1) Паролі не співпадають
+    #           2) Пароль повинен бути:
+    #              * Принаймні одна велика літера
+    #              * Принаймні одна мала літера
+    #              * Принаймні одна цифра
+    #              * Принаймні один спеціальний символ із набору ?!@%^&-
+    #              * Мінімальна довжина 8 символів
+    #           3) Введено некоректний номер телефону
+    #           4) Ім'я та прізвище повинно починатися з великої літери"
+    #              (наступні маленькі), доступна кирилиця,
+    #              доступні спецсимволи('-)
+    #       - **409**: Error: Conflict. \n
+    #           Причини:
+    #           1) Ця електронна адреса вже використовується
+    #       - **422**: Error: Unprocessable Entity.
+    #       - **500**: Internal server error if an unexpected error occurs.
+    #     """
+    #     result = self.user_service.register(user_body=user_body)
+    #     return result
 
 
 @api_controller("/users", tags=["users"])
