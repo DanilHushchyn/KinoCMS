@@ -7,15 +7,17 @@ from src.core.utils import get_timestamp_path
 # Create your models here.
 class Seo(models.Model):
     # url = models.URLField()
-    title = models.CharField(max_length=60)
-    description = models.CharField(max_length=160,
-                                   validators=[MinLengthValidator(50)])
+    seo_title = models.CharField(max_length=60, null=True)
+    seo_description = models.CharField(max_length=160,
+                                       null=True,
+                                       validators=
+                                       [MinLengthValidator(50)])
 
-    image = models.ForeignKey('Image', on_delete=models.CASCADE,
-                              null=True)
+    seo_image = models.ForeignKey('core.Image', on_delete=models.CASCADE,
+                                  null=True, related_query_name='seo_img')
 
     class Meta:
-        # abstract = True
+        abstract = True
         verbose_name = 'Seo'
         db_table = 'seo'
 
@@ -38,7 +40,7 @@ class Gallery(models.Model):
         db_table = 'gallery'
 
 
-class GalleryItem(models.Model):
+class GalleryImage(models.Model):
     image = models.ForeignKey('Image',
                               on_delete=models.CASCADE,
                               null=True, parent_link=True)
@@ -48,6 +50,6 @@ class GalleryItem(models.Model):
                                 null=True)
 
     class Meta:
-        verbose_name = 'GalleryItem'
-        verbose_name_plural = 'GalleryItems'
-        db_table = 'gallery_items'
+        verbose_name = 'GalleryImage'
+        verbose_name_plural = 'GalleryImages'
+        db_table = 'gallery_images'

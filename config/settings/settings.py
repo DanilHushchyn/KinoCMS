@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # django-environ
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, ".env.prod"))
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 
 # Quick-start development settings - unsuitable for production
@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'src.movies',
     'src.pages',
     'src.users',
+    'src.mailing',
 ]
 AUTH_USER_MODEL = "users.User"
 

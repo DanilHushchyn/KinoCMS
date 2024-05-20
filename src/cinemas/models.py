@@ -1,8 +1,10 @@
 from django.db import models
 
+from src.core.models import Seo
+
 
 # Create your models here.
-class Cinema(models.Model):
+class Cinema(Seo):
     name = models.CharField(max_length=100, unique=True, null=True)
     slug = models.SlugField(unique=True, db_index=True, null=True)
     description = models.TextField(max_length=2000, null=True)
@@ -23,8 +25,8 @@ class Cinema(models.Model):
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.CASCADE,
                                    null=True)
-    seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
-                               parent_link=True, null=True)
+    # seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
+    #                            parent_link=True, null=True)
 
     class Meta:
         verbose_name = "Cinema"
@@ -32,7 +34,7 @@ class Cinema(models.Model):
         db_table = 'cinemas'
 
 
-class Hall(models.Model):
+class Hall(Seo):
     number = models.CharField(max_length=60)
     slug = models.SlugField(db_index=True, unique=True, null=True)
     description = models.TextField(max_length=2000, null=True)
@@ -44,8 +46,8 @@ class Hall(models.Model):
                                null=True, parent_link=True)
     date_created = models.DateTimeField(auto_now_add=True)
     cinema = models.ForeignKey('Cinema', on_delete=models.CASCADE, null=True)
-    seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
-                               parent_link=True, null=True)
+    # seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
+    #                            parent_link=True, null=True)
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.CASCADE,
                                    null=True)

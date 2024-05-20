@@ -23,12 +23,12 @@ from ninja.errors import AuthenticationError, ValidationError
 
 from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController
-from src.users.endpoints import UsersKinoController
+# from src.users.endpoints import UsersKinoController
 
 kino_api = NinjaExtraAPI(title='Kino', description='KINO API')
 
 kino_api.register_controllers(CustomTokenObtainPairController)
-kino_api.register_controllers(UsersKinoController)
+# kino_api.register_controllers(UsersKinoController)
 
 
 @kino_api.exception_handler(AuthenticationError)

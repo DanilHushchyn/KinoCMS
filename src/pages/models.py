@@ -1,8 +1,10 @@
 from django.db import models
 
+from src.core.models import Seo
+
 
 # Create your models here.
-class Page(models.Model):
+class Page(Seo):
     name = models.CharField(max_length=60, unique=True, null=True)
     slug = models.SlugField(unique=True, null=True, db_index=True)
     content = models.TextField(null=True)
@@ -11,8 +13,8 @@ class Page(models.Model):
     active = models.BooleanField(null=True)
     can_delete = models.BooleanField(null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
-    seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
-                               parent_link=True, null=True)
+    # seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
+    #                            parent_link=True, null=True)
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.CASCADE,
                                    null=True)
@@ -23,7 +25,7 @@ class Page(models.Model):
         db_table = 'pages'
 
 
-class News_Promo(models.Model):
+class News_Promo(Seo):
     name = models.CharField(max_length=60, unique=True, null=True)
     slug = models.SlugField(unique=True, null=True, db_index=True)
     content = models.TextField(null=True)
@@ -36,8 +38,8 @@ class News_Promo(models.Model):
     active = models.BooleanField(null=True)
     promo = models.BooleanField(null=True)
     video_link = models.URLField(null=True)
-    seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
-                               parent_link=True, null=True)
+    # seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
+    #                            parent_link=True, null=True)
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.CASCADE,
                                    null=True)

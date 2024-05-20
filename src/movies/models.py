@@ -1,5 +1,7 @@
 from django.db import models
 
+from src.core.models import Seo
+
 
 # Create your models here.
 class MovieTech(models.Model):
@@ -50,7 +52,7 @@ class MovieParticipant(models.Model):
         db_table = 'movie_participants'
 
 
-class Movie(models.Model):
+class Movie(Seo):
     slug = models.SlugField(db_index=True, unique=True, null=True)
     name = models.CharField(max_length=60)
     description = models.TextField(max_length=2000)
@@ -72,8 +74,8 @@ class Movie(models.Model):
     released = models.DateField()
     participants = models.ManyToManyField('MovieParticipant')
     # countries = models.CharField(max_length=255, null=True)
-    seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
-                               parent_link=True, null=True)
+    # seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
+    #                            parent_link=True, null=True)
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.CASCADE,
                                    null=True)
