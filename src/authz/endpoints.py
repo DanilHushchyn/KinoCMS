@@ -181,8 +181,8 @@ class CustomTokenObtainPairController(ControllerBase):
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.user_service.get_by_id(request.user.id)
-        return result
+        # result = self.user_service.get_by_id(request.user.id)
+        return request.user
 
     @http_patch(
         "/my-profile/",

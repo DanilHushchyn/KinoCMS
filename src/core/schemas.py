@@ -10,7 +10,7 @@ class MessageOutSchema(Schema):
     has been successful or failed
     """
 
-    message: str | None
+    detail: str | None
 
 
 class LangEnum(Enum):

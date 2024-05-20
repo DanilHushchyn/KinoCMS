@@ -1139,6 +1139,28 @@ htmlsoup = ["BeautifulSoup4"]
 source = ["Cython (>=3.0.10)"]
 
 [[package]]
+name = "ninja-schema"
+version = "0.13.6"
+description = "Django Schema - Builds Pydantic Schemas from Django Models with default field type validations"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "ninja_schema-0.13.6-py3-none-any.whl", hash = "sha256:3f7e2d40c1ff124778d56630cdd5c9243e9430c924c50e7fb353ea54494242f7"},
+    {file = "ninja_schema-0.13.6.tar.gz", hash = "sha256:3b647a8eaf7071687c9d7d0e97c8807a877d950414940f93c495711fb8508f6c"},
+]
+
+[package.dependencies]
+Django = ">=2.0"
+pydantic = [
+    {version = ">=1.7.4,<1.8 || >1.8,<1.8.1 || >1.8.1,<2.0.0 || >2.0.0,<2.0.1 || >2.0.1,<2.1.0 || >2.1.0,<3.0.0"},
+    {version = "*", extras = ["email"]},
+]
+
+[package.extras]
+dev = ["pre-commit"]
+test = ["django-stubs", "mypy (==1.7.1)", "pytest", "pytest-asyncio", "pytest-cov", "pytest-django", "ruff (==0.1.7)"]
+
+[[package]]
 name = "nodeenv"
 version = "1.8.0"
 description = "Node.js virtual environment builder"
@@ -2123,4 +2145,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f545996a0a80e60c6e7ce0d2dfaa2f97ee7ccbfc0ad2c18e73a42442d57ba524"
+content-hash = "066be2329516203d816f94a38a5cfc87fbe6985e6d01bfc5155365a690e0bf05"

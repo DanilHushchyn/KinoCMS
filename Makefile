@@ -30,7 +30,6 @@ fix:
 	$(MANAGE) migrate
 	rm -rf ./media/*
 	$(MANAGE) init_script
-	$(MANAGE) runserver
 
 #test-fix:
 #	$(MANAGE) reset_db --noinput --database=test

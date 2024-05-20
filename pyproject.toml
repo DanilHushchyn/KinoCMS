@@ -35,6 +35,7 @@ django-phonenumber-field = {extras = ["phonenumberslite"], version = "^7.3.0"}
 pydantic-extra-types = "^2.7.0"
 pyjwt = "^2.8.0"
 django-ninja-extra = "^0.20.7"
+ninja-schema = "^0.13.6"
 
 [build-system]
 requires = ["poetry-core"]

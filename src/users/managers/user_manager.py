@@ -113,7 +113,7 @@ class CustomUserManager(UserManager):
                             _("Не знайдено: немає збігів користувачів"
                               " на заданному запиті."))
         msg = _("Користувач успішно видалений")
-        return MessageOutSchema(message=msg)
+        return MessageOutSchema(detail=msg)
 
     def update_by_id(self, user_id: int,
                      user_body: 'UserUpdateSchema'):
@@ -132,26 +132,11 @@ class CustomUserManager(UserManager):
             raise HttpError(404,
                             _("Не знайдено: немає збігів користувачів"
                               " на заданному запиті."))
-        # logger.debug(user_body.dict())
         for field, value in user_body.dict().items():
             if value is not None:
                 setattr(user, field, value)
         user.save()
         return user
-
-    @staticmethod
-    def check_password(password: str) -> None:
-        password_pattern = ("^(?=.*?[A-Z])(?=.*?[a-z])"
-                            "(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")
-        if re.match(password_pattern, password) is None:
-            raise HttpError(403, _(
-                "Пароль повинен відповідати:"
-                "* Хоча б одній великій літері, "
-                "* Хоч би одній малій літері, "
-                "* Хоча б одній цифрі, "
-                "* Хоча б одному спеціальному символу з набору ?!@%^&- "
-                "* Мінімальна довжина 8 символів"
-            ))
 
     def register(self, user_body: 'UserRegisterSchema') -> None:
         """
@@ -164,7 +149,6 @@ class CustomUserManager(UserManager):
         pass2 = user_body.password2.get_secret_value()
         if pass1 != pass2:
             raise HttpError(403, _("Паролі не співпадають"))
-        CustomUserManager.check_password(pass1)
 
         if self.model.objects.filter(email=user_body.email).exists():
             msg = _("Ця електронна адреса вже використовується")

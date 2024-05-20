@@ -3,6 +3,7 @@ from typing import Optional
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest
 from ninja import Header
+from ninja.params.functions import Query
 from ninja_extra.controllers.base import api_controller, ControllerBase
 
 from ninja.errors import HttpError
@@ -13,7 +14,7 @@ from ninja_jwt.authentication import JWTAuth
 from src.core.schemas import LangEnum, MessageOutSchema
 from src.users.models import User
 from src.users.schemas import (UserRegisterSchema, UserUpdateSchema,
-                               UserOutSchema, UsersAllSchema)
+                               UserOutSchema, UsersAllSchema, UserFieldsEnum)
 from src.users.services.user_service import UserService
 from ninja_extra import http_delete, http_get, http_patch, http_post
 
@@ -258,50 +259,7 @@ class UsersAdminController(ControllerBase):
         return result
 
     @http_get(
-        "/all/",
-        response=UsersAllSchema,
-        auth=JWTAuth(),
-        permissions=[IsAdminUser()],
-        openapi_extra={
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error if" " an unexpected error occurs.",
-                },
-            },
-        },
-    )
-    def get_all(
-            self,
-            request: HttpRequest,
-            page: int,
-            page_size: int,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
-    ) -> dict:
-        """
-        Endpoint gets all users.
-
-        Makes pagination of records.
-
-        Please provide:
-         - **page**  number of page we want to get
-         - **page_size**  length of records per page
-
-        Returns:
-          - **200**: Success response with the data.
-          - **422**: Error: Unprocessable Entity.
-          - **500**: Internal server error if an unexpected error occurs.
-        """
-
-        result = self.user_service.get_all(page, page_size)
-        return result
-
-    @http_get(
-        "/search/{search_line}/",
+        "/datable/",
         response=UsersAllSchema,
         auth=JWTAuth(),
         permissions=[IsAdminUser()],
@@ -316,12 +274,14 @@ class UsersAdminController(ControllerBase):
             },
         },
     )
-    def search(
+    def datatable(
             self,
             request: HttpRequest,
-            search_line: str,
             page: int,
             page_size: int,
+            search_line: str = None,
+            sort: UserFieldsEnum = None,
+            ascending: bool = True,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
@@ -329,18 +289,20 @@ class UsersAdminController(ControllerBase):
         """
         Endpoint gets all users.
 
-        Makes pagination of records.
+        Makes pagination, search and sorting of records.
 
         Please provide:
          - **page**  number of page we want to get
          - **page_size**  length of records per page
+         - **search_line**  helps to find rows which contains search line
+         - **sort**  define by which field sort rows
+         - **ascendig**  determines in which direction to sort
 
         Returns:
           - **200**: Success response with the data.
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
-
-        result = self.user_service.search(search_line, page, page_size)
+        result = self.user_service.search(search_line, sort, ascending,
+                                          page, page_size)
         return result
-
