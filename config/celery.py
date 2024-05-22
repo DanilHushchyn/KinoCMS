@@ -9,13 +9,6 @@ the Celery application and define
 settings such as the message broker,
 result backend, task serialization format,
 and other options.
-Example:
-    To configure Celery with these settings, pass the path
-    to this module to the Celery application:
-
-    celery_app = Celery('config')
-    celery_app.config_from_object("django.conf:settings", namespace="CELERY")
-
 
 For more information on Celery configuration options,
 see the Celery documentation:
@@ -27,7 +20,8 @@ from celery import Celery
 from celery.schedules import crontab
 
 # Set the default Django settings module for the 'celery' program.
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE",
+                      "config.settings.settings")
 
 app = Celery("config")
 

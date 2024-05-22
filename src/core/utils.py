@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, timedelta
 from os.path import splitext
 
@@ -17,8 +18,8 @@ def get_timestamp_path(instance: object, filename) -> str:
     :param filename: name of uploaded file to ImageField
     :return: unique file name
     """
-
-    return "%s%s" % (
+    return "%s/%s%s" % (
+        instance.__class__.__name__,
         datetime.now().timestamp(),
         splitext(filename)[1],
     )

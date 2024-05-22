@@ -12,7 +12,7 @@ from django.db.models import Q
 from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 
-from src.core.schemas import MessageOutSchema
+from src.core.schemas.base import MessageOutSchema
 from src.core.utils import paginate
 from src.users.models import User
 from src.users.schemas import UserRegisterSchema, UserUpdateSchema, UserFieldsEnum

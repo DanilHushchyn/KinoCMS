@@ -11,10 +11,11 @@ from django.utils.translation import gettext as _
 from ninja_extra.permissions import IsAdminUser
 from ninja_jwt.authentication import JWTAuth
 
-from src.core.schemas import LangEnum, MessageOutSchema
+from src.core.schemas.base import LangEnum, MessageOutSchema
 from src.users.models import User
 from src.users.schemas import (UserRegisterSchema, UserUpdateSchema,
-                               UserOutSchema, UsersAllSchema, UserFieldsEnum)
+                               UserOutSchema, UsersAllSchema,
+                               UserFieldsEnum)
 from src.users.services.user_service import UserService
 from ninja_extra import http_delete, http_get, http_patch, http_post
 
@@ -171,7 +172,6 @@ class UsersAdminController(ControllerBase):
         "/detail/{user_id}/",
         response=UserOutSchema,
         auth=JWTAuth(),
-
         permissions=[IsAdminUser()],
         openapi_extra={
             "responses": {

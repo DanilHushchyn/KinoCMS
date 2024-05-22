@@ -8,7 +8,7 @@ from django.utils.translation import gettext as _
 from loguru import logger
 from typing import TYPE_CHECKING, List, Optional
 
-from src.core.schemas import MessageOutSchema
+from src.core.schemas.base import MessageOutSchema
 
 if TYPE_CHECKING:
     from src.users.schemas import UserRegisterSchema, UserUpdateSchema

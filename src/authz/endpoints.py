@@ -11,7 +11,7 @@ from src.authz.schemas import LoginSchema, LoginResponseSchema
 from src.users.models import User
 from src.users.schemas import UserOutSchema, UserUpdateSchema, UserRegisterSchema
 from src.users.services.user_service import UserService
-from src.core.schemas import LangEnum, MessageOutSchema
+from src.core.schemas.base import LangEnum, MessageOutSchema
 from ninja import Header
 
 schema = SchemaControl(api_settings)

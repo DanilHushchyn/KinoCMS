@@ -1,4 +1,5 @@
 # Create your views here.
+import time
 from typing import Dict, Any, List
 
 from django.db.models import QuerySet
@@ -7,9 +8,9 @@ from ninja.files import UploadedFile
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 
-from src.core.schemas import MessageOutSchema, LangEnum
+from src.core.schemas.base import MessageOutSchema, LangEnum
 from src.mailing.models import MailTemplate
-from src.mailing.schemas import MailTemplateOutSchema
+from src.mailing.schemas import MailTemplateOutSchema, MailingInSchema, TaskInfoOutSchema
 from src.mailing.services.mailing_service import MailingService
 from src.users.services.user_service import UserService
 from ninja_extra.permissions import IsAdminUser
@@ -19,8 +20,8 @@ from ninja import Header
 
 
 @api_controller("/mailing", tags=["mailing"],
-                # permissions=[IsAdminUser()], auth=JWTAuth()
-                )
+                permissions=[IsAdminUser()],
+                auth=JWTAuth())
 class MailingController(ControllerBase):
     """
     A controller class for mailing.
@@ -123,7 +124,7 @@ class MailingController(ControllerBase):
         openapi_extra={
             "responses": {
                 404: {
-                    "description": "Error: Conflict",
+                    "description": "Error: Not Found",
                 },
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -148,7 +149,7 @@ class MailingController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **404**: Error: Conflict.
+          - **404**: Error: Not Found.
               Причини:
               1) Не знайдено: немає збігів шаблонів
               на заданному запиті.
@@ -158,3 +159,83 @@ class MailingController(ControllerBase):
         result = self.mailing_service.delete_template(temp_id=temp_id)
         return result
 
+    @http_post(
+        "/start/",
+        response=MessageOutSchema,
+        openapi_extra={
+            "responses": {
+                404: {
+                    "description": "Error: Not Found",
+                },
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    def start_mailing(
+            self,
+            request: HttpRequest,
+            body: MailingInSchema,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> MessageOutSchema:
+        """
+        Start mailing letter to recipients.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **404**: Error: Not Found.
+              Причини:
+              1) Не знайдено: немає збігів шаблонів
+              на заданному запиті.
+          - **422**: Error: Unprocessable Entity.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.mailing_service.send_mail(body)
+        return result
+
+    @http_get(
+        "/status/",
+        response=TaskInfoOutSchema,
+        openapi_extra={
+            "responses": {
+                404: {
+                    "description": "Error: Not Found",
+                },
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    def status_mailing(
+            self,
+            request: HttpRequest,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> dict:
+        """
+        Get status for current mailing.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **404**: Error: Not Found.
+              Причини:
+              1) Не знайдено: немає збігів шаблонів
+              на заданному запиті.
+          - **422**: Error: Unprocessable Entity.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.mailing_service.get_task_info()
+        return result

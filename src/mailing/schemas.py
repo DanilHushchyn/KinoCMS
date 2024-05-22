@@ -1,5 +1,14 @@
+from typing import List
+
+from pydantic import field_validator
 from src.mailing.models import MailTemplate
-from ninja import ModelSchema
+from ninja import ModelSchema, Schema
+import ninja_schema
+from django.utils.translation import gettext as _
+
+from ninja import Schema, ModelSchema
+
+from ninja.errors import HttpError
 
 
 class MailTemplateOutSchema(ModelSchema):
@@ -15,3 +24,32 @@ class MailTemplateOutSchema(ModelSchema):
             "id",
             "name",
         ]
+
+
+class MailingInSchema(ninja_schema.Schema):
+    """
+    Pydantic schema for mailing.
+
+    Purpose of this schema to make mailing
+    """
+    users: List[int] = None
+    temp_id: int
+
+    @field_validator('temp_id')
+    def clean_recipients(cls, temp_id: int) -> int:
+        try:
+            MailTemplate.objects.get(id=temp_id)
+        except MailTemplate.DoesNotExist:
+            msg = _('Не знайдено: немає збігів шаблонів '
+                    'на заданному запиті')
+            raise HttpError(404, msg)
+        return temp_id
+
+
+class TaskInfoOutSchema(ninja_schema.Schema):
+    """
+    Pydantic schema for getting task info.
+
+    Purpose of this schema to get task info
+    """
+    progress: int
