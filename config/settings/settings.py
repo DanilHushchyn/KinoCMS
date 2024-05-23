@@ -22,7 +22,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env.prod"))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -33,7 +32,6 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = [env('DJANGO_ALLOWED_HOSTS')]
-
 
 # Application definition
 
@@ -183,7 +181,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
+ABSOLUTE_URL = env('ABSOLUTE_URL')
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -198,7 +196,6 @@ DATABASES = {
         "PORT": env("DB_PORT"),
     },
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -217,7 +214,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -246,7 +242,6 @@ STATIC_URL = "/static/"
 # STATIC_ROOT = BASE_DIR / "static"
 # STATICFILES_DIRS = []
 
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 

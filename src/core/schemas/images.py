@@ -1,5 +1,7 @@
 from ninja import ModelSchema
 import ninja_schema
+
+from config.settings.settings import ABSOLUTE_URL
 from src.core.models import Image
 
 
@@ -21,8 +23,7 @@ class ImageOutSchema(ModelSchema):
 
     @staticmethod
     def resolve_image(obj: Image):
-        # request = self.context.get('request')
-        return str(obj.image.url)
+        return ABSOLUTE_URL+str(obj.image.url)
 
     class Meta:
         model = Image

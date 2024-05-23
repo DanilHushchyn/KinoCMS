@@ -1,6 +1,8 @@
 from typing import List
 
 from pydantic import field_validator
+
+from config.settings.settings import ABSOLUTE_URL
 from src.mailing.models import MailTemplate
 from ninja import ModelSchema, Schema
 import ninja_schema
@@ -17,6 +19,9 @@ class MailTemplateOutSchema(ModelSchema):
 
     Purpose of this schema to return mail template data
     """
+    @staticmethod
+    def resolve_file(obj: MailTemplate):
+        return ABSOLUTE_URL+str(obj.file.url)
 
     class Meta:
         model = MailTemplate

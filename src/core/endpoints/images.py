@@ -183,9 +183,7 @@ class ImageController(ControllerBase):
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
-        current_site = Site.objects.get_current(request).domain
-        loguru.logger.debug(current_site)
-        loguru.logger.debug(MEDIA_URL)
-        loguru.logger.debug(MEDIA_ROOT)
+        loguru.logger.debug(f"{ request.scheme }://{ request.META.get('HTTP_HOST') }")
         result = self.image_service.get_image(img_id=img_id)
+        result.request = request
         return result
