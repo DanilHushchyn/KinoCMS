@@ -1,6 +1,8 @@
 from django.core.validators import MinLengthValidator
 from django.db import models
 
+from src.core.managers.gallery import GalleryManager
+from src.core.managers.images import ImageManager
 from src.core.utils import get_timestamp_path
 
 
@@ -26,6 +28,7 @@ class Image(models.Model):
     alt = models.CharField(max_length=60,
                            validators=[MinLengthValidator(1)])
     image = models.ImageField(upload_to=get_timestamp_path, null=True)
+    objects = ImageManager()
 
     class Meta:
         verbose_name = 'Image'
@@ -34,22 +37,25 @@ class Image(models.Model):
 
 
 class Gallery(models.Model):
+    images = models.ManyToManyField('Image')
+    objects = GalleryManager()
+
     class Meta:
         verbose_name = 'Gallery'
         verbose_name_plural = 'Galleries'
         db_table = 'gallery'
 
-
-class GalleryImage(models.Model):
-    image = models.ForeignKey('Image',
-                              on_delete=models.CASCADE,
-                              null=True, parent_link=True)
-
-    gallery = models.ForeignKey('Gallery',
-                                on_delete=models.CASCADE,
-                                null=True)
-
-    class Meta:
-        verbose_name = 'GalleryImage'
-        verbose_name_plural = 'GalleryImages'
-        db_table = 'gallery_images'
+# class GalleryImage(models.Model):
+#     alt = models.CharField(max_length=60,
+#                            validators=[MinLengthValidator(1)],
+#                            null=True)
+#     image = models.ImageField(upload_to=get_timestamp_path, null=True)
+#
+#     gallery = models.ForeignKey('Gallery',
+#                                 on_delete=models.CASCADE,
+#                                 null=True)
+#
+#     class Meta:
+#         verbose_name = 'GalleryImage'
+#         verbose_name_plural = 'GalleryImages'
+#         db_table = 'gallery_images'

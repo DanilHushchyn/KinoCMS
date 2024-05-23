@@ -23,6 +23,7 @@ from ninja.errors import AuthenticationError, ValidationError
 
 from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController
+from src.core.endpoints.gallery import GalleryController
 from src.core.endpoints.images import ImageController
 from src.mailing.endpoints import MailingController
 from src.users.endpoints import UsersAdminController
@@ -32,6 +33,7 @@ admin_api.register_controllers(CustomTokenObtainPairController)
 admin_api.register_controllers(UsersAdminController)
 admin_api.register_controllers(MailingController)
 admin_api.register_controllers(ImageController)
+admin_api.register_controllers(GalleryController)
 # admin_api.register_controllers(UsersKinoController)
 
 

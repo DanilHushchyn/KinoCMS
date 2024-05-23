@@ -1,31 +1,28 @@
-from django.forms import Form
-from ninja import ModelSchema, File, UploadedFile, Schema
+from ninja import ModelSchema
 import ninja_schema
-from pydantic import FileUrl, FilePath
-
 from src.core.models import Image
 
 
-# class ImageInSchema(Schema):
-#     """
-#     Pydantic schema for uploading image to server side.
-#     """
-#     image: File[UploadedFile]
-#     alt: str
+class ImageInSchema(ninja_schema.ModelSchema):
+    """
+    Pydantic schema for uploading image to server side.
+    """
 
-    # class Meta:
-    #     model = Image
-    #     fields = ['alt', 'image']
-
-    # class Config:
-    #     model = Image
-    #     include = ['alt', 'image']
+    class Config:
+        model = Image
+        include = ['alt']
 
 
 class ImageOutSchema(ModelSchema):
     """
     Pydantic schema for return image to client side.
     """
+    image: str
+
+    @staticmethod
+    def resolve_image(obj: Image):
+        # request = self.context.get('request')
+        return str(obj.image.url)
 
     class Meta:
         model = Image
