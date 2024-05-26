@@ -33,6 +33,8 @@ class CustomTokenObtainPairController(ControllerBase):
         response=LoginResponseSchema,
         url_name="token_obtain_pair",
         openapi_extra={
+            "operationId": "obtain_token",
+
             "responses": {
                 401: {
                     "description": "Error: Unauthorized",
@@ -74,6 +76,8 @@ class CustomTokenObtainPairController(ControllerBase):
         response=schema.obtain_pair_refresh_schema.get_response_schema(),
         url_name="token_refresh",
         openapi_extra={
+            "operationId": "refresh_token",
+
             "responses": {
                 401: {
                     "description": "Error: Unauthorized",
@@ -116,6 +120,8 @@ class CustomTokenObtainPairController(ControllerBase):
         "/register/",
         response=MessageOutSchema,
         openapi_extra={
+            "operationId": "register",
+
             "responses": {
                 409: {
                     "description": "Error: Conflict",
@@ -176,6 +182,8 @@ class CustomTokenObtainPairController(ControllerBase):
         response=List,
         # auth=JWTAuth(),
         openapi_extra={
+            "operationId": "get_cities",
+
             "responses": {
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -208,6 +216,8 @@ class CustomTokenObtainPairController(ControllerBase):
         response=UserOutSchema,
         auth=JWTAuth(),
         openapi_extra={
+            "operationId": "get_my_profile",
+
             "responses": {
                 401: {
                     "description": "Error: Unauthorized",
@@ -248,6 +258,8 @@ class CustomTokenObtainPairController(ControllerBase):
         response=UserOutSchema,
         auth=JWTAuth(),
         openapi_extra={
+            "operationId": "update_my_profile",
+
             "responses": {
                 401: {
                     "description": "Error: Unauthorized",

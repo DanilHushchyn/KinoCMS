@@ -17,6 +17,7 @@ from src.users.models import User
 
 
 class Command(BaseCommand):
+
     def __init__(self):
         super().__init__()
         self.fake_ru = Faker("ru_RU")

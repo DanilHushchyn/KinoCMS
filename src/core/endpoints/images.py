@@ -78,11 +78,12 @@ class ImageController(ControllerBase):
         Returns:
           - **200**: Success response with the data.
           - **403**: Error: Forbidden. \n
-              Причини:
+              Причини: \n
               1) Максимально дозволений розмір файлу 1MB
-              Причини:
-              2) Максимально дозволена довжина поля alt 60 символів
+
           - **422**: Error: Unprocessable Entity.
+              Причини: \n
+              1) Максимально дозволена довжина поля alt 60 символів \n
           - **500**: Internal server error if an unexpected error occurs.
         """
         # current_site = Site.objects.get_current(request).domain

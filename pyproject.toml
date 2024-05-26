@@ -36,6 +36,7 @@ pydantic-extra-types = "^2.7.0"
 pyjwt = "^2.8.0"
 django-ninja-extra = "^0.20.7"
 ninja-schema = "^0.13.6"
+pytils = "^0.4.1"
 
 [build-system]
 requires = ["poetry-core"]

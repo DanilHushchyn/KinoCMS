@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-18 19:08+0300\n"
+"POT-Creation-Date: 2024-05-24 07:45+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,8 +21,61 @@ msgstr ""
 "100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
 "(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: config/admin_urls.py:37 config/kino_urls.py:38
+#: config/admin_urls.py:44 config/kino_urls.py:38
 msgid "Не авторизований"
+msgstr ""
+
+#: media/MailTemplate/1716493179.180941.html:13
+msgid "Кинотеатры"
+msgstr ""
+
+#: media/MailTemplate/1716493179.180941.html:25
+msgid "Список текущих кинотеатров"
+msgstr ""
+
+#: src/core/managers/gallery.py:24
+msgid "Не знайдено: немає збігів галерей на заданному запиті."
+msgstr ""
+
+#: src/core/managers/images.py:25 src/core/managers/images.py:39
+msgid "Не знайдено: немає збігів картинок на заданному запиті."
+msgstr ""
+
+#: src/core/services/images.py:20
+#, python-brace-format
+msgid "Дозволено відправляти тільки {self.image_types}"
+msgstr ""
+
+#: src/core/services/images.py:23 src/mailing/services/mailing_service.py:89
+msgid "Максимально дозволений розмір файлу 1MB"
+msgstr ""
+
+#: src/core/services/images.py:49
+msgid "Картинка успішно видалена"
+msgstr ""
+
+#: src/mailing/schemas.py:48 src/mailing/services/mailing_service.py:105
+msgid "Не знайдено: немає збігів шаблонів на заданному запиті"
+msgstr ""
+
+#: src/mailing/services/mailing_service.py:40
+msgid "Треба зачекати поки закінчиться поточне розсилання"
+msgstr ""
+
+#: src/mailing/services/mailing_service.py:42
+msgid "Розсилання почалося"
+msgstr ""
+
+#: src/mailing/services/mailing_service.py:64
+msgid "На теперішній час розсилання не активне"
+msgstr ""
+
+#: src/mailing/services/mailing_service.py:86
+msgid "Дозволено відправляти тільки html"
+msgstr ""
+
+#: src/mailing/services/mailing_service.py:109
+msgid "Шаблон успішно видалений"
 msgstr ""
 
 #: src/users/managers/user_manager.py:96 src/users/managers/user_manager.py:113
@@ -34,18 +87,11 @@ msgstr ""
 msgid "Користувач успішно видалений"
 msgstr ""
 
-#: src/users/managers/user_manager.py:148
-msgid ""
-"Пароль повинен відповідати:* Хоча б одній великій літері, * Хоч би одній "
-"малій літері, * Хоча б одній цифрі, * Хоча б одному спеціальному символу з "
-"набору ?!@%^&- * Мінімальна довжина 8 символів"
-msgstr ""
-
-#: src/users/managers/user_manager.py:166
+#: src/users/managers/user_manager.py:151
 msgid "Паролі не співпадають"
 msgstr ""
 
-#: src/users/managers/user_manager.py:170
+#: src/users/managers/user_manager.py:154
 msgid "Ця електронна адреса вже використовується"
 msgstr ""
 
@@ -149,22 +195,29 @@ msgstr ""
 msgid "Луцьк"
 msgstr ""
 
-#: src/users/services/user_service.py:67 src/users/services/user_service.py:97
+#: src/users/schemas.py:72
 msgid "Введено некоректний номер телефону."
 msgstr ""
 
-#: src/users/services/user_service.py:69 src/users/services/user_service.py:99
+#: src/users/schemas.py:82
 msgid ""
 "Ім'я повинно починатися з великої літери(наступні маленькі), доступна "
 "кирилиця та латиниця, доступні спецсимволи('-)"
 msgstr ""
 
-#: src/users/services/user_service.py:74 src/users/services/user_service.py:104
+#: src/users/schemas.py:91
 msgid ""
 "Прізвище повинно починатися з великої літери(наступні маленькі), доступна "
 "кирилиця та латиниця, доступні спецсимволи('-)"
 msgstr ""
 
-#: src/users/services/user_service.py:79
+#: src/users/schemas.py:114
+msgid ""
+"Пароль повинен відповідати: * Хоча б одній великій літері, * Хоча б одній "
+"малій літері, * Хоча б одній цифрі, * Хоча б одному спеціальному символу з "
+"набору ?!@%^&- * Мінімальна довжина 8 символів"
+msgstr ""
+
+#: src/users/services/user_service.py:67
 msgid "Ви успішно зареєструвалися"
 msgstr ""

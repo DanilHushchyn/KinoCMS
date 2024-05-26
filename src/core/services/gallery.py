@@ -1,4 +1,4 @@
-from src.core.models import Image, Gallery
+from src.core.models import Gallery
 from src.core.schemas.gallery import GalleryInSchema
 
 

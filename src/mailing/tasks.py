@@ -6,7 +6,7 @@ from config.settings import settings
 from src.mailing.models import MailTemplate
 from src.users.models import User
 from django.core.cache import cache
-
+import loguru
 
 @shared_task()
 def make_mailing(users_list: List | None, temp_id: int) -> None:
@@ -33,8 +33,14 @@ def make_mailing(users_list: List | None, temp_id: int) -> None:
                                        [recipient])
         email.attach_alternative(html_content, 'text/html')
         email.send()
-        current_task.update_state(state='PROGRESS',
-                                  meta={'current': index,
-                                        'total': len(recipients)})
+        if index == len(recipients):
+            loguru.logger.debug('COMPLETE')
+            current_task.update_state(state='COMPLETE',
+                                      meta={'current': index,
+                                            'total': len(recipients)})
+        else:
+            current_task.update_state(state='PROGRESS',
+                                      meta={'current': index,
+                                            'total': len(recipients)})
 
     cache.delete(f'mailing_task')

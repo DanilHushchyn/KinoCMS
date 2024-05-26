@@ -45,6 +45,7 @@ class MailingController(ControllerBase):
         "/template/",
         response=MailTemplateOutSchema,
         openapi_extra={
+            "operationId": "create_template",
             "responses": {
                 403: {
                     "description": "Error: Forbidden",
@@ -89,6 +90,8 @@ class MailingController(ControllerBase):
         "/templates/",
         response=List[MailTemplateOutSchema],
         openapi_extra={
+            "operationId": "get_templates",
+
             "responses": {
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -122,6 +125,7 @@ class MailingController(ControllerBase):
         "/template/{temp_id}/",
         response=MessageOutSchema,
         openapi_extra={
+            "operationId": "delete_template",
             "responses": {
                 404: {
                     "description": "Error: Not Found",
@@ -163,6 +167,7 @@ class MailingController(ControllerBase):
         "/start/",
         response=MessageOutSchema,
         openapi_extra={
+            "operationId": "start_mailing",
             "responses": {
                 404: {
                     "description": "Error: Not Found",
@@ -179,6 +184,7 @@ class MailingController(ControllerBase):
     )
     def start_mailing(
             self,
+
             request: HttpRequest,
             body: MailingInSchema,
             accept_lang: LangEnum =
@@ -204,6 +210,7 @@ class MailingController(ControllerBase):
         "/status/",
         response=TaskInfoOutSchema,
         openapi_extra={
+            "operationId": "status_mailing",
             "responses": {
                 404: {
                     "description": "Error: Not Found",

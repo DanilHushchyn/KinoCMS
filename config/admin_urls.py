@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.http import HttpRequest, HttpResponse
 from django.urls import path, include
+from ninja.openapi.docs import Redoc
 from ninja_extra import NinjaExtraAPI, status
 from django.conf.urls.static import static
 from django.utils.translation import gettext as _
@@ -23,17 +24,24 @@ from ninja.errors import AuthenticationError, ValidationError
 
 from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController
+from src.cinemas.endpoints.cinema import CinemaController
 from src.core.endpoints.gallery import GalleryController
 from src.core.endpoints.images import ImageController
 from src.mailing.endpoints import MailingController
 from src.users.endpoints import UsersAdminController
+from django.core.cache import cache
 
-admin_api = NinjaExtraAPI(title='Admin', description='ADMIN API')
+cache.delete('mailing_task')
+
+admin_api = NinjaExtraAPI(title='Kino', description='KINO API')
 admin_api.register_controllers(CustomTokenObtainPairController)
 admin_api.register_controllers(UsersAdminController)
 admin_api.register_controllers(MailingController)
-admin_api.register_controllers(ImageController)
-admin_api.register_controllers(GalleryController)
+# admin_api.register_controllers(ImageController)
+# admin_api.register_controllers(GalleryController)
+# admin_api.register_controllers(CinemaController)
+
+
 # admin_api.register_controllers(UsersKinoController)
 
 

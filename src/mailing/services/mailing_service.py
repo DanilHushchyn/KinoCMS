@@ -59,7 +59,8 @@ class MailingService:
             task = AsyncResult(task_id)
             data = task.result
             result = (data['current'] / data['total']) * 100
-            loguru.logger.debug(data)
+            if task.state == 'COMPLETE':
+                loguru.logger.debug('COMPLETED TASK)')
         else:
             msg = _('На теперішній час розсилання не активне')
             raise HttpError(400, msg)
