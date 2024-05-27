@@ -3,11 +3,14 @@ from typing import Tuple, List
 from django.http import HttpRequest
 from ninja_extra import http_post, http_get, http_patch
 from ninja_extra.controllers.base import ControllerBase, api_controller
+from ninja_extra.pagination.decorator import paginate
 from ninja_extra.permissions.common import AllowAny
+from ninja_extra.schemas.response import PaginatedResponseSchema
 from ninja_jwt.authentication import JWTAuth
 from ninja_jwt.schema_control import SchemaControl
 from ninja_jwt.settings import api_settings
 from src.authz.schemas import LoginSchema, LoginResponseSchema
+from src.core.utils import CustomJWTAuth
 from src.users.models import User
 from src.users.schemas import UserOutSchema, UserUpdateSchema, UserRegisterSchema
 from src.users.services.user_service import UserService
@@ -156,21 +159,21 @@ class CustomTokenObtainPairController(ControllerBase):
         Returns:
           - **200**: Success response with the data.
           - **403**: Error: Forbidden. \n
-              Причини:
-              1) Паролі не співпадають
-              2) Пароль повинен бути:
-                 * Принаймні одна велика літера
-                 * Принаймні одна мала літера
-                 * Принаймні одна цифра
-                 * Принаймні один спеціальний символ із набору ?!@%^&-
-                 * Мінімальна довжина 8 символів
-              3) Введено некоректний номер телефону
-              4) Ім'я та прізвище повинно починатися з великої літери"
-                 (наступні маленькі), доступна кирилиця,
-                 доступні спецсимволи('-)
+            Причини: \n
+                1) Паролі не співпадають \n
+                2) Пароль повинен бути: \n
+                   * Принаймні одна велика літера \n
+                   * Принаймні одна мала літера \n
+                   * Принаймні одна цифра \n
+                   * Принаймні один спеціальний символ із набору ?!@%^&- \n
+                   * Мінімальна довжина 8 символів \n
+                3) Введено некоректний номер телефону \n
+                4) Ім'я та прізвище повинно починатися з великої літери \n
+                   (наступні маленькі), доступна кирилиця,
+                   доступні спецсимволи('-) \n
           - **409**: Error: Conflict. \n
-              Причини:
-              1) Ця електронна адреса вже використовується
+            Причини: \n
+                1) Ця електронна адреса вже використовується
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
@@ -179,7 +182,7 @@ class CustomTokenObtainPairController(ControllerBase):
 
     @http_get(
         "/cities/choices/",
-        response=List,
+        response=PaginatedResponseSchema[List],
         # auth=JWTAuth(),
         openapi_extra={
             "operationId": "get_cities",
@@ -194,6 +197,7 @@ class CustomTokenObtainPairController(ControllerBase):
             },
         },
     )
+    @paginate()
     def get_cities(
             self,
             request: HttpRequest,
@@ -214,7 +218,7 @@ class CustomTokenObtainPairController(ControllerBase):
     @http_get(
         "/my-profile/",
         response=UserOutSchema,
-        auth=JWTAuth(),
+        auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "get_my_profile",
 
@@ -256,7 +260,7 @@ class CustomTokenObtainPairController(ControllerBase):
     @http_patch(
         "/my-profile/",
         response=UserOutSchema,
-        auth=JWTAuth(),
+        auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "update_my_profile",
 

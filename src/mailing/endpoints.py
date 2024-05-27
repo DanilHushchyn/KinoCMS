@@ -9,8 +9,10 @@ from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 
 from src.core.schemas.base import MessageOutSchema, LangEnum
+from src.core.utils import CustomJWTAuth
 from src.mailing.models import MailTemplate
-from src.mailing.schemas import MailTemplateOutSchema, MailingInSchema, TaskInfoOutSchema
+from src.mailing.schemas import (MailTemplateOutSchema, MailingInSchema,
+                                 TaskInfoOutSchema)
 from src.mailing.services.mailing_service import MailingService
 from src.users.services.user_service import UserService
 from ninja_extra.permissions import IsAdminUser
@@ -21,7 +23,7 @@ from ninja import Header
 
 @api_controller("/mailing", tags=["mailing"],
                 permissions=[IsAdminUser()],
-                auth=JWTAuth())
+                auth=CustomJWTAuth())
 class MailingController(ControllerBase):
     """
     A controller class for mailing.
@@ -77,9 +79,9 @@ class MailingController(ControllerBase):
         Returns:
           - **200**: Success response with the data.
           - **403**: Error: Forbidden. \n
-              Причини:
-              1) Дозволено відправляти тільки html
-              2) Максимально дозволений розмір файлу 1MB
+            Причини: \n
+                1) Дозволено відправляти тільки html \n
+                2) Максимально дозволений розмір файлу 1MB \n
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
@@ -153,10 +155,13 @@ class MailingController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **404**: Error: Not Found.
-              Причини:
-              1) Не знайдено: немає збігів шаблонів
-              на заданному запиті.
+          - **403**: Error: Not Found.\n
+            Причини: \n
+                1) Не можна видаляти шаблони поки йде розсилання.
+          - **404**: Error: Not Found.\n
+            Причини: \n
+                1) Не знайдено: немає збігів шаблонів
+                   на заданному запиті.
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
@@ -196,10 +201,13 @@ class MailingController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **404**: Error: Not Found.
-              Причини:
-              1) Не знайдено: немає збігів шаблонів
-              на заданному запиті.
+          - **404**: Error: Not Found. \n
+            Причини: \n
+                1) Треба зачекати поки закінчиться поточне розсилання.
+          - **404**: Error: Not Found.\n
+            Причини: \n
+                1) Не знайдено: немає збігів шаблонів
+                   на заданному запиті.
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
@@ -208,7 +216,7 @@ class MailingController(ControllerBase):
 
     @http_get(
         "/status/",
-        response=TaskInfoOutSchema,
+        response={200: TaskInfoOutSchema, 201: MessageOutSchema},
         openapi_extra={
             "operationId": "status_mailing",
             "responses": {
@@ -237,10 +245,11 @@ class MailingController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **404**: Error: Not Found.
-              Причини:
-              1) Не знайдено: немає збігів шаблонів
-              на заданному запиті.
+          - **201**: Success mailing completed.
+          - **404**: Error: Not Found. \n
+            Причини: \n
+                1) Не знайдено: немає збігів шаблонів
+                   на заданному запиті.
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """

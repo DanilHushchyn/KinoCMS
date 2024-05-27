@@ -1,3 +1,5 @@
+from typing import Type, Dict
+
 import loguru
 from celery.result import AsyncResult
 from django.db.models import QuerySet
@@ -9,7 +11,7 @@ from django.core.cache import cache
 
 from src.core.schemas.base import MessageOutSchema
 from src.mailing.models import MailTemplate
-from src.mailing.schemas import MailingInSchema
+from src.mailing.schemas import MailingInSchema, TaskInfoOutSchema
 from src.mailing.tasks import make_mailing
 
 
@@ -33,7 +35,7 @@ class MailingService:
         # for key, value in inspector.active().items():
         #     actives = len(value)
         if cache.get(f'mailing_task') is None:
-            task = make_mailing.delay(users_list=body.users,
+            task = make_mailing.delay(user_ids=body.user_ids,
                                       temp_id=body.temp_id)
             cache.set(f'mailing_task', task.id)
         else:
@@ -42,31 +44,25 @@ class MailingService:
         return MessageOutSchema(detail=_('Розсилання почалося'))
 
     @staticmethod
-    def get_task_info() -> dict:
+    def get_task_info() -> int and MessageOutSchema | dict[str, int]:
         """
         Get templates for mailing.
 
         :return: MailTemplate QuerySet
         """
-        # inspector = app.control.inspect()
-        # current_task_id = None
-        # for key, tasks in inspector.active().items():
-        #     for task in tasks:
-        #         current_task_id = task['id']
-        # print(current_task_id)
         task_id = cache.get(f'mailing_task')
         if task_id:
             task = AsyncResult(task_id)
+            if task.result == 'COMPLETE':
+                cache.delete(f'mailing_task')
+                msg = _('Розсилання успішно виконане')
+                return 201, MessageOutSchema(detail=msg)
             data = task.result
             result = (data['current'] / data['total']) * 100
-            if task.state == 'COMPLETE':
-                loguru.logger.debug('COMPLETED TASK)')
+            return 200, TaskInfoOutSchema(progress=int(result))
         else:
             msg = _('На теперішній час розсилання не активне')
             raise HttpError(400, msg)
-        return {
-            'progress': int(result)
-        }
 
     @staticmethod
     def get_templates() -> QuerySet:
@@ -106,5 +102,10 @@ class MailingService:
             msg = _('Не знайдено: немає збігів шаблонів '
                     'на заданному запиті')
             raise HttpError(404, msg)
+
+        task_id = cache.get(f'mailing_task')
+        if task_id:
+            msg = _('Не можна видаляти шаблони поки йде розсилання.')
+            raise HttpError(403, msg)
         template.delete()
         return MessageOutSchema(detail=_('Шаблон успішно видалений'))

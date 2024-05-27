@@ -20,3 +20,12 @@ class LangEnum(Enum):
     @classmethod
     def _missing_(cls, value):
         return cls.Ukrainian
+
+
+class DirectionEnum(Enum):
+    Ascending = "ascending"
+    Descending = "descending"
+
+    @classmethod
+    def _missing_(cls, value):
+        return cls.Descending

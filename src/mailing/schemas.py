@@ -37,7 +37,7 @@ class MailingInSchema(ninja_schema.Schema):
 
     Purpose of this schema to make mailing
     """
-    users: List[int] = None
+    user_ids: List[int] = None
     temp_id: int
 
     @field_validator('temp_id')

@@ -8,11 +8,11 @@ from typing import List
 
 import loguru
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 
-from src.core.schemas.base import MessageOutSchema
+from src.core.schemas.base import MessageOutSchema, DirectionEnum
 from src.core.utils import paginate
 from src.users.models import User
 from src.users.schemas import UserRegisterSchema, UserUpdateSchema, UserFieldsEnum
@@ -94,17 +94,15 @@ class UserService:
         return paginate(items=users, page=page, page_size=page_size)
 
     @staticmethod
-    def search(search_line: str, sort: UserFieldsEnum, ascending: bool,
-               page: int, page_size: int) -> dict:
+    def search(search_line: str, sort: UserFieldsEnum,
+               direction: DirectionEnum) -> QuerySet:
         """
         Get all users.
 
-        :param ascending: value about how to order users
+        :param direction: value about how to order users
         by ascending or by descending
         :param sort: parameter for sorting
         :param search_line: line for searching users
-        :param page: the page number we want to get
-        :param page_size: length of queryset per page
         :return: dict which contains all parameters for pagination
         """
         users = User.objects.all()
@@ -121,10 +119,13 @@ class UserService:
                 Q(city__icontains=search_line)
             )
         if sort:
-            symbol = '' if ascending else '-'
+            symbol = ''
+            if direction.value == 'descending':
+                symbol = '-'
+
             if sort.name == 'fio':
                 users = users.order_by(f'{symbol}last_name',
                                        f'{symbol}first_name')
             else:
                 users = users.order_by(f'{symbol}{sort.value}')
-        return paginate(items=users, page=page, page_size=page_size)
+        return users

@@ -115,6 +115,11 @@ NINJA_JWT = {
     "TOKEN_BLACKLIST_INPUT_SCHEMA": "ninja_jwt.schema.TokenBlacklistInputSchema",
     "TOKEN_VERIFY_INPUT_SCHEMA": "ninja_jwt.schema.TokenVerifyInputSchema",
 }
+
+NINJA_EXTRA={
+    'PAGINATION_CLASS': 'ninja_extra.pagination.PageNumberPaginationExtra'
+}
+
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = "email"

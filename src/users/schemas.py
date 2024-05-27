@@ -177,16 +177,3 @@ class UserOutSchema(ModelSchema):
             "is_superuser",
             "birthday", ]
         # fields_optional = "__all__"
-
-
-class UsersAllSchema(Schema):
-    """
-    Pydantic schema for Users.
-    Purpose of this schema to return all users
-    with pagination
-    """
-
-    items: List[UserOutSchema]
-    count: int
-    next: bool
-    previous: bool

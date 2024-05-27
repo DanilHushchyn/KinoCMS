@@ -1,100 +1,24 @@
 from typing import Optional
 
 from django.core.exceptions import ValidationError
+from django.db.models import QuerySet
 from django.http import HttpRequest
 from ninja import Header
-from ninja.params.functions import Query
 from ninja_extra.controllers.base import api_controller, ControllerBase
-
-from ninja.errors import HttpError
-from django.utils.translation import gettext as _
+from ninja_extra.pagination.decorator import paginate
 from ninja_extra.permissions import IsAdminUser
+from ninja_extra.schemas.response import PaginatedResponseSchema
 from ninja_jwt.authentication import JWTAuth
 
-from src.core.schemas.base import LangEnum, MessageOutSchema
+from src.core.schemas.base import (LangEnum, MessageOutSchema,
+                                   DirectionEnum)
+from src.core.utils import CustomJWTAuth
 from src.users.models import User
 from src.users.schemas import (UserRegisterSchema, UserUpdateSchema,
-                               UserOutSchema, UsersAllSchema,
+                               UserOutSchema,
                                UserFieldsEnum)
 from src.users.services.user_service import UserService
 from ninja_extra import http_delete, http_get, http_patch, http_post
-
-
-# @api_controller("/users", tags=["users"])
-# class UsersKinoController(ControllerBase):
-#     """
-#     A controller class for managing user's personal data.
-#
-#     This class provides endpoints for
-#     get, post, update, create users in the site
-#     """
-#
-#     def __init__(self, user_service: UserService):
-#         """
-#         Use this method to inject "services" to UsersController.
-#
-#         :param user_service: variable for managing access control system
-#         """
-#         self.user_service = user_service
-
-    # @http_post(
-    #     "/register/",
-    #     response=MessageOutSchema,
-    #     openapi_extra={
-    #         "responses": {
-    #             409: {
-    #                 "description": "Error: Conflict",
-    #             },
-    #             403: {
-    #                 "description": "Error: Forbidden",
-    #             },
-    #             422: {
-    #                 "description": "Error: Unprocessable Entity",
-    #             },
-    #             500: {
-    #                 "description": "Internal server error "
-    #                                "if an unexpected error occurs.",
-    #             },
-    #         },
-    #     },
-    # )
-    # def register(
-    #         self,
-    #         request: HttpRequest,
-    #         user_body: UserRegisterSchema,
-    #         accept_lang: LangEnum =
-    #         Header(alias="Accept-Language",
-    #                default="uk"),
-    # ) -> MessageOutSchema:
-    #     """
-    #     Register new user.
-    #
-    #     Please provide:
-    #       - **Request body**  data for registration new user
-    #
-    #     Returns:
-    #       - **200**: Success response with the data.
-    #       - **403**: Error: Forbidden. \n
-    #           Причини:
-    #           1) Паролі не співпадають
-    #           2) Пароль повинен бути:
-    #              * Принаймні одна велика літера
-    #              * Принаймні одна мала літера
-    #              * Принаймні одна цифра
-    #              * Принаймні один спеціальний символ із набору ?!@%^&-
-    #              * Мінімальна довжина 8 символів
-    #           3) Введено некоректний номер телефону
-    #           4) Ім'я та прізвище повинно починатися з великої літери"
-    #              (наступні маленькі), доступна кирилиця,
-    #              доступні спецсимволи('-)
-    #       - **409**: Error: Conflict. \n
-    #           Причини:
-    #           1) Ця електронна адреса вже використовується
-    #       - **422**: Error: Unprocessable Entity.
-    #       - **500**: Internal server error if an unexpected error occurs.
-    #     """
-    #     result = self.user_service.register(user_body=user_body)
-    #     return result
 
 
 @api_controller("/users", tags=["users"])
@@ -116,7 +40,7 @@ class UsersAdminController(ControllerBase):
 
     @http_patch(
         "/detail/{user_id}/",
-        auth=JWTAuth(),
+        auth=CustomJWTAuth(),
         permissions=[IsAdminUser()],
         response=UserOutSchema,
         openapi_extra={
@@ -153,15 +77,15 @@ class UsersAdminController(ControllerBase):
         Returns:
           - **200**: Success response with the data.
           - **403**: Error: Forbidden. \n
-              Причини:
-              1) Введено некоректний номер телефону
-              2) Ім'я та прізвище повинно починатися з великої літери
-                 (наступні маленькі), доступна кирилиця,
-                 доступні спецсимволи('-)
+            Причини: \n
+                1) Введено некоректний номер телефону \n
+                2) Ім'я та прізвище повинно починатися з великої літери
+                   (наступні маленькі), доступна кирилиця,
+                   доступні спецсимволи('-)
           - **404**: Error: Conflict. \n
-              Причини:
-              1) Не знайдено: немає збігів користувачів
-              на заданному запиті.
+            Причини: \n
+                1) Не знайдено: немає збігів користувачів
+                   на заданному запиті.
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
@@ -172,7 +96,7 @@ class UsersAdminController(ControllerBase):
     @http_get(
         "/detail/{user_id}/",
         response=UserOutSchema,
-        auth=JWTAuth(),
+        auth=CustomJWTAuth(),
         permissions=[IsAdminUser()],
         openapi_extra={
             "operationId": "get_by_id",
@@ -206,9 +130,9 @@ class UsersAdminController(ControllerBase):
         Returns:
           - **200**: Success response with the data.
           - **404**: Error: Conflict. \n
-              Причини:
-              1) Не знайдено: немає збігів користувачів
-              на заданному запиті.
+            Причини: \n
+                1) Не знайдено: немає збігів користувачів
+                   на заданному запиті.
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
@@ -217,7 +141,7 @@ class UsersAdminController(ControllerBase):
 
     @http_delete(
         "/detail/{user_id}/",
-        auth=JWTAuth(),
+        auth=CustomJWTAuth(),
         permissions=[IsAdminUser()],
         response=MessageOutSchema,
         openapi_extra={
@@ -252,9 +176,9 @@ class UsersAdminController(ControllerBase):
         Returns:
           - **200**: Success response with the data.
           - **404**: Error: Conflict. \n
-              Причини:
-              1) Не знайдено: немає збігів користувачів
-              на заданному запиті.
+            Причини: \n
+                1) Не знайдено: немає збігів користувачів
+                   на заданному запиті.
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
@@ -263,8 +187,8 @@ class UsersAdminController(ControllerBase):
 
     @http_get(
         "/datable/",
-        response=UsersAllSchema,
-        auth=JWTAuth(),
+        response=PaginatedResponseSchema[UserOutSchema],
+        auth=CustomJWTAuth(),
         permissions=[IsAdminUser()],
         openapi_extra={
             "operationId": "datatable",
@@ -278,18 +202,17 @@ class UsersAdminController(ControllerBase):
             },
         },
     )
+    @paginate()
     def datatable(
             self,
             request: HttpRequest,
-            page: int,
-            page_size: int,
             search_line: str = None,
             sort: UserFieldsEnum = None,
-            ascending: bool = True,
+            direction: DirectionEnum = DirectionEnum.Descending,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
-    ) -> dict:
+    ) -> QuerySet:
         """
         Endpoint gets all users.
 
@@ -300,13 +223,12 @@ class UsersAdminController(ControllerBase):
          - **page_size**  length of records per page
          - **search_line**  helps to find rows which contains search line
          - **sort**  define by which field sort rows
-         - **ascendig**  determines in which direction to sort
+         - **direction**  determines in which direction to sort
 
         Returns:
           - **200**: Success response with the data.
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.user_service.search(search_line, sort, ascending,
-                                          page, page_size)
+        result = self.user_service.search(search_line, sort, direction)
         return result
