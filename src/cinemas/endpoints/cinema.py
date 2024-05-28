@@ -12,6 +12,8 @@ from ninja_extra import http_get, http_post, http_patch, http_delete
 from ninja import Header
 from django.utils.translation import gettext as _
 
+from src.core.utils import CustomJWTAuth
+
 
 @api_controller("/cinema", tags=["cinemas"])
 class CinemaController(ControllerBase):
@@ -33,8 +35,8 @@ class CinemaController(ControllerBase):
     @http_post(
         "/",
         response=MessageOutSchema,
-        permissions=[IsAdminUser()],
-        auth=JWTAuth(),
+        # permissions=[IsAdminUser()],
+        # auth=CustomJWTAuth(),
         openapi_extra={
             "responses": {
                 403: {
@@ -98,10 +100,8 @@ class CinemaController(ControllerBase):
         return MessageOutSchema(detail=_('Кінотеатр успішно створений'))
 
     @http_get(
-        "/{cinema_id}/",
+        "/{cnm_slug}/",
         response=CinemaCardOutSchema,
-        permissions=[IsAdminUser()],
-        auth=JWTAuth(),
         openapi_extra={
             "responses": {
                 404: {
@@ -120,7 +120,7 @@ class CinemaController(ControllerBase):
     def get_by_id(
             self,
             request: HttpRequest,
-            cinema_id: int,
+            cnm_slug: str,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
@@ -139,14 +139,14 @@ class CinemaController(ControllerBase):
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.cinema_service.get_by_id(cinema_id=cinema_id)
+        result = self.cinema_service.get_by_slug(cnm_slug=cnm_slug)
         return result
 
     @http_delete(
-        "/{cinema_id}/",
+        "/{cnm_slug}/",
         response=MessageOutSchema,
         permissions=[IsAdminUser()],
-        auth=JWTAuth(),
+        auth=CustomJWTAuth(),
         openapi_extra={
             "responses": {
                 404: {
@@ -165,7 +165,7 @@ class CinemaController(ControllerBase):
     def delete_by_id(
             self,
             request: HttpRequest,
-            cinema_id: int,
+            cnm_slug: str,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
@@ -184,5 +184,5 @@ class CinemaController(ControllerBase):
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.cinema_service.delete_by_id(cinema_id=cinema_id)
+        result = self.cinema_service.delete_by_slug(cnm_slug=cnm_slug)
         return result

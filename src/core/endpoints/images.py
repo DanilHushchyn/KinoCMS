@@ -36,63 +36,60 @@ class ImageController(ControllerBase):
         """
         self.image_service = image_service
 
-    @http_post(
-        "/upload/",
-        response=ImageOutSchema,
-        # permissions=[IsAdminUser()],
-        # auth=JWTAuth(),
-        openapi_extra={
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
-        },
-    )
-    def upload_image(
-            self,
-            request: HttpRequest,
-            image: File[UploadedFile],
-            body: Form[ImageInSchema],
-            img_id: int = None,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
-    ) -> Image:
-        """
-        Create image for some entity.
-
-        Please provide:
-          - **file**  file for new template
-
-        Returns:
-          - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
-              Причини: \n
-              1) Максимально дозволений розмір файлу 1MB
-
-          - **422**: Error: Unprocessable Entity.
-              Причини: \n
-              1) Максимально дозволена довжина поля alt 60 символів \n
-          - **500**: Internal server error if an unexpected error occurs.
-        """
-        # current_site = Site.objects.get_current(request).domain
-        # current_site = Site.objects.get_current()
-        # print(current_site)
-        result = self.image_service.upload_image(alt=body.alt,
-                                                 image=image,
-                                                 img_id=img_id)
-        return result
+    # @http_post(
+    #     "/upload/",
+    #     response=ImageOutSchema,
+    #     # permissions=[IsAdminUser()],
+    #     # auth=JWTAuth(),
+    #     openapi_extra={
+    #         "responses": {
+    #             403: {
+    #                 "description": "Error: Forbidden",
+    #             },
+    #             404: {
+    #                 "description": "Error: Not Found",
+    #             },
+    #             422: {
+    #                 "description": "Error: Unprocessable Entity",
+    #             },
+    #             500: {
+    #                 "description": "Internal server error "
+    #                                "if an unexpected error occurs.",
+    #             },
+    #         },
+    #     },
+    # )
+    # def upload_image(
+    #         self,
+    #         request: HttpRequest,
+    #         image: File[UploadedFile],
+    #         body: Form[ImageInSchema],
+    #         img_id: int = None,
+    #         accept_lang: LangEnum =
+    #         Header(alias="Accept-Language",
+    #                default="uk"),
+    # ) -> Image:
+    #     """
+    #     Create image for some entity.
+    #
+    #     Please provide:
+    #       - **file**  file for new template
+    #
+    #     Returns:
+    #       - **200**: Success response with the data.
+    #       - **403**: Error: Forbidden. \n
+    #           Причини: \n
+    #           1) Максимально дозволений розмір файлу 1MB
+    #
+    #       - **422**: Error: Unprocessable Entity.
+    #           Причини: \n
+    #           1) Максимально дозволена довжина поля alt 60 символів \n
+    #       - **500**: Internal server error if an unexpected error occurs.
+    #     """
+    #     result = self.image_service.upload_image(alt=body.alt,
+    #                                              image=image,
+    #                                              img_id=img_id)
+    #     return result
 
     @http_delete(
         "/{img_id}/",

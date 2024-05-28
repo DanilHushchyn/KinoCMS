@@ -1,5 +1,6 @@
 from django.core.validators import MinLengthValidator
 from django.db import models
+from imagekit.models import ImageSpecField
 
 from src.core.managers.gallery import GalleryManager
 from src.core.managers.images import ImageManager
@@ -28,6 +29,10 @@ class Image(models.Model):
     alt = models.CharField(max_length=60,
                            validators=[MinLengthValidator(1)])
     image = models.ImageField(upload_to=get_timestamp_path, null=True)
+    image_webp = ImageSpecField(source='image',
+                                format='WEBP',
+                                options={'quality': 90})
+
     objects = ImageManager()
 
     class Meta:

@@ -1,9 +1,14 @@
+import binascii
+import io
+from base64 import b64decode
+
+from django.core.files.base import ContentFile
 from ninja.errors import HttpError
-from ninja import File
-from src.core.models import Image
+import src.core.models as im
 from src.core.schemas.base import MessageOutSchema
 from django.utils.translation import gettext as _
-import loguru
+from PIL import Image
+from src.core.schemas.images import ImageInSchema
 
 
 class ImageService:
@@ -12,30 +17,45 @@ class ImageService:
     """
 
     def __init__(self):
-        self.image_types = ['image/jpeg', 'image/png', 'image/svg',
-                            'image/svg+xml', 'image/webp', 'image/jpeg']
+        self.image_types = ['jpeg', 'jpg', 'png',
+                            'svg', 'webp', ]
 
-    def check_image(self, image: File):
-        if image.content_type not in self.image_types:
-            msg = _(f'Дозволено відправляти тільки {self.image_types}')
+    @staticmethod
+    def check_image(image_base64: str, filename: str):
+        name, extension = filename.split('.')
+        try:
+            head, image_base64 = image_base64.split(',')
+            img_obj = b64decode(image_base64, validate=True)
+            if extension != 'svg':
+                img = Image.open(io.BytesIO(img_obj))
+                img.verify()
+        except binascii.Error as e:
+            msg = _('Невірний формат base64 був відправлений')
             raise HttpError(403, msg)
-        if image.size > 1_000_000:
+        except Exception as e:
+            raise HttpError(403, _('Файл пошкоджений'))
+        image_field = ContentFile(img_obj, filename)
+        if image_field.size > 1_000_000:
             msg = _('Максимально дозволений розмір файлу 1MB')
             raise HttpError(403, msg)
+        return image_field
 
-    def upload_image(self, alt: str, image: File, img_id: int) -> Image:
+    def create(self, body: ImageInSchema) \
+            -> Image:
         """
-        Upload image to server side for some entity.
-        """
+        Create image to server side for some entity.
+        json format
 
-        self.check_image(image)
-        if img_id is not None:
-            obj = Image.objects.get_by_id(img_id=img_id)
-            obj.image = image
-            obj.alt = alt
-            obj.save()
-        else:
-            obj = Image.objects.create(image=image, alt=alt)
+        """
+        filename = body.filename
+        image_base64 = body.image
+        alt_text = body.alt
+        image_field = self.check_image(image_base64=image_base64,
+                                       filename=filename)
+        name, extension = filename.split('.')
+        if not alt_text:
+            alt_text = name
+        obj = im.Image.objects.create(image=image_field, alt=alt_text)
         return obj
 
     @staticmethod
@@ -43,7 +63,7 @@ class ImageService:
         """
          delete image by id.
         """
-        image = Image.objects.get_by_id(img_id=img_id)
+        image = im.Image.objects.get_by_id(img_id=img_id)
         image.delete()
 
         return MessageOutSchema(detail=_('Картинка успішно видалена'))
@@ -53,6 +73,6 @@ class ImageService:
         """
          get image by id.
         """
-        obj = Image.objects.get_by_id(img_id=img_id)
+        obj = im.Image.objects.get_by_id(img_id=img_id)
 
         return obj

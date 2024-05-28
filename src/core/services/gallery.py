@@ -1,5 +1,10 @@
+from typing import List
+
 from src.core.models import Gallery
 from src.core.schemas.gallery import GalleryInSchema
+from src.core.schemas.images import ImageInSchema
+from src.core.services.images import ImageService
+from injector import Binder, singleton, inject, provider
 
 
 class GalleryService:
@@ -7,13 +12,18 @@ class GalleryService:
     A service class for managing gallery.
     """
 
-    @staticmethod
-    def create(body: GalleryInSchema) -> Gallery:
+    @inject
+    def __init__(self, image_service: ImageService):
+        self.image_service = image_service
+
+    def create(self, images: List[ImageInSchema]) -> Gallery:
         """
         Create gallery.
         """
         gallery = Gallery.objects.create()
-        gallery.images.set(body.images)
+        for img in images:
+            result = self.image_service.create(body=img)
+            gallery.images.add(result)
         return gallery
 
     @staticmethod
