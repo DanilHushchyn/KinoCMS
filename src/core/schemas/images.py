@@ -7,6 +7,7 @@ from pydantic.functional_validators import field_validator
 from django.utils.translation import gettext as _
 from config.settings.settings import ABSOLUTE_URL
 from src.core.models import Image
+from django.shortcuts import get_object_or_404
 
 
 class ImageInSchema(ninja_schema.ModelSchema):
@@ -61,3 +62,33 @@ class ImageOutSchema(ModelSchema):
     class Meta:
         model = Image
         fields = '__all__'
+
+
+class ImageUpdateSchema(ImageInSchema):
+    """
+    Pydantic schema for updating image.
+    """
+    filename: str = None
+
+    @field_validator('filename')
+    @classmethod
+    def clean_filename(cls, filename: str) -> str:
+        image_types = ['jpeg', 'jpg', 'png',
+                       'svg', 'webp', ]
+        pattern = r'^[a-zA-Z0-9_-]{1,255}\.[a-zA-Z0-9]+$'
+        if re.match(pattern, filename) is None:
+            raise HttpError(403,
+                            f"Field filename is not valid "
+                            f"filename have to correspond "
+                            f"to next regular expression "
+                            f"{pattern}")
+        name, extension = filename.split('.')
+        if extension not in image_types:
+            raise HttpError(403,
+                            _(f'Дозволено відправляти тільки {image_types}'))
+        return filename
+
+    class Config:
+        model = Image
+        include = ['id', 'image', 'alt']
+        optional = ['alt', 'image']

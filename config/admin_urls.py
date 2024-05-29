@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.http import HttpRequest, HttpResponse
 from django.urls import path, include
+from imagekit.utils import get_cache
 from ninja.openapi.docs import Redoc
 from ninja_extra import NinjaExtraAPI, status
 from django.conf.urls.static import static
@@ -32,7 +33,8 @@ from src.users.endpoints import UsersAdminController
 from django.core.cache import cache
 
 cache.delete('mailing_task')
-
+cache = get_cache()
+cache.clear()
 admin_api = NinjaExtraAPI(title='Kino', description='KINO API')
 admin_api.register_controllers(CustomTokenObtainPairController)
 admin_api.register_controllers(UsersAdminController)

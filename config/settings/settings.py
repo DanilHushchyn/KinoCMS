@@ -81,6 +81,8 @@ CACHES = {
         },
     }
 }
+IMAGEKIT_DEFAULT_IMAGE_CACHE_BACKEND = 'django_redis.client.DefaultClient'
+
 SITE_ID = 1
 NINJA_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=5),

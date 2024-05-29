@@ -21,9 +21,9 @@ class GalleryService:
         Create gallery.
         """
         gallery = Gallery.objects.create()
-        for img in images:
-            result = self.image_service.create(body=img)
-            gallery.images.add(result)
+        if images:
+            list_of_images = self.image_service.bulk_create(bodies=images)
+            gallery.images.set(list_of_images)
         return gallery
 
     @staticmethod

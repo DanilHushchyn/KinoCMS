@@ -42,9 +42,11 @@ class MovieParticipantRole(models.Model):
 
 class MovieParticipant(models.Model):
     person = models.ForeignKey(MovieParticipantPerson,
-                               on_delete=models.CASCADE, null=True)
+                               on_delete=models.CASCADE,
+                               null=True)
     role = models.ForeignKey(MovieParticipantRole,
-                             on_delete=models.CASCADE, null=True)
+                             on_delete=models.CASCADE,
+                             null=True)
 
     class Meta:
         verbose_name = "MovieParticipant"
@@ -56,14 +58,14 @@ class Movie(Seo):
     slug = models.SlugField(db_index=True, unique=True, null=True)
     name = models.CharField(max_length=60)
     description = models.TextField(max_length=2000)
-    banner = models.ForeignKey('core.Image',
-                               related_name='movie_bnr',
-                               on_delete=models.CASCADE,
-                               null=True, parent_link=True)
-    card_img = models.ForeignKey('core.Image',
-                                 related_name='movie_card',
-                                 on_delete=models.CASCADE,
-                                 null=True, parent_link=True)
+    banner = models.OneToOneField('core.Image',
+                                  related_name='movie_bnr',
+                                  on_delete=models.SET_NULL,
+                                  null=True)
+    card_img = models.OneToOneField('core.Image',
+                                    related_name='movie_card',
+                                    on_delete=models.SET_NULL,
+                                    null=True)
     trailer_link = models.URLField(null=True)
     year = models.PositiveIntegerField(null=True)
     budget = models.PositiveIntegerField(null=True)
@@ -77,7 +79,7 @@ class Movie(Seo):
     # seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
     #                            parent_link=True, null=True)
     gallery = models.OneToOneField('core.Gallery',
-                                   on_delete=models.CASCADE,
+                                   on_delete=models.SET_NULL,
                                    null=True)
 
     class Meta:

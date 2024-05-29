@@ -49,7 +49,7 @@ class GalleryController(ControllerBase):
             },
         },
     )
-    def get_max_gallery(
+    def get_gallery(
             self,
             request: HttpRequest,
             gallery_id: int,

@@ -212,6 +212,7 @@ class CustomTokenObtainPairController(ControllerBase):
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
+
         result = self.user_service.get_cities()
         return result
 
@@ -300,7 +301,3 @@ class CustomTokenObtainPairController(ControllerBase):
         result = self.user_service.update_by_id(request.user.id,
                                                 user_body)
         return result
-
-
-
-

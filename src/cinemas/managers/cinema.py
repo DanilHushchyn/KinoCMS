@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 from django.db import models
+
 if TYPE_CHECKING:
     from src.cinemas.models import Cinema
 
@@ -22,7 +23,9 @@ class CinemaManager(models.Manager):
         :return: Cinema model instance
         """
         try:
-            cinema = self.model.objects.get(slug=cnm_slug)
+            cinema = (self.model.objects
+                      .select_related('seo_image', 'logo', 'banner')
+                      .get(slug=cnm_slug))
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів кінотеатрів '
                     'на заданному запиті.')

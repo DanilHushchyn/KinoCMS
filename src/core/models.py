@@ -16,8 +16,10 @@ class Seo(models.Model):
                                        validators=
                                        [MinLengthValidator(50)])
 
-    seo_image = models.ForeignKey('core.Image', on_delete=models.CASCADE,
-                                  null=True, related_query_name='seo_img')
+    seo_image = models.OneToOneField('core.Image',
+                                     on_delete=models.SET_NULL,
+                                     null=True,
+                                     related_query_name='seo_img')
 
     class Meta:
         abstract = True
