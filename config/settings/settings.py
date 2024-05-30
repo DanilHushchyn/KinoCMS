@@ -17,6 +17,7 @@ import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+from corsheaders.defaults import default_headers
 
 # django-environ
 env = environ.Env()
@@ -129,10 +130,10 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -143,8 +144,11 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+CORS_ALLOW_HEADERS = (
+    *default_headers,
+    "Access-Control-Allow-Headers",
+)
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_ORIGIN_ALLOW_ALL = True
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:1337",
