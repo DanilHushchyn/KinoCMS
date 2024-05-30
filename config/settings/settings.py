@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # django-environ
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+environ.Env.read_env(os.path.join(BASE_DIR, ".env.prod"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -152,6 +152,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://gold-boost.netlify.app",
     "http://127.0.0.1",
     "https://goodboost-spacelab.avada-media-dev2.od.ua",
+    "https://kinocms-panel.demodev.cc",
 ]
 # ROOT_URLCONF = 'config.urls'
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
