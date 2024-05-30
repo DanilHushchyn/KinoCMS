@@ -146,7 +146,10 @@ INTERNAL_IPS = [
 ]
 CORS_ALLOW_HEADERS = (
     *default_headers,
-    "Access-Control-Allow-Headers",
+    "access-control-allow-headers",
+    "access-control-allow-origin",
+    "content-type",
+    "cookie",
 )
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
