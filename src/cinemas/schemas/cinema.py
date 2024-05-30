@@ -2,17 +2,14 @@ from typing import List
 
 import ninja_schema
 from django.db.models import Q
-import base64
 
-import uuid
 
 from src.cinemas.models import Cinema
 from ninja import ModelSchema
 from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 
-from src.core.models import Gallery, Image
-from src.core.schemas.gallery import GalleryMaxOutSchema
+from src.core.schemas.gallery import GalleryItemSchema
 from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
 from src.core.utils import validate_capitalized
 
@@ -96,7 +93,7 @@ class CinemaUpdateSchema(CinemaInSchema):
     banner: ImageUpdateSchema = None
     logo: ImageUpdateSchema = None
     seo_image: ImageUpdateSchema = None
-    gallery: List[ImageUpdateSchema] = None
+    gallery: List[GalleryItemSchema] = None
 
     class Config(CinemaInSchema.Config):
         include = [

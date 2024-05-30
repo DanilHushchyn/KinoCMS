@@ -7,7 +7,6 @@ from src.cinemas.schemas.cinema import CinemaInSchema, CinemaCardOutSchema, Cine
 from src.cinemas.services.cinema import CinemaService
 from src.core.schemas.base import LangEnum, MessageOutSchema
 from ninja_extra.permissions import IsAdminUser
-from ninja_jwt.authentication import JWTAuth
 from ninja_extra import http_get, http_post, http_patch, http_delete
 from ninja import Header
 from django.utils.translation import gettext as _

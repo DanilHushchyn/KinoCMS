@@ -18,7 +18,7 @@ from src.users.models import User
 
 
 def validate_capitalized(value, msg):
-    if value != value.capitalize():
+    if value[0] != value[0].capitalize():
         raise HttpError(403, msg)
 
 

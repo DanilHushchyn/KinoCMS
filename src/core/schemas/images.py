@@ -7,7 +7,6 @@ from pydantic.functional_validators import field_validator
 from django.utils.translation import gettext as _
 from config.settings.settings import ABSOLUTE_URL
 from src.core.models import Image
-from django.shortcuts import get_object_or_404
 
 
 class ImageInSchema(ninja_schema.ModelSchema):
@@ -15,6 +14,7 @@ class ImageInSchema(ninja_schema.ModelSchema):
     Pydantic schema for uploading image to server side.
     """
     filename: str
+    image: str
 
     @field_validator('filename')
     @classmethod
@@ -37,7 +37,7 @@ class ImageInSchema(ninja_schema.ModelSchema):
     class Config:
         model = Image
         include = ['image', 'alt']
-        optional = ['alt', ]
+        optional = ['alt']
 
 
 class ImageOutSchema(ModelSchema):
@@ -61,7 +61,7 @@ class ImageOutSchema(ModelSchema):
 
     class Meta:
         model = Image
-        fields = '__all__'
+        fields = ['image', 'alt']
 
 
 class ImageUpdateSchema(ImageInSchema):
@@ -90,5 +90,5 @@ class ImageUpdateSchema(ImageInSchema):
 
     class Config:
         model = Image
-        include = ['id', 'image', 'alt']
+        include = ['image', 'alt']
         optional = ['alt', 'image']

@@ -40,8 +40,8 @@ admin_api.register_controllers(CustomTokenObtainPairController)
 admin_api.register_controllers(UsersAdminController)
 admin_api.register_controllers(MailingController)
 # admin_api.register_controllers(ImageController)
-# admin_api.register_controllers(GalleryController)
-# admin_api.register_controllers(CinemaController)
+admin_api.register_controllers(GalleryController)
+admin_api.register_controllers(CinemaController)
 
 
 # admin_api.register_controllers(UsersKinoController)

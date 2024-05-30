@@ -6,10 +6,8 @@ from pathlib import Path
 from typing import List
 
 from django.core.files.base import ContentFile
-from django.shortcuts import get_object_or_404
 from ninja.errors import HttpError
 import src.core.models as im
-from src.core.schemas.base import MessageOutSchema
 from django.utils.translation import gettext as _
 from PIL import Image
 from src.core.schemas.images import ImageInSchema, ImageUpdateSchema
@@ -33,27 +31,27 @@ class ImageService:
             if extension != 'svg':
                 img = Image.open(io.BytesIO(img_obj))
                 img.verify()
+            image_field = ContentFile(img_obj, filename)
         except binascii.Error as e:
             msg = _('Невірний формат base64 був відправлений')
             raise HttpError(403, msg)
         except Exception as e:
             raise HttpError(403, _('Файл пошкоджений'))
-        image_field = ContentFile(img_obj, filename)
         if image_field.size > 1_000_000:
             msg = _('Максимально дозволений розмір файлу 1MB')
             raise HttpError(403, msg)
         return image_field
 
-    def create(self, body: ImageInSchema) \
+    def create(self, schema: ImageInSchema) \
             -> Image:
         """
         Create image to server side for some entity.
         json format
 
         """
-        filename = body.filename
-        image_base64 = body.image
-        alt_text = body.alt
+        filename = schema.filename
+        image_base64 = schema.image
+        alt_text = schema.alt
         image_field = self.check_image(image_base64=image_base64,
                                        filename=filename)
         name, extension = filename.split('.')
@@ -62,55 +60,36 @@ class ImageService:
         obj = im.Image.objects.create(image=image_field, alt=alt_text)
         return obj
 
-    def update(self, body: ImageUpdateSchema, parent: object) \
-            -> Image:
-        """
-        Update image in json format
-        """
-
-        filename = body.filename
-        image_base64 = body.image
-        alt_text = body.alt
-        image_field = self.check_image(image_base64=image_base64,
-                                       filename=filename)
-        name, extension = filename.split('.')
-        if not alt_text:
-            alt_text = name
-        obj = im.Image.objects.create(image=image_field, alt=alt_text)
-        return obj
-
-    def update(self, img: ImageUpdateSchema, related_img: im.Image) \
+    def update(self, schema: ImageUpdateSchema, image_obj: im.Image) \
             -> None:
         """
         Update image in json format
         """
-        if img:
-            image_obj = get_object_or_404(Image, pk=img.id)
-            if image_obj != related_img:
-                msg = f'Incorrect id {img.id} for image'
-                raise HttpError(409, msg)
-            filename = img.filename
-            image_base64 = img.image
-            alt_text = img.alt
+        if schema:
+            filename = schema.filename
+            image_base64 = schema.image
             if filename and image_base64:
+                name, extension = filename.split('.')
                 image_field = self.check_image(image_base64=image_base64,
                                                filename=filename)
+                self.clear_imagekit_cache(image_obj)
                 image_obj.image = image_field
-            if alt_text:
-                image_obj.alt = alt_text
+                image_obj.alt = name
+            if schema.alt:
+                image_obj.alt = schema.alt
             image_obj.save()
 
-    def bulk_create(self, bodies: List[ImageInSchema]) -> im.Image:
+    def bulk_create(self, schemas: List[ImageInSchema]) -> im.Image:
         """
         Create image to server side for some entity.
         json format
 
         """
         images = []
-        for body in bodies:
-            filename = body.filename
-            image_base64 = body.image
-            alt_text = body.alt
+        for schema in schemas:
+            filename = schema.filename
+            image_base64 = schema.image
+            alt_text = schema.alt
             image_field = self.check_image(image_base64=image_base64,
                                            filename=filename)
             name, extension = filename.split('.')
@@ -120,18 +99,13 @@ class ImageService:
         list_of_images = im.Image.objects.bulk_create(images)
         return list_of_images
 
-    @staticmethod
-    def delete_image(instance: im.Image) -> None:
+    def delete_image(self, image_obj: im.Image) -> None:
         """
          delete image.
         """
-        if instance:
-            name = instance.image.name
-            dir_path = Path(name).stem
-            dir_to_rem = Path(f"media/CACHE/images/Image/{dir_path}")
-            if dir_to_rem.is_dir():
-                shutil.rmtree(dir_to_rem)
-            instance.delete()
+        if image_obj:
+            self.clear_imagekit_cache(image_obj)
+            image_obj.delete()
 
     @staticmethod
     def get_image(img_id: int) -> Image:
@@ -141,3 +115,15 @@ class ImageService:
         obj = im.Image.objects.get_by_id(img_id=img_id)
 
         return obj
+
+    @staticmethod
+    def clear_imagekit_cache(image_obj: im.Image) -> Image:
+        """
+         Clear webp image format which generates
+         Imagekit library for each image in system.
+        """
+        name = image_obj.image.name
+        dir_path = Path(name).stem
+        dir_to_rem = Path(f"media/CACHE/images/Image/{dir_path}")
+        if dir_to_rem.is_dir():
+            shutil.rmtree(dir_to_rem)

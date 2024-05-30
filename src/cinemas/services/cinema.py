@@ -26,7 +26,7 @@ class CinemaService:
         """
         bodies = [schema.banner, schema.logo, schema.seo_image]
         banner, logo, seo_image = (self.image_service
-                                   .bulk_create(bodies=bodies))
+                                   .bulk_create(schemas=bodies))
         gallery = self.gallery_service.create(images=schema.gallery)
 
         cinema = Cinema.objects.create(
@@ -46,33 +46,23 @@ class CinemaService:
         )
         return cinema
 
-    def update(self, cnm_slug: str, schema: CinemaUpdateSchema) -> Cinema:
+    def update(self, cnm_slug: str, schema: CinemaUpdateSchema) -> MessageOutSchema:
         """
         Update cinema.
         """
         cinema = Cinema.objects.get_by_slug(cnm_slug=cnm_slug)
-
         self.image_service.update(schema.banner, cinema.banner)
         self.image_service.update(schema.logo, cinema.logo)
         self.image_service.update(schema.seo_image, cinema.seo_image)
 
-
-        # cinema = Cinema.objects.create(
-        #     name_uk=body.name_uk,
-        #     name_ru=body.name_ru,
-        #     slug=slugify(body.name_uk),
-        #     description_uk=body.description_uk,
-        #     description_ru=body.description_ru,
-        #     banner=banner,
-        #     logo=logo,
-        #     address=body.address,
-        #     coordinate=body.coordinate,
-        #     gallery=gallery,
-        #     seo_title=body.seo_title,
-        #     seo_description=body.seo_description,
-        #     seo_image=seo_image,
-        # )
-        return cinema
+        self.gallery_service.update(schemas=schema.gallery,
+                                    gallery=cinema.gallery)
+        expt_list = ['banner', 'logo', 'seo_image', 'gallery']
+        for attr, value in schema.dict().items():
+            if attr not in expt_list and value is not None:
+                setattr(cinema, attr, value)
+        cinema.save()
+        return MessageOutSchema(detail=_('Кінотеатр успішно оновлений'))
 
     @staticmethod
     def get_by_slug(cnm_slug: str) -> Cinema:

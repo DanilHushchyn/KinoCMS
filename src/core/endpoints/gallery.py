@@ -1,10 +1,13 @@
 # Create your views here.
+from typing import List
+
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 
 from src.core.models import Gallery
 from src.core.schemas.base import LangEnum
-from src.core.schemas.gallery import GalleryInSchema, GalleryMinOutSchema, GalleryMaxOutSchema
+from src.core.schemas.gallery import GalleryInSchema, GalleryMinOutSchema, GalleryOutSchema, GalleryItemOutSchema
+from src.core.schemas.images import ImageOutSchema
 from src.core.services.gallery import GalleryService
 from ninja_extra.permissions import IsAdminUser
 from ninja_jwt.authentication import JWTAuth
@@ -31,7 +34,7 @@ class GalleryController(ControllerBase):
 
     @http_get(
         "/{gallery_id}/",
-        response=GalleryMaxOutSchema,
+        response=List[GalleryItemOutSchema],
         # permissions=[IsAdminUser()],
         # auth=JWTAuth(),
         openapi_extra={
