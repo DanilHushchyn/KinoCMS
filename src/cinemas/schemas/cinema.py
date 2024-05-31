@@ -3,7 +3,6 @@ from typing import List
 import ninja_schema
 from django.db.models import Q
 
-
 from src.cinemas.models import Cinema
 from ninja import ModelSchema
 from ninja.errors import HttpError
@@ -18,13 +17,6 @@ class CinemaInSchema(ninja_schema.ModelSchema):
     """
     Pydantic schema for creating cinemas to server side.
     """
-
-    @ninja_schema.model_validator('name_uk', 'name_ru')
-    def clean_name(cls, value) -> int:
-        if Cinema.objects.filter(Q(name_uk=value) | Q(name_ru=value)).exists():
-            msg = _('Поле name повинно бути унікальним. Ця назва вже зайнята')
-            raise HttpError(409, msg)
-        return value
 
     @ninja_schema.model_validator('name_uk', 'name_ru',
                                   'description_uk', 'description_ru',
@@ -49,6 +41,8 @@ class CinemaInSchema(ninja_schema.ModelSchema):
             'description_uk',
             'description_ru',
             'logo',
+            'terms_uk',
+            'terms_ru',
             'gallery',
             'banner',
             'address',
@@ -65,16 +59,28 @@ class CinemaCardOutSchema(ModelSchema):
     Pydantic schema for showing cinema card.
     """
     banner: ImageOutSchema
+
+    class Meta:
+        model = Cinema
+        fields = ['name',
+                  'banner',
+                  'slug',]
+
+
+class CinemaOutSchema(ModelSchema):
+    """
+    Pydantic schema for showing cinema full data.
+    """
+    banner: ImageOutSchema
     logo: ImageOutSchema
     seo_image: ImageOutSchema
 
     class Meta:
         model = Cinema
-        fields = ['name_uk',
-                  'name_ru',
-                  'description_uk',
-                  'description_ru',
+        fields = ['name',
+                  'description',
                   'logo',
+                  'terms',
                   'gallery',
                   'banner',
                   'slug',
@@ -90,6 +96,7 @@ class CinemaUpdateSchema(CinemaInSchema):
     """
     Pydantic schema for updating cinema.
     """
+
     banner: ImageUpdateSchema = None
     logo: ImageUpdateSchema = None
     seo_image: ImageUpdateSchema = None
@@ -102,6 +109,8 @@ class CinemaUpdateSchema(CinemaInSchema):
             'description_uk',
             'description_ru',
             'logo',
+            'terms_uk',
+            'terms_ru',
             'gallery',
             'banner',
             'address',

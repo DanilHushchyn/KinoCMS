@@ -9,6 +9,7 @@ class Cinema(Seo):
     name = models.CharField(max_length=100, unique=True, null=True)
     slug = models.SlugField(unique=True, db_index=True, null=True)
     description = models.TextField(max_length=2000, null=True)
+    terms = models.JSONField(null=True)
     banner = models.OneToOneField('core.Image',
                                   related_name='cin_bnr',
                                   on_delete=models.SET_NULL,

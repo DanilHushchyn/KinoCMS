@@ -1,9 +1,16 @@
 # Create your views here.
+from typing import List
+
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
+from ninja_extra.pagination.decorator import paginate
+from ninja_extra.schemas.response import PaginatedResponseSchema
 
 from src.cinemas.models import Cinema
-from src.cinemas.schemas.cinema import CinemaInSchema, CinemaCardOutSchema, CinemaUpdateSchema
+from src.cinemas.schemas.cinema import (CinemaInSchema,
+                                        CinemaCardOutSchema,
+                                        CinemaUpdateSchema,
+                                        CinemaOutSchema)
 from src.cinemas.services.cinema import CinemaService
 from src.core.schemas.base import LangEnum, MessageOutSchema
 from ninja_extra.permissions import IsAdminUser
@@ -31,11 +38,44 @@ class CinemaController(ControllerBase):
         """
         self.cinema_service = cinema_service
 
+    @http_get(
+        "/all-cards/",
+        response=PaginatedResponseSchema[CinemaCardOutSchema],
+        openapi_extra={
+            "responses": {
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    @paginate()
+    def get_cinema_cards(
+            self,
+            request: HttpRequest,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> Cinema:
+        """
+        Get all cinema cards.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.cinema_service.get_all()
+        return result
+
     @http_post(
         "/",
         response=MessageOutSchema,
-        # permissions=[IsAdminUser()],
-        # auth=CustomJWTAuth(),
+        permissions=[IsAdminUser()],
+        auth=CustomJWTAuth(),
         openapi_extra={
             "responses": {
                 403: {
@@ -92,8 +132,8 @@ class CinemaController(ControllerBase):
     @http_patch(
         "/{cnm_slug}/",
         response=MessageOutSchema,
-        # permissions=[IsAdminUser()],
-        # auth=CustomJWTAuth(),
+        permissions=[IsAdminUser()],
+        auth=CustomJWTAuth(),
         openapi_extra={
             "responses": {
                 403: {
@@ -159,7 +199,7 @@ class CinemaController(ControllerBase):
 
     @http_get(
         "/{cnm_slug}/",
-        response=CinemaCardOutSchema,
+        response=CinemaOutSchema,
         openapi_extra={
             "responses": {
                 404: {

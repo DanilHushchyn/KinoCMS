@@ -1,3 +1,6 @@
+from django.db.models import Q
+from ninja.errors import HttpError
+
 from src.cinemas.models import Cinema
 from src.cinemas.schemas.cinema import CinemaInSchema, CinemaUpdateSchema
 from django.utils.translation import gettext as _
@@ -24,6 +27,8 @@ class CinemaService:
         """
         Create cinema.
         """
+        self.check_cnm_name_unique(schema.name_uk)
+        self.check_cnm_name_unique(schema.name_ru)
         bodies = [schema.banner, schema.logo, schema.seo_image]
         banner, logo, seo_image = (self.image_service
                                    .bulk_create(schemas=bodies))
@@ -37,6 +42,8 @@ class CinemaService:
             description_ru=schema.description_ru,
             banner=banner,
             logo=logo,
+            terms_uk=schema.terms_uk,
+            terms_ru=schema.terms_ru,
             address=schema.address,
             coordinate=schema.coordinate,
             gallery=gallery,
@@ -46,11 +53,14 @@ class CinemaService:
         )
         return cinema
 
-    def update(self, cnm_slug: str, schema: CinemaUpdateSchema) -> MessageOutSchema:
+    def update(self, cnm_slug: str, schema: CinemaUpdateSchema) \
+            -> MessageOutSchema:
         """
         Update cinema.
         """
         cinema = Cinema.objects.get_by_slug(cnm_slug=cnm_slug)
+        self.check_cnm_name_unique(schema.name_uk, cinema)
+        self.check_cnm_name_unique(schema.name_ru, cinema)
         self.image_service.update(schema.banner, cinema.banner)
         self.image_service.update(schema.logo, cinema.logo)
         self.image_service.update(schema.seo_image, cinema.seo_image)
@@ -61,16 +71,42 @@ class CinemaService:
         for attr, value in schema.dict().items():
             if attr not in expt_list and value is not None:
                 setattr(cinema, attr, value)
+        cinema.slug = slugify(cinema.name_uk)
         cinema.save()
         return MessageOutSchema(detail=_('Кінотеатр успішно оновлений'))
 
     @staticmethod
     def get_by_slug(cnm_slug: str) -> Cinema:
         """
-        Create cinema.
+        Get cinema by slug.
         """
         cinema = Cinema.objects.get_by_slug(cnm_slug=cnm_slug)
         return cinema
+
+    @staticmethod
+    def get_all() -> Cinema:
+        """
+        Get all cinemas.
+        """
+        cinema = Cinema.objects.all()
+        return cinema
+
+    @staticmethod
+    def check_cnm_name_unique(value: str, cinema_obj: Cinema = None) -> bool:
+        """
+        Check name for cinema unique.
+        """
+        if value is not None:
+            cinemas = Cinema.objects.filter(Q(name_uk=value) |
+                                            Q(name_ru=value))
+            if cinemas and cinema_obj:
+                cinemas = cinemas.exclude(id=cinema_obj.id)
+            if cinemas.count():
+                msg = _('Поле name повинно бути унікальним. '
+                        'Ця назва вже зайнята')
+                raise HttpError(409, msg)
+            else:
+                return True
 
     def delete_by_slug(self, cnm_slug: str) -> MessageOutSchema:
         """
