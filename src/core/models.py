@@ -16,8 +16,8 @@ class Seo(models.Model):
                                        validators=
                                        [MinLengthValidator(50)])
 
-    seo_image = models.OneToOneField('core.Image',
-                                     on_delete=models.SET_NULL,
+    seo_image = models.ForeignKey('core.Image',
+                                     on_delete=models.DO_NOTHING,
                                      null=True,
                                      related_query_name='seo_img')
 

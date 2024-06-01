@@ -60,11 +60,11 @@ class Movie(Seo):
     description = models.TextField(max_length=2000)
     banner = models.OneToOneField('core.Image',
                                   related_name='movie_bnr',
-                                  on_delete=models.SET_NULL,
+                                  on_delete=models.DO_NOTHING,
                                   null=True)
     card_img = models.OneToOneField('core.Image',
                                     related_name='movie_card',
-                                    on_delete=models.SET_NULL,
+                                    on_delete=models.DO_NOTHING,
                                     null=True)
     trailer_link = models.URLField(null=True)
     year = models.PositiveIntegerField(null=True)
@@ -76,10 +76,8 @@ class Movie(Seo):
     released = models.DateField()
     participants = models.ManyToManyField('MovieParticipant')
     # countries = models.CharField(max_length=255, null=True)
-    # seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
-    #                            parent_link=True, null=True)
     gallery = models.OneToOneField('core.Gallery',
-                                   on_delete=models.SET_NULL,
+                                   on_delete=models.DO_NOTHING,
                                    null=True)
 
     class Meta:

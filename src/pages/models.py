@@ -9,7 +9,7 @@ class Page(Seo):
     slug = models.SlugField(unique=True, null=True, db_index=True)
     content = models.TextField(null=True)
     banner = models.OneToOneField('core.Image',
-                                  on_delete=models.SET_NULL,
+                                  on_delete=models.DO_NOTHING,
                                   null=True, related_name='page_bnr')
     active = models.BooleanField(null=True)
     can_delete = models.BooleanField(null=True)
@@ -17,7 +17,7 @@ class Page(Seo):
     # seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
     #                            parent_link=True, null=True)
     gallery = models.ForeignKey('core.Gallery',
-                                on_delete=models.SET_NULL,
+                                on_delete=models.DO_NOTHING,
                                 null=True)
 
     class Meta:
@@ -31,10 +31,10 @@ class NewsPromo(Seo):
     slug = models.SlugField(unique=True, null=True, db_index=True)
     content = models.TextField(null=True)
     banner = models.OneToOneField('core.Image',
-                                  on_delete=models.SET_NULL,
+                                  on_delete=models.DO_NOTHING,
                                   null=True, related_name='np_bnr')
     card_img = models.OneToOneField('core.Image',
-                                    on_delete=models.SET_NULL,
+                                    on_delete=models.DO_NOTHING,
                                     null=True, related_name='np_card')
     cinema = models.ForeignKey('cinemas.Cinema',
                                on_delete=models.CASCADE,
@@ -43,10 +43,8 @@ class NewsPromo(Seo):
     active = models.BooleanField(null=True)
     promo = models.BooleanField(null=True)
     video_link = models.URLField(null=True)
-    # seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
-    #                            parent_link=True, null=True)
     gallery = models.OneToOneField('core.Gallery',
-                                   on_delete=models.SET_NULL,
+                                   on_delete=models.DO_NOTHING,
                                    null=True)
 
     class Meta:
@@ -77,7 +75,7 @@ class Slider(models.Model):
 
 class ETEndBBanner(models.Model):
     img = models.OneToOneField('core.Image',
-                               on_delete=models.SET_NULL,
+                               on_delete=models.DO_NOTHING,
                                null=True)
     color = models.CharField(null=True, max_length=10)
     use_img = models.BooleanField(null=True)

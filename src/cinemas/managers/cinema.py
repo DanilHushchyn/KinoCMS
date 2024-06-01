@@ -24,7 +24,8 @@ class CinemaManager(models.Manager):
         """
         try:
             cinema = (self.model.objects
-                      .select_related('seo_image', 'logo', 'banner')
+                      .select_related('seo_image', 'logo',
+                                      'banner', 'gallery')
                       .get(slug=cnm_slug))
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів кінотеатрів '

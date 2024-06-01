@@ -172,12 +172,6 @@ class CinemaController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **404**: Error: Not Found. \n
-            Причини: \n
-                1) Не знайдено: немає збігів картинок
-                   на заданному запиті. \n
-                2) Не знайдено: немає збігів галерей
-                   на заданному запиті. \n
           - **403**: Error: Forbidden. \n
             Причини: \n
                 1) Недійсне значення (не написане великими літерами).

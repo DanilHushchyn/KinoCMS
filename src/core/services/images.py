@@ -99,18 +99,27 @@ class ImageService:
         list_of_images = im.Image.objects.bulk_create(images)
         return list_of_images
 
-    def delete_image(self, image_obj: im.Image) -> None:
+    def delete(self, image_obj: im.Image) -> None:
         """
-         delete image.
+        Delete image.
         """
         if image_obj:
             self.clear_imagekit_cache(image_obj)
             image_obj.delete()
 
+    def bulk_delete(self, image_ids: List[int]) -> None:
+        """
+        Delete multiple images.
+        """
+        images = im.Image.objects.filter(id__in=image_ids)
+        for img in images:
+            self.clear_imagekit_cache(img)
+        images.delete()
+
     @staticmethod
     def get_image(img_id: int) -> Image:
         """
-         get image by id.
+        Get image by id.
         """
         obj = im.Image.objects.get_by_id(img_id=img_id)
 

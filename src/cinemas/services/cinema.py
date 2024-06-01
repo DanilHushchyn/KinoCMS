@@ -114,12 +114,13 @@ class CinemaService:
         """
         cinema = (Cinema.objects
                   .get_by_slug(cnm_slug=cnm_slug))
-        self.image_service.delete_image(cinema.seo_image)
-        self.image_service.delete_image(cinema.banner)
-        self.image_service.delete_image(cinema.logo)
-
-        for img in cinema.gallery.images.all():
-            self.image_service.delete_image(img)
-        cinema.gallery.delete() if cinema.gallery else ...
+        cnm_imgs_ids = [cinema.seo_image_id,
+                        cinema.banner_id,
+                        cinema.logo_id]
+        gallery = cinema.gallery
         cinema.delete()
+        gallery_imgs_ids = list(gallery.images.values_list('id', flat=True))
+        gallery.delete()
+        imgs_ids_for_delete = cnm_imgs_ids + gallery_imgs_ids
+        self.image_service.bulk_delete(imgs_ids_for_delete)
         return MessageOutSchema(detail=_('Кінотеатр успішно видалений'))

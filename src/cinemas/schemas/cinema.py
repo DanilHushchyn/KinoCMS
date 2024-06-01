@@ -64,7 +64,7 @@ class CinemaCardOutSchema(ModelSchema):
         model = Cinema
         fields = ['name',
                   'banner',
-                  'slug',]
+                  'slug', ]
 
 
 class CinemaOutSchema(ModelSchema):

@@ -1,4 +1,6 @@
+import binascii
 import re
+from base64 import b64decode
 
 from ninja import ModelSchema
 import ninja_schema
@@ -33,6 +35,17 @@ class ImageInSchema(ninja_schema.ModelSchema):
             raise HttpError(403,
                             _(f'Дозволено відправляти тільки {image_types}'))
         return filename
+
+    @ninja_schema.model_validator('image')
+    def clean_base64(cls, value: str) -> str:
+        try:
+            head, image_base64 = value.split(',')
+            b64decode(image_base64, validate=True)
+        except binascii.Error as e:
+            print('EASY')
+            msg = _('Невірний формат base64 був відправлений')
+            raise HttpError(403, msg)
+        return value
 
     class Config:
         model = Image

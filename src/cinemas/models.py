@@ -12,17 +12,17 @@ class Cinema(Seo):
     terms = models.JSONField(null=True)
     banner = models.OneToOneField('core.Image',
                                   related_name='cin_bnr',
-                                  on_delete=models.SET_NULL,
+                                  on_delete=models.DO_NOTHING,
                                   null=True)
     logo = models.OneToOneField('core.Image',
-                                on_delete=models.SET_NULL,
+                                on_delete=models.DO_NOTHING,
                                 related_name='logo',
                                 null=True)
     address = models.TextField(max_length=2000, null=True)
     coordinate = models.CharField(max_length=2000, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     gallery = models.OneToOneField('core.Gallery',
-                                   on_delete=models.SET_NULL,
+                                   on_delete=models.DO_NOTHING,
                                    null=True)
     objects = CinemaManager()
 
@@ -38,16 +38,17 @@ class Hall(Seo):
     slug = models.SlugField(db_index=True, unique=True, null=True)
     description = models.TextField(max_length=2000, null=True)
     banner = models.OneToOneField('core.Image', related_name='hall_bnr',
-                                  on_delete=models.SET_NULL,
+                                  on_delete=models.DO_NOTHING,
                                   null=True)
     schema = models.OneToOneField('core.Image', related_name='schema',
-                                  on_delete=models.SET_NULL,
+                                  on_delete=models.DO_NOTHING,
                                   null=True)
     date_created = models.DateTimeField(auto_now_add=True)
-    cinema = models.ForeignKey('Cinema', on_delete=models.CASCADE,
+    cinema = models.ForeignKey('Cinema',
+                               on_delete=models.CASCADE,
                                null=True)
     gallery = models.OneToOneField('core.Gallery',
-                                   on_delete=models.SET_NULL,
+                                   on_delete=models.DO_NOTHING,
                                    null=True)
 
     class Meta:
