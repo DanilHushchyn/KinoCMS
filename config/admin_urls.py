@@ -29,6 +29,7 @@ from src.cinemas.endpoints.cinema import CinemaController
 from src.core.endpoints.gallery import GalleryController
 from src.core.endpoints.images import ImageController
 from src.mailing.endpoints import MailingController
+from src.movies.endpoints import MovieController
 from src.users.endpoints import UsersAdminController
 from django.core.cache import cache
 
@@ -42,6 +43,7 @@ admin_api.register_controllers(MailingController)
 # admin_api.register_controllers(ImageController)
 admin_api.register_controllers(GalleryController)
 admin_api.register_controllers(CinemaController)
+admin_api.register_controllers(MovieController)
 
 
 # admin_api.register_controllers(UsersKinoController)
@@ -71,7 +73,7 @@ def http_exceptions_handler(request: HttpRequest, exc: ValidationError) \
             {
                 "location": location,
                 "field": field_full,
-                "message": message.capitalize(),
+                "message": message,
             }
         )
 

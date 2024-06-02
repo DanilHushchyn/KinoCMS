@@ -1,9 +1,11 @@
 from django.db import models
 
 from src.core.models import Seo
+from src.movies.manager import MovieManager
+
+from django_countries.fields import CountryField
 
 
-# Create your models here.
 class MovieTech(models.Model):
     name = models.CharField(max_length=60)
 
@@ -58,27 +60,40 @@ class Movie(Seo):
     slug = models.SlugField(db_index=True, unique=True, null=True)
     name = models.CharField(max_length=60)
     description = models.TextField(max_length=2000)
-    banner = models.OneToOneField('core.Image',
-                                  related_name='movie_bnr',
-                                  on_delete=models.DO_NOTHING,
-                                  null=True)
     card_img = models.OneToOneField('core.Image',
                                     related_name='movie_card',
                                     on_delete=models.DO_NOTHING,
                                     null=True)
+
     trailer_link = models.URLField(null=True)
     year = models.PositiveIntegerField(null=True)
     budget = models.PositiveIntegerField(null=True)
-    legal_age = models.PositiveIntegerField(null=True)
+    AGE_CHOICES = [
+        ["+0", "+0"],
+        ["+6", "+6"],
+        ["+12", "+12"],
+        ["+16", "+16"],
+        ["+18", "+18"],
+    ]
+    legal_age = models.CharField(null=True, choices=AGE_CHOICES,
+                                 default='+0')
     duration = models.DurationField(null=True)
     techs = models.ManyToManyField('MovieTech')
     genres = models.ManyToManyField('MovieGenre')
-    released = models.DateField()
+    released = models.DateField(null=True)
     participants = models.ManyToManyField('MovieParticipant')
-    # countries = models.CharField(max_length=255, null=True)
+    COUNTRY_CHOICES = [
+        [1, "Украина"],
+        [2, "США"],
+        [3, "Германия"],
+        [4, "Франция"],
+        [5, "Великобритания"],
+    ]
+    countries = CountryField(multiple=True, blank=True)
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.DO_NOTHING,
                                    null=True)
+    objects = MovieManager()
 
     class Meta:
         verbose_name = "Movie"

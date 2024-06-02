@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _
 from pytils.translit import slugify
 
 from src.core.schemas.base import MessageOutSchema
+from src.core.services.core import CoreService
 from src.core.services.gallery import GalleryService
 from src.core.services.images import ImageService
 from injector import inject
@@ -18,17 +19,22 @@ class CinemaService:
     """
 
     @inject
-    def __init__(self, image_service: ImageService,
+    def __init__(self,
+                 image_service: ImageService,
+                 core_service: CoreService,
                  gallery_service: GalleryService):
         self.image_service = image_service
         self.gallery_service = gallery_service
+        self.core_service = core_service
 
     def create(self, schema: CinemaInSchema) -> Cinema:
         """
         Create cinema.
         """
-        self.check_cnm_name_unique(schema.name_uk)
-        self.check_cnm_name_unique(schema.name_ru)
+        self.core_service.check_name_unique(value=schema.name_uk,
+                                            model=Cinema)
+        self.core_service.check_name_unique(value=schema.name_ru,
+                                            model=Cinema)
         bodies = [schema.banner, schema.logo, schema.seo_image]
         banner, logo, seo_image = (self.image_service
                                    .bulk_create(schemas=bodies))
@@ -59,8 +65,12 @@ class CinemaService:
         Update cinema.
         """
         cinema = Cinema.objects.get_by_slug(cnm_slug=cnm_slug)
-        self.check_cnm_name_unique(schema.name_uk, cinema)
-        self.check_cnm_name_unique(schema.name_ru, cinema)
+        self.core_service.check_name_unique(value=schema.name_uk,
+                                            instance=cinema,
+                                            model=Cinema)
+        self.core_service.check_name_unique(value=schema.name_ru,
+                                            instance=cinema,
+                                            model=Cinema)
         self.image_service.update(schema.banner, cinema.banner)
         self.image_service.update(schema.logo, cinema.logo)
         self.image_service.update(schema.seo_image, cinema.seo_image)
@@ -90,23 +100,6 @@ class CinemaService:
         """
         cinema = Cinema.objects.all()
         return cinema
-
-    @staticmethod
-    def check_cnm_name_unique(value: str, cinema_obj: Cinema = None) -> bool:
-        """
-        Check name for cinema unique.
-        """
-        if value is not None:
-            cinemas = Cinema.objects.filter(Q(name_uk=value) |
-                                            Q(name_ru=value))
-            if cinemas and cinema_obj:
-                cinemas = cinemas.exclude(id=cinema_obj.id)
-            if cinemas.count():
-                msg = _('Поле name повинно бути унікальним. '
-                        'Ця назва вже зайнята')
-                raise HttpError(409, msg)
-            else:
-                return True
 
     def delete_by_slug(self, cnm_slug: str) -> MessageOutSchema:
         """

@@ -37,6 +37,7 @@ pyjwt = "^2.8.0"
 django-ninja-extra = "^0.20.7"
 ninja-schema = "^0.13.6"
 pytils = "^0.4.1"
+django-countries = "^7.6.1"
 
 [build-system]
 requires = ["poetry-core"]

@@ -39,7 +39,7 @@ class GalleryService:
                     self.image_matches_gallery(gallery, schema.id)
                     img = self.image_service.get_image(schema.id)
                     if schema.delete:
-                        self.image_service.delete_image(img)
+                        self.image_service.delete(img)
                     else:
                         self.image_service.update(schema, img)
                 elif not schema.delete:

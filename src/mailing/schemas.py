@@ -4,7 +4,6 @@ from pydantic import field_validator
 
 from config.settings.settings import ABSOLUTE_URL
 from src.mailing.models import MailTemplate
-from ninja import ModelSchema, Schema
 import ninja_schema
 from django.utils.translation import gettext as _
 
