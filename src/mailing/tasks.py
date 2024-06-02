@@ -30,7 +30,7 @@ def make_mailing(user_ids: List | None, temp_id: int) -> str:
     recipients = [user.email for user in users]
     print(temp.file.path)
     print(temp.file.url)
-    with open(f'media/{temp.file}', 'r') as file:
+    with open(f'/media/{temp.file.path}', 'r') as file:
         html_content = file.read()
     for index, recipient in enumerate(recipients, start=1):
 
