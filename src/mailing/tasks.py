@@ -28,6 +28,8 @@ def make_mailing(user_ids: List | None, temp_id: int) -> str:
     temp = MailTemplate.objects.get(id=temp_id)
 
     recipients = [user.email for user in users]
+    print(temp.file.path)
+    print(temp.file.url)
     with open(f'media/{temp.file}', 'r') as file:
         html_content = file.read()
     for index, recipient in enumerate(recipients, start=1):
