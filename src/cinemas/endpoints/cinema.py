@@ -1,6 +1,3 @@
-# Create your views here.
-from typing import List
-
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate

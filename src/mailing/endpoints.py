@@ -13,7 +13,7 @@ from src.core.utils import CustomJWTAuth
 from src.mailing.models import MailTemplate
 from src.mailing.schemas import (MailTemplateOutSchema, MailingInSchema,
                                  TaskInfoOutSchema)
-from src.mailing.services.mailing_service import MailingService
+from src.mailing.services.mailing import MailingService
 from src.users.services.user_service import UserService
 from ninja_extra.permissions import IsAdminUser
 from ninja_jwt.authentication import JWTAuth
