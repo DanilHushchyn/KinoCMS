@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     'django.contrib.sites',
     "modeltranslation",
-    "debug_toolbar",
+    # "debug_toolbar",
+    "requests_tracker",
     "corsheaders",
     "imagekit",
     "django_extensions",
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     "django_cleanup.apps.CleanupConfig",
     "ninja_extra",
     "meta",
+    'multiselectfield',
     "phonenumber_field",
     'django_countries',
     'src.authz',
@@ -132,7 +134,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    # "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -176,8 +178,7 @@ CELERY_RESULT_SERIALIZER = "json"
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': []
-        ,
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -249,8 +250,8 @@ MODELTRANSLATION_LANGUAGES = ("uk", "ru")
 # MODELTRANSLATION_FALLBACK_LANGUAGES = {'default': ('en',)}
 LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
 STATIC_URL = "/static/"
-# STATIC_ROOT = BASE_DIR / "static"
-# STATICFILES_DIRS = []
+STATIC_ROOT = BASE_DIR / "static"
+STATICFILES_DIRS = []
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")

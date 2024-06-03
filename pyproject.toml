@@ -29,7 +29,6 @@ pytest-django = "^4.8.0"
 loguru = "^0.7.2"
 django-redis = "^5.4.0"
 pendulum = "^3.0.0"
-django-debug-toolbar = "^4.3.0"
 translate = "^3.6.1"
 django-phonenumber-field = {extras = ["phonenumberslite"], version = "^7.3.0"}
 pydantic-extra-types = "^2.7.0"
@@ -38,6 +37,8 @@ django-ninja-extra = "^0.20.7"
 ninja-schema = "^0.13.6"
 pytils = "^0.4.1"
 django-countries = "^7.6.1"
+requests-tracker = "^0.3.3"
+django-multiselectfield = "^0.1.12"
 
 [build-system]
 requires = ["poetry-core"]

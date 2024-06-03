@@ -556,21 +556,6 @@ pyuca = ["pyuca"]
 test = ["djangorestframework", "graphene-django", "pytest", "pytest-cov", "pytest-django"]
 
 [[package]]
-name = "django-debug-toolbar"
-version = "4.3.0"
-description = "A configurable set of panels that display various debug information about the current request/response."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "django_debug_toolbar-4.3.0-py3-none-any.whl", hash = "sha256:e09b7dcb8417b743234dfc57c95a7c1d1d87a88844abd13b4c5387f807b31bf6"},
-    {file = "django_debug_toolbar-4.3.0.tar.gz", hash = "sha256:0b0dddee5ea29b9cb678593bc0d7a6d76b21d7799cb68e091a2148341a80f3c4"},
-]
-
-[package.dependencies]
-django = ">=3.2.4"
-sqlparse = ">=0.2"
-
-[[package]]
 name = "django-environ"
 version = "0.11.2"
 description = "A package that allows you to utilize 12factor inspired environment variables to configure your Django application."
@@ -648,6 +633,20 @@ files = [
 [package.dependencies]
 Django = ">=4.2"
 typing-extensions = {version = ">=4.0.1", markers = "python_version < \"3.11\""}
+
+[[package]]
+name = "django-multiselectfield"
+version = "0.1.12"
+description = "Django multiple select field"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-multiselectfield-0.1.12.tar.gz", hash = "sha256:d0a4c71568fb2332c71478ffac9f8708e01314a35cf923dfd7a191343452f9f9"},
+    {file = "django_multiselectfield-0.1.12-py3-none-any.whl", hash = "sha256:c270faa7f80588214c55f2d68cbddb2add525c2aa830c216b8a198de914eb470"},
+]
+
+[package.dependencies]
+django = ">=1.4"
 
 [[package]]
 name = "django-ninja"
@@ -1901,6 +1900,21 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "requests-tracker"
+version = "0.3.3"
+description = "The Django Requests Tracker is designed for local Django development, particularly for Rest API development. It provides various debugging information, such as SQL queries, headers, and status codes."
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "requests_tracker-0.3.3-py3-none-any.whl", hash = "sha256:31d8924470ceea34be51743142c5248f1bf625d2ff95d1f0dccc2cfe14ecda0b"},
+    {file = "requests_tracker-0.3.3.tar.gz", hash = "sha256:eb288d69ebcae49149b41d603960d101d7eb892627e3455a456fa1f9441d2a49"},
+]
+
+[package.dependencies]
+django = ">=3.2"
+sqlparse = ">=0.4.3"
+
+[[package]]
 name = "rpds-py"
 version = "0.18.1"
 description = "Python bindings to Rust's persistent data structures (rpds)"
@@ -2176,4 +2190,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "9475a5f75ce31330257e78cfe531ebecac98ce8535a5ffdaea4927e45c4a3dfc"
+content-hash = "fe23222c8e1e46dd4be58fef2b3f136c0a5c8f49d66beb29cd713f4fa5ff4a44"

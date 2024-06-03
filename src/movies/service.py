@@ -8,6 +8,7 @@ from src.core.services.images import ImageService
 from src.movies.schemas import *
 from django.utils.translation import gettext as _
 from pytils.translit import slugify
+import inspect
 
 
 class MovieService:
@@ -36,7 +37,6 @@ class MovieService:
         card_img, seo_image = (self.image_service
                                .bulk_create(schemas=bodies))
         gallery = self.gall_service.create(images=schema.gallery)
-
         Movie.objects.create(
             name_uk=schema.name_uk,
             name_ru=schema.name_ru,
@@ -46,6 +46,7 @@ class MovieService:
             gallery=gallery,
             card_img=card_img,
             countries=schema.countries,
+            genres=schema.genres,
             seo_title=schema.seo_title,
             seo_description=schema.seo_description,
             seo_image=seo_image,
@@ -64,19 +65,18 @@ class MovieService:
         self.core_service.check_name_unique(value=schema.name_ru,
                                             instance=movie,
                                             model=Movie)
-        self.image_service.update(schema.banner, movie.banner)
-        self.image_service.update(schema.logo, movie.card_img)
+        self.image_service.update(schema.card_img, movie.card_img)
         self.image_service.update(schema.seo_image, movie.seo_image)
 
         self.gall_service.update(schemas=schema.gallery,
                                  gallery=Movie.gallery)
-        expt_list = ['banner', 'card_img', 'seo_image', 'gallery']
+        expt_list = ['card_img', 'seo_image', 'gallery']
         for attr, value in schema.dict().items():
             if attr not in expt_list and value is not None:
                 setattr(movie, attr, value)
         movie.slug = slugify(movie.name_uk)
         movie.save()
-        return MessageOutSchema(detail=_('Кінотеатр успішно оновлений'))
+        return MessageOutSchema(detail=_('Фільм успішно оновлений'))
 
     #
     @staticmethod
@@ -85,6 +85,10 @@ class MovieService:
         Get movie by slug.
         """
         movie = Movie.objects.get_by_slug(mv_slug=mv_slug)
+
+        # print(Movie.objects.filter(genres__contains='1,').count())
+        # keys = [key for key in movie.genres]
+        # print(keys)
         return movie
 
     @staticmethod
@@ -94,6 +98,16 @@ class MovieService:
         """
         movie = Movie.objects.all()
         return movie
+
+    @staticmethod
+    def get_genres() -> List:
+        """
+        Get all genres for movie.
+        """
+        keys = [k for k, v in Movie.GENRES_CHOICES]
+        print(keys)
+        genres = Movie.GENRES_CHOICES
+        return genres
 
     def delete_by_slug(self, mv_slug: str) -> MessageOutSchema:
         """

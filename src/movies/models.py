@@ -1,9 +1,14 @@
+from enum import Enum
+
 from django.db import models
 
 from src.core.models import Seo
 from src.movies.manager import MovieManager
+from django.utils.translation import gettext as _
 
 from django_countries.fields import CountryField
+
+from src.movies.utils import MultiSelectField
 
 
 class MovieTech(models.Model):
@@ -56,6 +61,21 @@ class MovieParticipant(models.Model):
         db_table = 'movie_participants'
 
 
+# class Genres(Enum):
+#     COMEDY = ('comedy', _('Комедія'))
+#     FANTASY = ('fantasy', _('Фантастика'))
+#     HORROR = ('horror', _('Жахи'))
+#     ACTION = ('action', _('Бойовик'))
+#     MELODRAMAS = ('melodramas', _('Мелодрами'))
+#     THRILLER = ('thriller', _('Трилер'))
+#     MYSTICISM = ('mysticism', _('Містика'))
+#     DETECTIVE = ('detective', _('Детектив'))
+#
+#     @classmethod
+#     def choices(cls):
+#         return tuple((i.value, i.name) for i in cls)
+
+
 class Movie(Seo):
     slug = models.SlugField(db_index=True, unique=True, null=True)
     name = models.CharField(max_length=60)
@@ -79,16 +99,21 @@ class Movie(Seo):
                                  default='+0')
     duration = models.DurationField(null=True)
     techs = models.ManyToManyField('MovieTech')
-    genres = models.ManyToManyField('MovieGenre')
     released = models.DateField(null=True)
     participants = models.ManyToManyField('MovieParticipant')
-    COUNTRY_CHOICES = [
-        [1, "Украина"],
-        [2, "США"],
-        [3, "Германия"],
-        [4, "Франция"],
-        [5, "Великобритания"],
+    GENRES_CHOICES = [
+        ['comedy', _("Комедія")],
+        ['fantasy', _("Фантастика")],
+        ['horror', _("Жахи")],
+        ['action', _("Бойовик")],
+        ['melodramas', _("Мелодрами")],
+        ['thriller', _("Трилер")],
+        ['mysticism', _("Містика")],
+        ['detective', _("Детектив")],
     ]
+    genres = MultiSelectField(choices=GENRES_CHOICES,
+                              min_choices=1,
+                              max_length=255, null=True)
     countries = CountryField(multiple=True, blank=True)
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.DO_NOTHING,

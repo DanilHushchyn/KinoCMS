@@ -91,8 +91,12 @@ urlpatterns = [
     path('api/', admin_api.urls)
 ]
 if settings.DEBUG:
+    settings.INSTALLED_APPS += ["requests_tracker"]
+    settings.MIDDLEWARE += ["requests_tracker.middleware.requests_tracker_middleware"]
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
-    urlpatterns += [
-        path("__debug__/", include("debug_toolbar.urls")),
-    ]
+    # urlpatterns += [
+    #     path("__debug__/", include("debug_toolbar.urls")),
+    # ]
+    urlpatterns += [path("__requests_tracker__/", include("requests_tracker.urls"))]
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

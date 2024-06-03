@@ -35,6 +35,39 @@ class MovieController(ControllerBase):
         self.movie_service = movie_service
 
     @http_get(
+        "/genres/",
+        response=PaginatedResponseSchema[List],
+        openapi_extra={
+            "responses": {
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    @paginate()
+    def get_genres(
+            self,
+            request: HttpRequest,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> List:
+        """
+        Get genres for input.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.movie_service.get_genres()
+        return result
+
+    @http_get(
         "/countries/",
         response=PaginatedResponseSchema[List],
         openapi_extra={
@@ -160,8 +193,8 @@ class MovieController(ControllerBase):
     @http_patch(
         "/{mv_slug}/",
         response=MessageOutSchema,
-        permissions=[IsAdminUser()],
-        auth=CustomJWTAuth(),
+        # permissions=[IsAdminUser()],
+        # auth=CustomJWTAuth(),
         openapi_extra={
             "responses": {
                 403: {
@@ -265,8 +298,8 @@ class MovieController(ControllerBase):
     @http_delete(
         "/{mv_slug}/",
         response=MessageOutSchema,
-        permissions=[IsAdminUser()],
-        auth=CustomJWTAuth(),
+        # permissions=[IsAdminUser()],
+        # auth=CustomJWTAuth(),
         openapi_extra={
             "responses": {
                 404: {
