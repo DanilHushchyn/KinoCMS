@@ -8,9 +8,10 @@ from ninja import ModelSchema
 from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 
+from src.core.schemas.seo import SeoInSchema
 from src.core.schemas.gallery import GalleryItemSchema
 from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
-from src.core.utils import validate_capitalized
+from src.core.utils import validate_capitalized, validate_max_length
 
 
 class CinemaInSchema(ninja_schema.ModelSchema):
@@ -27,6 +28,20 @@ class CinemaInSchema(ninja_schema.ModelSchema):
                 'description, seo_title, seo_description)')
         validate_capitalized(value, msg)
         return value
+
+    @ninja_schema.model_validator('name_uk', 'name_ru')
+    def clean_name_max_length(cls, name: str) -> str:
+        validate_max_length(available=100,
+                            current=len(name),
+                            field_name='name')
+        return name
+
+    @ninja_schema.model_validator('description_uk', 'description_ru')
+    def clean_description_max_length(cls, description: str) -> str:
+        validate_max_length(available=2000,
+                            current=len(description),
+                            field_name='description')
+        return description
 
     banner: ImageInSchema
     logo: ImageInSchema
@@ -119,4 +134,4 @@ class CinemaUpdateSchema(CinemaInSchema):
             'seo_image',
             'seo_description',
         ]
-        optional = '__all__'
+        # optional = '__all__'

@@ -25,6 +25,7 @@ class MovieManager(models.Manager):
             movie = (self.model.objects
                      .select_related('card_img',
                                      'seo_image', 'gallery')
+                     .prefetch_related('participants')
                      .get(slug=mv_slug))
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів фільмів '

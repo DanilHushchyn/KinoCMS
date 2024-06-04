@@ -1,23 +1,9 @@
-from enum import Enum
-
 from django.db import models
-
 from src.core.models import Seo
 from src.movies.manager import MovieManager
 from django.utils.translation import gettext as _
-
 from django_countries.fields import CountryField
-
 from src.movies.utils import MultiSelectField
-
-
-class MovieTech(models.Model):
-    name = models.CharField(max_length=60)
-
-    class Meta:
-        verbose_name = "MovieTech"
-        verbose_name_plural = "MovieTechs"
-        db_table = 'movie_techs'
 
 
 class MovieGenre(models.Model):
@@ -30,7 +16,7 @@ class MovieGenre(models.Model):
 
 
 class MovieParticipantPerson(models.Model):
-    fullname = models.CharField(max_length=255)
+    fullname = models.CharField(max_length=255, null=True)
 
     class Meta:
         verbose_name = "MovieParticipant"
@@ -39,7 +25,7 @@ class MovieParticipantPerson(models.Model):
 
 
 class MovieParticipantRole(models.Model):
-    name = models.CharField(max_length=60)
+    name = models.CharField(max_length=60, null=True)
 
     class Meta:
         verbose_name = "MovieParticipantRole"
@@ -56,24 +42,11 @@ class MovieParticipant(models.Model):
                              null=True)
 
     class Meta:
+        ordering = ['-id']
+        unique_together = ('person', 'role',)
         verbose_name = "MovieParticipant"
         verbose_name_plural = "MovieParticipants"
         db_table = 'movie_participants'
-
-
-# class Genres(Enum):
-#     COMEDY = ('comedy', _('Комедія'))
-#     FANTASY = ('fantasy', _('Фантастика'))
-#     HORROR = ('horror', _('Жахи'))
-#     ACTION = ('action', _('Бойовик'))
-#     MELODRAMAS = ('melodramas', _('Мелодрами'))
-#     THRILLER = ('thriller', _('Трилер'))
-#     MYSTICISM = ('mysticism', _('Містика'))
-#     DETECTIVE = ('detective', _('Детектив'))
-#
-#     @classmethod
-#     def choices(cls):
-#         return tuple((i.value, i.name) for i in cls)
 
 
 class Movie(Seo):
@@ -97,10 +70,6 @@ class Movie(Seo):
     ]
     legal_age = models.CharField(null=True, choices=AGE_CHOICES,
                                  default='+0')
-    duration = models.DurationField(null=True)
-    techs = models.ManyToManyField('MovieTech')
-    released = models.DateField(null=True)
-    participants = models.ManyToManyField('MovieParticipant')
     GENRES_CHOICES = [
         ['comedy', _("Комедія")],
         ['fantasy', _("Фантастика")],
@@ -111,16 +80,32 @@ class Movie(Seo):
         ['mysticism', _("Містика")],
         ['detective', _("Детектив")],
     ]
+    duration = models.DurationField(null=True)
+    released = models.DateField(null=True)
+    participants = models.ManyToManyField('MovieParticipant')
+    TECHS_CHOICES = [
+        ['3d', "3D"],
+        ['2d', "2D"],
+        ['imax', "IMAX"],
+        ['4dx', "4DX"],
+        ['5d', "5D"],
+    ]
+    techs = MultiSelectField(choices=TECHS_CHOICES,
+                             min_choices=1,
+                             max_length=255, null=True)
+
     genres = MultiSelectField(choices=GENRES_CHOICES,
                               min_choices=1,
                               max_length=255, null=True)
     countries = CountryField(multiple=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True,null=True)
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.DO_NOTHING,
                                    null=True)
     objects = MovieManager()
 
     class Meta:
+        ordering = ['-date_created']
         verbose_name = "Movie"
         verbose_name_plural = "Movies"
         db_table = 'movies'

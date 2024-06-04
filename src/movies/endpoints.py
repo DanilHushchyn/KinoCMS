@@ -1,11 +1,10 @@
 from typing import Any, Tuple
 
+from django.db.models import QuerySet
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.schemas.response import PaginatedResponseSchema
-
-from src.movies.models import Movie
 from src.core.schemas.base import LangEnum, MessageOutSchema
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_post, http_patch, http_delete
@@ -68,6 +67,39 @@ class MovieController(ControllerBase):
         return result
 
     @http_get(
+        "/techs/",
+        response=PaginatedResponseSchema[List],
+        openapi_extra={
+            "responses": {
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    @paginate()
+    def get_techs(
+            self,
+            request: HttpRequest,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> List:
+        """
+        Get techs for input.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.movie_service.get_techs()
+        return result
+
+    @http_get(
         "/countries/",
         response=PaginatedResponseSchema[List],
         openapi_extra={
@@ -99,38 +131,72 @@ class MovieController(ControllerBase):
         """
         return list(COUNTRIES.items())
 
-    # @http_get(
-    #     "/all-cards/",
-    #     response=PaginatedResponseSchema[movieCardOutSchema],
-    #     openapi_extra={
-    #         "responses": {
-    #             422: {
-    #                 "description": "Error: Unprocessable Entity",
-    #             },
-    #             500: {
-    #                 "description": "Internal server error "
-    #                                "if an unexpected error occurs.",
-    #             },
-    #         },
-    #     },
-    # )
-    # @paginate()
-    # def get_movie_cards(
-    #         self,
-    #         request: HttpRequest,
-    #         accept_lang: LangEnum =
-    #         Header(alias="Accept-Language",
-    #                default="uk"),
-    # ) -> movie:
-    #     """
-    #     Get all movie cards.
-    #
-    #     Returns:
-    #       - **200**: Success response with the data.
-    #       - **500**: Internal server error if an unexpected error occurs.
-    #     """
-    #     result = self.movie_service.get_all()
-    #     return result
+    @http_get(
+        "/participants/",
+        response=PaginatedResponseSchema[MovieParticipantOutSchema],
+        openapi_extra={
+            "responses": {
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    @paginate()
+    def get_participants(
+            self,
+            request: HttpRequest,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> QuerySet:
+        """
+        Get participants for input.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.movie_service.get_participants()
+        return result
+
+    @http_get(
+        "/all-cards/",
+        response=PaginatedResponseSchema[MovieCardOutSchema],
+        openapi_extra={
+            "responses": {
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    @paginate()
+    def get_cards(
+            self,
+            request: HttpRequest,
+            release: ReleaseEnum = ReleaseEnum.Current,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default='uk'),
+    ) -> QuerySet:
+        """
+        Get all movie cards.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.movie_service.get_all(release=release.value)
+        return result
 
     @http_post(
         "/",
@@ -216,7 +282,7 @@ class MovieController(ControllerBase):
             },
         },
     )
-    def update_movie(
+    def update(
             self,
             request: HttpRequest,
             mv_slug: str,

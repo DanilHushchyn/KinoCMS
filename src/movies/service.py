@@ -1,6 +1,5 @@
 from django.db.models import QuerySet
 from injector import inject
-
 from src.core.schemas.base import MessageOutSchema
 from src.core.services.core import CoreService
 from src.core.services.gallery import GalleryService
@@ -8,7 +7,6 @@ from src.core.services.images import ImageService
 from src.movies.schemas import *
 from django.utils.translation import gettext as _
 from pytils.translit import slugify
-import inspect
 
 
 class MovieService:
@@ -37,20 +35,25 @@ class MovieService:
         card_img, seo_image = (self.image_service
                                .bulk_create(schemas=bodies))
         gallery = self.gall_service.create(images=schema.gallery)
-        Movie.objects.create(
+        movie = Movie.objects.create(
             name_uk=schema.name_uk,
             name_ru=schema.name_ru,
             slug=slugify(schema.name_uk),
             description_uk=schema.description_uk,
             description_ru=schema.description_ru,
             gallery=gallery,
+            year=schema.year,
+            duration=schema.duration,
             card_img=card_img,
+            released=schema.released,
             countries=schema.countries,
             genres=schema.genres,
             seo_title=schema.seo_title,
             seo_description=schema.seo_description,
             seo_image=seo_image,
         )
+        movie.participants.set(schema.participants)
+        movie.save()
         return MessageOutSchema(detail=_('Фільм успішно створений'))
 
     def update(self, mv_slug: str, schema: MovieUpdateSchema) \
@@ -70,10 +73,13 @@ class MovieService:
 
         self.gall_service.update(schemas=schema.gallery,
                                  gallery=Movie.gallery)
-        expt_list = ['card_img', 'seo_image', 'gallery']
+        expt_list = ['card_img', 'seo_image', 'gallery', 'participants']
         for attr, value in schema.dict().items():
             if attr not in expt_list and value is not None:
                 setattr(movie, attr, value)
+
+        if schema.participants is not None:
+            movie.participants.set(schema.participants)
         movie.slug = slugify(movie.name_uk)
         movie.save()
         return MessageOutSchema(detail=_('Фільм успішно оновлений'))
@@ -92,11 +98,16 @@ class MovieService:
         return movie
 
     @staticmethod
-    def get_all() -> QuerySet:
+    def get_all(release: str) -> QuerySet:
         """
         Get all movies.
         """
-        movie = Movie.objects.all()
+        movie = Movie.objects.select_related('card_img').all()
+        today = datetime.date.today()
+        if release == 'current':
+            movie = movie.filter(released__lte=today)
+        else:
+            movie = movie.filter(released__gte=today)
         return movie
 
     @staticmethod
@@ -104,10 +115,26 @@ class MovieService:
         """
         Get all genres for movie.
         """
-        keys = [k for k, v in Movie.GENRES_CHOICES]
-        print(keys)
+        # keys = [k for k, v in Movie.GENRES_CHOICES]
+        # print(keys)
         genres = Movie.GENRES_CHOICES
         return genres
+
+    @staticmethod
+    def get_techs() -> List:
+        """
+        Get all techs for movie.
+        """
+        genres = Movie.TECHS_CHOICES
+        return genres
+
+    @staticmethod
+    def get_participants() -> QuerySet:
+        """
+        Get all participants for movie.
+        """
+        participants = MovieParticipant.objects.all()
+        return participants
 
     def delete_by_slug(self, mv_slug: str) -> MessageOutSchema:
         """

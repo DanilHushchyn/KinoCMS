@@ -22,6 +22,13 @@ def validate_capitalized(value, msg):
         raise HttpError(403, msg)
 
 
+def validate_max_length(available, current, field_name):
+    if current > available:
+        msg = (f'Max length expected for field {field_name} '
+               f'is {available} but got {current} ')
+        raise HttpError(403, msg)
+
+
 def get_timestamp_path(instance: object, filename) -> str:
     """
     Make unique naming of files in directory media.

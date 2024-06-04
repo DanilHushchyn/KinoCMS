@@ -176,4 +176,3 @@ class UserOutSchema(ModelSchema):
             "address",
             "is_superuser",
             "birthday", ]
-        # fields_optional = "__all__"
