@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-24 07:45+0300\n"
+"POT-Creation-Date: 2024-06-05 17:05+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,16 +21,57 @@ msgstr ""
 "100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
 "(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: config/admin_urls.py:44 config/kino_urls.py:38
+#: config/admin_urls.py:58 config/kino_urls.py:38
 msgid "Не авторизований"
 msgstr ""
 
-#: media/MailTemplate/1716493179.180941.html:13
-msgid "Кинотеатры"
+#: src/cinemas/endpoints/cinema.py:127
+msgid "Кінотеатр успішно створений"
 msgstr ""
 
-#: media/MailTemplate/1716493179.180941.html:25
-msgid "Список текущих кинотеатров"
+#: src/cinemas/endpoints/cinema.py:189 src/cinemas/services/cinema.py:86
+msgid "Кінотеатр успішно оновлений"
+msgstr ""
+
+#: src/cinemas/endpoints/hall.py:191 src/cinemas/services/hall.py:69
+msgid "Зал успішно оновлений"
+msgstr ""
+
+#: src/cinemas/managers/cinema.py:32
+msgid "Не знайдено: немає збігів кінотеатрів на заданному запиті."
+msgstr ""
+
+#: src/cinemas/managers/hall.py:31
+msgid "Не знайдено: немає збігів залів на заданному запиті."
+msgstr ""
+
+#: src/cinemas/schemas/cinema.py:24 src/movies/schemas.py:56
+msgid ""
+"Недійсне значення (не написане великими літерами). З великих літер повинні "
+"починатися (name, description, seo_title, seo_description)"
+msgstr ""
+
+#: src/cinemas/schemas/hall.py:21
+msgid ""
+"Недійсне значення (не написане великими літерами). З великих літер повинні "
+"починатися (description, seo_title, seo_description)"
+msgstr ""
+
+#: src/cinemas/services/cinema.py:119
+msgid "Кінотеатр успішно видалений"
+msgstr ""
+
+#: src/cinemas/services/hall.py:48
+msgid "Зал успішно створений"
+msgstr ""
+
+#: src/cinemas/services/hall.py:82
+msgid ""
+"Поле number повинно бути унікальним по відношенню до конкретного кінотеатру. "
+msgstr ""
+
+#: src/cinemas/services/hall.py:121
+msgid "Зал успішно видалений"
 msgstr ""
 
 #: src/core/managers/gallery.py:24
@@ -41,41 +82,118 @@ msgstr ""
 msgid "Не знайдено: немає збігів картинок на заданному запиті."
 msgstr ""
 
-#: src/core/services/images.py:20
+#: src/core/schemas/gallery.py:74 src/core/schemas/images.py:36
+#: src/core/schemas/images.py:101
 #, python-brace-format
-msgid "Дозволено відправляти тільки {self.image_types}"
+msgid "Дозволено відправляти тільки {image_types}"
 msgstr ""
 
-#: src/core/services/images.py:23 src/mailing/services/mailing_service.py:89
+#: src/core/schemas/images.py:46 src/core/services/images.py:36
+msgid "Невірний формат base64 був відправлений"
+msgstr ""
+
+#: src/core/services/core.py:27
+msgid "Поле name повинно бути унікальним. Ця назва вже зайнята"
+msgstr ""
+
+#: src/core/services/images.py:39
+msgid "Файл пошкоджений"
+msgstr ""
+
+#: src/core/services/images.py:41 src/mailing/services/mailing.py:89
 msgid "Максимально дозволений розмір файлу 1MB"
 msgstr ""
 
-#: src/core/services/images.py:49
-msgid "Картинка успішно видалена"
-msgstr ""
-
-#: src/mailing/schemas.py:48 src/mailing/services/mailing_service.py:105
+#: src/mailing/schemas.py:47 src/mailing/services/mailing.py:105
 msgid "Не знайдено: немає збігів шаблонів на заданному запиті"
 msgstr ""
 
-#: src/mailing/services/mailing_service.py:40
+#: src/mailing/services/mailing.py:42
 msgid "Треба зачекати поки закінчиться поточне розсилання"
 msgstr ""
 
-#: src/mailing/services/mailing_service.py:42
+#: src/mailing/services/mailing.py:44
 msgid "Розсилання почалося"
 msgstr ""
 
-#: src/mailing/services/mailing_service.py:64
+#: src/mailing/services/mailing.py:58
+msgid "Розсилання успішно виконане"
+msgstr ""
+
+#: src/mailing/services/mailing.py:67
 msgid "На теперішній час розсилання не активне"
 msgstr ""
 
-#: src/mailing/services/mailing_service.py:86
+#: src/mailing/services/mailing.py:86
 msgid "Дозволено відправляти тільки html"
 msgstr ""
 
-#: src/mailing/services/mailing_service.py:109
+#: src/mailing/services/mailing.py:111
+msgid "Не можна видаляти шаблони поки йде розсилання."
+msgstr ""
+
+#: src/mailing/services/mailing.py:114
 msgid "Шаблон успішно видалений"
+msgstr ""
+
+#: src/movies/manager.py:31
+msgid "Не знайдено: немає збігів фільмів на заданному запиті."
+msgstr ""
+
+#: src/movies/models.py:83
+msgid "Комедія"
+msgstr ""
+
+#: src/movies/models.py:84
+msgid "Фантастика"
+msgstr ""
+
+#: src/movies/models.py:85
+msgid "Жахи"
+msgstr ""
+
+#: src/movies/models.py:86
+msgid "Бойовик"
+msgstr ""
+
+#: src/movies/models.py:87
+msgid "Мелодрами"
+msgstr ""
+
+#: src/movies/models.py:88
+msgid "Трилер"
+msgstr ""
+
+#: src/movies/models.py:89
+msgid "Містика"
+msgstr ""
+
+#: src/movies/models.py:90
+msgid "Детектив"
+msgstr ""
+
+#: src/movies/schemas.py:72
+msgid "Expected min year is 1984 "
+msgstr ""
+
+#: src/movies/schemas.py:85 src/movies/schemas.py:98 src/movies/schemas.py:110
+msgid "List should contain any of "
+msgstr ""
+
+#: src/movies/schemas.py:123
+msgid "Not Found: No MovieParticipant"
+msgstr ""
+
+#: src/movies/service.py:61
+msgid "Фільм успішно створений"
+msgstr ""
+
+#: src/movies/service.py:89
+msgid "Фільм успішно оновлений"
+msgstr ""
+
+#: src/movies/service.py:158
+msgid "Фільм успішно видалений"
 msgstr ""
 
 #: src/users/managers/user_manager.py:96 src/users/managers/user_manager.py:113

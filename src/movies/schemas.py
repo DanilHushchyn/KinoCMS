@@ -5,7 +5,7 @@ from typing import List
 import ninja_schema
 from ninja.errors import HttpError
 
-from src.movies.models import Movie, MovieParticipant
+from src.movies.models import Movie, MovieParticipant, TECHS_CHOICES
 from ninja import ModelSchema
 from django.utils.translation import gettext as _
 
@@ -26,7 +26,7 @@ CountryEnum = Enum(
 )
 TechsEnum = Enum(
     "TechsEnum",
-    [(value, key) for key, value in Movie.TECHS_CHOICES],
+    [(value, key) for key, value in TECHS_CHOICES],
     type=str,
 )
 
@@ -92,7 +92,7 @@ class MovieInSchema(ninja_schema.ModelSchema):
     def clean_techs(cls, techs) -> List[str]:
         techs = set(techs)
         result = []
-        keys = [str(key) for key, value in Movie.TECHS_CHOICES]
+        keys = [str(key) for key, value in TECHS_CHOICES]
         for tech in techs:
             if tech not in keys:
                 msg = _(f'List should contain any of '
@@ -140,6 +140,7 @@ class MovieInSchema(ninja_schema.ModelSchema):
             'participants',
             'released',
             'countries',
+            'trailer_link',
             'legal_age',
             'card_img',
             'gallery',
@@ -172,8 +173,10 @@ class MovieOutSchema(ModelSchema):
     seo_image: ImageOutSchema
     genres_display: str
     genres: List[str]
+    techs: List[str]
     countries: List[str]
     countries_display: str
+    techs_display: str
 
     @staticmethod
     def resolve_genres(obj: Movie) -> List[str]:
@@ -183,8 +186,19 @@ class MovieOutSchema(ModelSchema):
         return result
 
     @staticmethod
+    def resolve_techs(obj: Movie) -> List[str]:
+        result = []
+        for tech in obj.techs:
+            result.append(tech)
+        return result
+
+    @staticmethod
     def resolve_genres_display(obj: Movie) -> str:
         return str(obj.genres)
+
+    @staticmethod
+    def resolve_techs_display(obj: Movie) -> str:
+        return str(obj.techs)
 
     @staticmethod
     def resolve_countries(obj: Movie) -> List[str]:
@@ -200,14 +214,17 @@ class MovieOutSchema(ModelSchema):
 
     class Meta:
         model = Movie
-        fields = ['name',
-                  'description',
+        fields = ['name_uk',
+                  'name_ru',
+                  'description_uk',
+                  'description_ru',
                   'gallery',
                   'slug',
                   'genres',
                   'duration',
                   'legal_age',
                   'year',
+                  'techs',
                   'released',
                   'participants',
                   'countries',

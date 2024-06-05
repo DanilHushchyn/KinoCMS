@@ -1,51 +1,42 @@
 from typing import List
-
 import ninja_schema
-from django.db.models import Q
-
-from src.cinemas.models import Cinema
+from src.cinemas.models import Hall
 from ninja import ModelSchema
 from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 from src.core.schemas.gallery import GalleryItemSchema
 from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
-from src.core.utils import validate_capitalized, validate_max_length
+from src.core.utils import validate_capitalized
+from src.movies.models import TECHS_CHOICES
 
 
-class CinemaInSchema(ninja_schema.ModelSchema):
+class HallInSchema(ninja_schema.ModelSchema):
     """
-    Pydantic schema for creating cinemas to server side.
+    Pydantic schema for creating halls to server side.
     """
 
-    @ninja_schema.model_validator('name_uk', 'name_ru',
-                                  'description_uk', 'description_ru',
+    @ninja_schema.model_validator('description_uk', 'description_ru',
                                   'seo_title', 'seo_description')
     def clean_capitalize(cls, value) -> int:
         msg = _('Недійсне значення (не написане великими літерами). '
-                'З великих літер повинні починатися (name, '
+                'З великих літер повинні починатися ('
                 'description, seo_title, seo_description)')
         validate_capitalized(value, msg)
         return value
 
     banner: ImageInSchema
-    logo: ImageInSchema
     seo_image: ImageInSchema
     gallery: List[ImageInSchema] = None
 
     class Config:
-        model = Cinema
+        model = Hall
         include = [
-            'name_uk',
-            'name_ru',
+            'number',
             'description_uk',
             'description_ru',
-            'logo',
-            'terms_uk',
-            'terms_ru',
             'gallery',
             'banner',
-            'address',
-            'coordinate',
+            'tech',
             'seo_title',
             'seo_image',
             'seo_description',
@@ -53,69 +44,65 @@ class CinemaInSchema(ninja_schema.ModelSchema):
         optional = ['gallery', ]
 
 
-class CinemaCardOutSchema(ModelSchema):
+class HallCardOutSchema(ModelSchema):
     """
-    Pydantic schema for showing cinema card.
+    Pydantic schema for showing hall card.
     """
-    banner: ImageOutSchema
 
     class Meta:
-        model = Cinema
-        fields = ['name',
-                  'banner',
-                  'slug', ]
+        model = Hall
+        fields = ['number',
+                  'date_created',
+                  'id', ]
 
 
-class CinemaOutSchema(ModelSchema):
+class HallOutSchema(ModelSchema):
     """
-    Pydantic schema for showing cinema full data.
+    Pydantic schema for showing hall full data.
     """
     banner: ImageOutSchema
-    logo: ImageOutSchema
     seo_image: ImageOutSchema
+    tech_display: str
+
+    @staticmethod
+    def resolve_tech_display(obj: Hall) -> str:
+        tech_display = dict(TECHS_CHOICES)[obj.tech]
+        return tech_display
+
+    @staticmethod
+    def resolve_tech(obj: Hall) -> str:
+        return obj.tech
 
     class Meta:
-        model = Cinema
-        fields = ['name_uk',
-                  'name_ru',
+        model = Hall
+        fields = ['number',
                   'description_uk',
                   'description_ru',
-                  'logo',
-                  'terms',
                   'gallery',
                   'banner',
-                  'slug',
-                  'address',
-                  'coordinate',
+                  'id',
+                  'tech',
                   'seo_title',
                   'seo_image',
                   'seo_description',
                   ]
 
 
-class CinemaUpdateSchema(CinemaInSchema):
+class HallUpdateSchema(HallInSchema):
     """
-    Pydantic schema for updating cinema.
+    Pydantic schema for updating hall.
     """
-
     banner: ImageUpdateSchema = None
-    logo: ImageUpdateSchema = None
     seo_image: ImageUpdateSchema = None
     gallery: List[GalleryItemSchema] = None
 
-    class Config(CinemaInSchema.Config):
+    class Config(HallInSchema.Config):
         include = [
-            'name_uk',
-            'name_ru',
+            'number',
             'description_uk',
             'description_ru',
-            'logo',
-            'terms_uk',
-            'terms_ru',
             'gallery',
             'banner',
-            'address',
-            'coordinate',
             'seo_title',
             'seo_image',
             'seo_description',

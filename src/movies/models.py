@@ -33,6 +33,15 @@ class MovieParticipantRole(models.Model):
         db_table = 'movie_participant_roles'
 
 
+TECHS_CHOICES = [
+    ['3d', "3D"],
+    ['2d', "2D"],
+    ['imax', "IMAX"],
+    ['4dx', "4DX"],
+    ['5d', "5D"],
+]
+
+
 class MovieParticipant(models.Model):
     person = models.ForeignKey(MovieParticipantPerson,
                                on_delete=models.CASCADE,
@@ -51,7 +60,7 @@ class MovieParticipant(models.Model):
 
 class Movie(Seo):
     slug = models.SlugField(db_index=True, unique=True, null=True)
-    name = models.CharField(max_length=60)
+    name = models.CharField(max_length=60, unique=True)
     description = models.TextField(max_length=2000)
     card_img = models.OneToOneField('core.Image',
                                     related_name='movie_card',
@@ -83,13 +92,7 @@ class Movie(Seo):
     duration = models.DurationField(null=True)
     released = models.DateField(null=True)
     participants = models.ManyToManyField('MovieParticipant')
-    TECHS_CHOICES = [
-        ['3d', "3D"],
-        ['2d', "2D"],
-        ['imax', "IMAX"],
-        ['4dx', "4DX"],
-        ['5d', "5D"],
-    ]
+
     techs = MultiSelectField(choices=TECHS_CHOICES,
                              min_choices=1,
                              max_length=255, null=True)
@@ -98,7 +101,7 @@ class Movie(Seo):
                               min_choices=1,
                               max_length=255, null=True)
     countries = CountryField(multiple=True, blank=True)
-    date_created = models.DateTimeField(auto_now_add=True,null=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.DO_NOTHING,
                                    null=True)

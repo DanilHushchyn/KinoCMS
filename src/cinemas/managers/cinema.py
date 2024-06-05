@@ -26,9 +26,10 @@ class CinemaManager(models.Manager):
             cinema = (self.model.objects
                       .select_related('seo_image', 'logo',
                                       'banner', 'gallery')
+                      .prefetch_related('hall_set')
                       .get(slug=cnm_slug))
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів кінотеатрів '
                     'на заданному запиті.')
-            raise HttpError(403, msg)
+            raise HttpError(404, msg)
         return cinema

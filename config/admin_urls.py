@@ -26,6 +26,7 @@ from ninja.errors import AuthenticationError, ValidationError
 from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController
 from src.cinemas.endpoints.cinema import CinemaController
+from src.cinemas.endpoints.hall import HallController
 from src.core.endpoints.gallery import GalleryController
 from src.core.endpoints.images import ImageController
 from src.mailing.endpoints import MailingController
@@ -44,6 +45,7 @@ admin_api.register_controllers(MailingController)
 admin_api.register_controllers(GalleryController)
 admin_api.register_controllers(CinemaController)
 admin_api.register_controllers(MovieController)
+admin_api.register_controllers(HallController)
 
 
 # admin_api.register_controllers(UsersKinoController)

@@ -1,7 +1,10 @@
 from django.db import models
 
 from src.cinemas.managers.cinema import CinemaManager
+from src.cinemas.managers.hall import HallManager
 from src.core.models import Seo
+from src.movies.models import TECHS_CHOICES
+from src.movies.utils import MultiSelectField
 
 
 # Create your models here.
@@ -35,7 +38,6 @@ class Cinema(Seo):
 
 class Hall(Seo):
     number = models.CharField(max_length=60)
-    slug = models.SlugField(db_index=True, unique=True, null=True)
     description = models.TextField(max_length=2000, null=True)
     banner = models.OneToOneField('core.Image', related_name='hall_bnr',
                                   on_delete=models.DO_NOTHING,
@@ -50,6 +52,11 @@ class Hall(Seo):
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.DO_NOTHING,
                                    null=True)
+
+    tech = models.CharField(choices=TECHS_CHOICES,
+                            default='3d',
+                            max_length=25, null=True)
+    objects = HallManager()
 
     class Meta:
         verbose_name = "Hall"

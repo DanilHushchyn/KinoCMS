@@ -1,10 +1,14 @@
-from typing import Any, Tuple
-
-from django.db.models import QuerySet
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.schemas.response import PaginatedResponseSchema
+
+from src.cinemas.models import Hall
+from src.cinemas.schemas.hall import (HallInSchema,
+                                      HallCardOutSchema,
+                                      HallUpdateSchema,
+                                      HallOutSchema)
+from src.cinemas.services.hall import HallService
 from src.core.schemas.base import LangEnum, MessageOutSchema
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_post, http_patch, http_delete
@@ -12,161 +16,28 @@ from ninja import Header
 from django.utils.translation import gettext as _
 
 from src.core.utils import CustomJWTAuth
-from src.movies.schemas import *
-from src.movies.service import MovieService
 
 
-@api_controller("/movie", tags=["movies"])
-class MovieController(ControllerBase):
+@api_controller("/hall", tags=["halls"])
+class HallController(ControllerBase):
     """
-    A controller class for managing movie in system.
+    A controller class for managing hall in system.
 
     This class provides endpoints for
-    get, post, update, delete movie in the site
+    get, post, update, delete hall in the site
     """
 
-    def __init__(self, movie_service: MovieService):
+    def __init__(self, hall_service: HallService):
         """
-        Use this method to inject "services" to MovieController.
+        Use this method to inject "services" to HallController.
 
-        :param movie_service: variable for managing movies
+        :param hall_service: variable for managing halls
         """
-        self.movie_service = movie_service
-
-    @http_get(
-        "/genres/",
-        response=PaginatedResponseSchema[List],
-        openapi_extra={
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
-        },
-    )
-    @paginate()
-    def get_genres(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
-    ) -> List:
-        """
-        Get genres for input.
-
-        Returns:
-          - **200**: Success response with the data.
-          - **500**: Internal server error if an unexpected error occurs.
-        """
-        result = self.movie_service.get_genres()
-        return result
-
-    @http_get(
-        "/techs/",
-        response=PaginatedResponseSchema[List],
-        openapi_extra={
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
-        },
-    )
-    @paginate()
-    def get_techs(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
-    ) -> List:
-        """
-        Get techs for input.
-
-        Returns:
-          - **200**: Success response with the data.
-          - **500**: Internal server error if an unexpected error occurs.
-        """
-        result = self.movie_service.get_techs()
-        return result
-
-    @http_get(
-        "/countries/",
-        response=PaginatedResponseSchema[List],
-        openapi_extra={
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
-        },
-    )
-    @paginate()
-    def get_countries(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
-    ) -> list[tuple[str, Any]]:
-        """
-        Get countries for input.
-
-        Returns:
-          - **200**: Success response with the data.
-          - **500**: Internal server error if an unexpected error occurs.
-        """
-        return list(COUNTRIES.items())
-
-    @http_get(
-        "/participants/",
-        response=PaginatedResponseSchema[MovieParticipantOutSchema],
-        openapi_extra={
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
-        },
-    )
-    @paginate()
-    def get_participants(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
-    ) -> QuerySet:
-        """
-        Get participants for input.
-
-        Returns:
-          - **200**: Success response with the data.
-          - **500**: Internal server error if an unexpected error occurs.
-        """
-        result = self.movie_service.get_participants()
-        return result
+        self.hall_service = hall_service
 
     @http_get(
         "/all-cards/",
-        response=PaginatedResponseSchema[MovieCardOutSchema],
+        response=PaginatedResponseSchema[HallCardOutSchema],
         openapi_extra={
             "responses": {
                 422: {
@@ -180,22 +51,22 @@ class MovieController(ControllerBase):
         },
     )
     @paginate()
-    def get_cards(
+    def get_hall_cards(
             self,
             request: HttpRequest,
-            release: ReleaseEnum = ReleaseEnum.Current,
+            cnm_slug: str,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
-                   default='uk'),
-    ) -> QuerySet:
+                   default="uk"),
+    ) -> Hall:
         """
-        Get all movie cards.
+        Get all hall cards.
 
         Returns:
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.movie_service.get_all(release=release.value)
+        result = self.hall_service.get_all(cnm_slug=cnm_slug)
         return result
 
     @http_post(
@@ -221,26 +92,27 @@ class MovieController(ControllerBase):
             },
         },
     )
-    def create(
+    def create_hall(
             self,
             request: HttpRequest,
-            body: MovieInSchema,
+            body: HallInSchema,
+            cnm_slug: str,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
     ) -> MessageOutSchema:
         """
-        Create movie.
+        Create hall.
 
         Please provide:
-          - **body**  body for creating new movie
+          - **body**  body for creating new hall
 
         Returns:
           - **200**: Success response with the data.
           - **403**: Error: Forbidden. \n
             Причини: \n
                 1) Недійсне значення (не написане великими літерами).
-                   З великих літер повинні починатися (name, description,
+                   З великих літер повинні починатися (description,
                    seo_title, seo_description) \n
           - **409**: Error: Conflict.
             Причини: \n
@@ -248,16 +120,16 @@ class MovieController(ControllerBase):
           - **422**: Error: Unprocessable Entity. \n
             Причини: \n
                 1) Максимальни довжина description 2000 символів \n
-                2) Максимальни довжина name 100 символів \n
+                2) Максимальни довжина number 60 символів \n
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.movie_service.create(schema=body)
+        result = self.hall_service.create(schema=body, cnm_slug=cnm_slug)
         return result
 
     @http_patch(
-        "/{mv_slug}/",
+        "/{hall_id}/",
         response=MessageOutSchema,
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
@@ -282,27 +154,27 @@ class MovieController(ControllerBase):
             },
         },
     )
-    def update(
+    def update_hall(
             self,
             request: HttpRequest,
-            mv_slug: str,
-            body: MovieUpdateSchema,
+            hall_id: int,
+            body: HallUpdateSchema,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
     ) -> MessageOutSchema:
         """
-        Update movie by slug.
+        Update hall.
 
         Please provide:
-          - **body**  body for creating new movie
+          - **body**  body for creating new hall
 
         Returns:
           - **200**: Success response with the data.
           - **403**: Error: Forbidden. \n
             Причини: \n
                 1) Недійсне значення (не написане великими літерами).
-                   З великих літер повинні починатися (name, description,
+                   З великих літер повинні починатися (description,
                    seo_title, seo_description) \n
           - **409**: Error: Conflict. \n
             Причини: \n
@@ -310,17 +182,17 @@ class MovieController(ControllerBase):
           - **422**: Error: Unprocessable Entity. \n
             Причини: \n
                 1) Максимальни довжина description 2000 символів \n
-                2) Максимальни довжина name 100 символів \n
+                2) Максимальни довжина number 60 символів \n
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.movie_service.update(mv_slug=mv_slug, schema=body)
-        return result
+        self.hall_service.update(hall_id=hall_id, schema=body)
+        return MessageOutSchema(detail=_('Зал успішно оновлений'))
 
     @http_get(
-        "/{mv_slug}/",
-        response=MovieOutSchema,
+        "/{hall_id}/",
+        response=HallOutSchema,
         openapi_extra={
             "responses": {
                 404: {
@@ -336,33 +208,33 @@ class MovieController(ControllerBase):
             },
         },
     )
-    def get_by_slug(
+    def get_by_id(
             self,
             request: HttpRequest,
-            mv_slug: str,
+            hall_id: int,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
-    ) -> Movie:
+    ) -> Hall:
         """
-        Get movie by slug.
+        Create hall.
 
         Please provide:
-          - **mv_slug**  slug of movie
+          - **hall_id**  id of hall
 
         Returns:
           - **200**: Success response with the data.
           - **404**: Error: Forbidden. \n
             Причини: \n
-                1) Не знайдено: немає збігів фільмів
+                1) Не знайдено: немає збігів залів
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.movie_service.get_by_slug(mv_slug=mv_slug)
+        result = self.hall_service.get_by_id(hall_id=hall_id)
         return result
 
     @http_delete(
-        "/{mv_slug}/",
+        "/{hall_id}/",
         response=MessageOutSchema,
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
@@ -384,24 +256,24 @@ class MovieController(ControllerBase):
     def delete_by_slug(
             self,
             request: HttpRequest,
-            mv_slug: str,
+            hall_id: int,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
     ) -> MessageOutSchema:
         """
-        Delete movie by slug.
+        Delete hall by id.
 
         Please provide:
-          - **mv_slug**  slug of movie
+          - **hall_id**  id of hall
 
         Returns:
           - **200**: Success response with the data.
           - **404**: Error: Forbidden. \n
             Причини: \n
-                1) Не знайдено: немає збігів фільмів
+                1) Не знайдено: немає збігів залів
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.movie_service.delete_by_slug(mv_slug=mv_slug)
+        result = self.hall_service.delete_by_id(hall_id=hall_id)
         return result

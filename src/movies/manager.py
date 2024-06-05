@@ -30,5 +30,5 @@ class MovieManager(models.Manager):
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів фільмів '
                     'на заданному запиті.')
-            raise HttpError(403, msg)
+            raise HttpError(404, msg)
         return movie
