@@ -37,6 +37,7 @@ class MovieController(ControllerBase):
         "/genres/",
         response=PaginatedResponseSchema[List],
         openapi_extra={
+            "operationId": "get_cinema_genres",
             "responses": {
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -49,7 +50,7 @@ class MovieController(ControllerBase):
         },
     )
     @paginate()
-    def get_genres(
+    def get_cinema_genres(
             self,
             request: HttpRequest,
             accept_lang: LangEnum =
@@ -70,6 +71,7 @@ class MovieController(ControllerBase):
         "/techs/",
         response=PaginatedResponseSchema[List],
         openapi_extra={
+            "operationId": "get_techs",
             "responses": {
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -103,6 +105,7 @@ class MovieController(ControllerBase):
         "/countries/",
         response=PaginatedResponseSchema[List],
         openapi_extra={
+            "operationId": "get_countries",
             "responses": {
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -135,6 +138,7 @@ class MovieController(ControllerBase):
         "/participants/",
         response=PaginatedResponseSchema[MovieParticipantOutSchema],
         openapi_extra={
+            "operationId": "get_participants",
             "responses": {
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -168,6 +172,7 @@ class MovieController(ControllerBase):
         "/all-cards/",
         response=PaginatedResponseSchema[MovieCardOutSchema],
         openapi_extra={
+            "operationId": "get_all_movie_cards",
             "responses": {
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -180,7 +185,7 @@ class MovieController(ControllerBase):
         },
     )
     @paginate()
-    def get_cards(
+    def get_all_movie_cards(
             self,
             request: HttpRequest,
             release: ReleaseEnum = ReleaseEnum.Current,
@@ -204,6 +209,7 @@ class MovieController(ControllerBase):
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
+            "operationId": "create_movie",
             "responses": {
                 403: {
                     "description": "Error: Forbidden",
@@ -221,7 +227,7 @@ class MovieController(ControllerBase):
             },
         },
     )
-    def create(
+    def create_movie(
             self,
             request: HttpRequest,
             body: MovieInSchema,
@@ -262,6 +268,7 @@ class MovieController(ControllerBase):
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
+            "operationId": "update_movie",
             "responses": {
                 403: {
                     "description": "Error: Forbidden",
@@ -282,7 +289,7 @@ class MovieController(ControllerBase):
             },
         },
     )
-    def update(
+    def update_movie(
             self,
             request: HttpRequest,
             mv_slug: str,
@@ -322,6 +329,7 @@ class MovieController(ControllerBase):
         "/{mv_slug}/",
         response=MovieOutSchema,
         openapi_extra={
+            "operationId": "get_movie_by_slug",
             "responses": {
                 404: {
                     "description": "Error: Not Found",
@@ -336,7 +344,7 @@ class MovieController(ControllerBase):
             },
         },
     )
-    def get_by_slug(
+    def get_movie_by_slug(
             self,
             request: HttpRequest,
             mv_slug: str,
@@ -367,6 +375,7 @@ class MovieController(ControllerBase):
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
+            "operationId": "delete_movie_by_slug",
             "responses": {
                 404: {
                     "description": "Error: Not Found",
@@ -381,7 +390,7 @@ class MovieController(ControllerBase):
             },
         },
     )
-    def delete_by_slug(
+    def delete_movie_by_slug(
             self,
             request: HttpRequest,
             mv_slug: str,

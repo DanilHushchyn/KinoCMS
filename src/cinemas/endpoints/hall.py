@@ -39,6 +39,7 @@ class HallController(ControllerBase):
         "/all-cards/",
         response=PaginatedResponseSchema[HallCardOutSchema],
         openapi_extra={
+            "operationId": "get_all_hall_cards",
             "responses": {
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -51,7 +52,7 @@ class HallController(ControllerBase):
         },
     )
     @paginate()
-    def get_hall_cards(
+    def get_all_hall_cards(
             self,
             request: HttpRequest,
             cnm_slug: str,
@@ -75,6 +76,7 @@ class HallController(ControllerBase):
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
+            "operationId": "create_hall",
             "responses": {
                 403: {
                     "description": "Error: Forbidden",
@@ -134,6 +136,7 @@ class HallController(ControllerBase):
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
+            "operationId": "update_hall",
             "responses": {
                 403: {
                     "description": "Error: Forbidden",
@@ -194,6 +197,7 @@ class HallController(ControllerBase):
         "/{hall_id}/",
         response=HallOutSchema,
         openapi_extra={
+            "operationId": "get_hall_by_id",
             "responses": {
                 404: {
                     "description": "Error: Not Found",
@@ -208,7 +212,7 @@ class HallController(ControllerBase):
             },
         },
     )
-    def get_by_id(
+    def get_hall_by_id(
             self,
             request: HttpRequest,
             hall_id: int,
@@ -239,6 +243,7 @@ class HallController(ControllerBase):
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
+            "operationId": "delete_hall_by_slug",
             "responses": {
                 404: {
                     "description": "Error: Not Found",
@@ -253,7 +258,7 @@ class HallController(ControllerBase):
             },
         },
     )
-    def delete_by_slug(
+    def delete_hall_by_slug(
             self,
             request: HttpRequest,
             hall_id: int,

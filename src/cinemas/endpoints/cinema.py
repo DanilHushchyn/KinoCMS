@@ -39,6 +39,7 @@ class CinemaController(ControllerBase):
         "/all-cards/",
         response=PaginatedResponseSchema[CinemaCardOutSchema],
         openapi_extra={
+            "operationId": "get_all_cinema_cards",
             "responses": {
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -51,7 +52,7 @@ class CinemaController(ControllerBase):
         },
     )
     @paginate()
-    def get_cinema_cards(
+    def get_all_cinema_cards(
             self,
             request: HttpRequest,
             accept_lang: LangEnum =
@@ -74,6 +75,7 @@ class CinemaController(ControllerBase):
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
+            "operationId": "create_cinema",
             "responses": {
                 403: {
                     "description": "Error: Forbidden",
@@ -132,6 +134,7 @@ class CinemaController(ControllerBase):
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
+            "operationId": "update_cinema",
             "responses": {
                 403: {
                     "description": "Error: Forbidden",
@@ -192,6 +195,7 @@ class CinemaController(ControllerBase):
         "/{cnm_slug}/",
         response=CinemaOutSchema,
         openapi_extra={
+            "operationId": "get_cinema_by_slug",
             "responses": {
                 404: {
                     "description": "Error: Not Found",
@@ -206,7 +210,7 @@ class CinemaController(ControllerBase):
             },
         },
     )
-    def get_by_slug(
+    def get_cinema_by_slug(
             self,
             request: HttpRequest,
             cnm_slug: str,
@@ -237,6 +241,7 @@ class CinemaController(ControllerBase):
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
+            "operationId": "delete_cinema_by_slug",
             "responses": {
                 404: {
                     "description": "Error: Not Found",
@@ -251,7 +256,7 @@ class CinemaController(ControllerBase):
             },
         },
     )
-    def delete_by_slug(
+    def delete_cinema_by_slug(
             self,
             request: HttpRequest,
             cnm_slug: str,
