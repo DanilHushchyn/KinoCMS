@@ -56,7 +56,7 @@ class Command(BaseCommand):
 
     @classmethod
     def _create_users(cls):
-        if User.objects.none():
+        if not User.objects.exists():
             users = []
             for i in range(100):
                 first_name = cls._fake_en.first_name()
