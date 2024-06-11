@@ -13,7 +13,7 @@ from django.utils.translation import gettext as _
 import loguru
 from ninja.security import HttpBearer
 from ninja_jwt.authentication import JWTBaseAuthentication
-
+from pydantic_core._pydantic_core import Url
 from src.users.models import User
 
 
@@ -76,3 +76,6 @@ class CustomJWTAuth(JWTBaseAuthentication, HttpBearer):
             request.user = user
             return user
         return self.jwt_authenticate(request, token)
+
+
+primitives = (bool, str, int, float, Url)

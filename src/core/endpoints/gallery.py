@@ -6,7 +6,7 @@ from ninja_extra.controllers.base import api_controller, ControllerBase
 
 from src.core.models import Gallery
 from src.core.schemas.base import LangEnum
-from src.core.schemas.gallery import GalleryInSchema, GalleryMinOutSchema, GalleryOutSchema, GalleryItemOutSchema
+from src.core.schemas.gallery import GalleryItemOutSchema
 from src.core.schemas.images import ImageOutSchema
 from src.core.services.gallery import GalleryService
 from ninja_extra.permissions import IsAdminUser
@@ -38,6 +38,8 @@ class GalleryController(ControllerBase):
         # permissions=[IsAdminUser()],
         # auth=JWTAuth(),
         openapi_extra={
+            "operationId": "get_gallery_by_id",
+
             "responses": {
                 404: {
                     "description": "Error: Not Found",
@@ -52,7 +54,7 @@ class GalleryController(ControllerBase):
             },
         },
     )
-    def get_gallery(
+    def get_gallery_by_id(
             self,
             request: HttpRequest,
             gallery_id: int,

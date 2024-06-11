@@ -43,7 +43,7 @@ class MovieService:
             description_ru=schema.description_ru,
             gallery=gallery,
             year=schema.year,
-            legal_age=schema.legal_age,
+            legal_age=schema.legal_age.value,
             duration=schema.duration,
             budget=schema.budget,
             trailer_link=schema.trailer_link,
@@ -115,6 +115,14 @@ class MovieService:
         return movie
 
     @staticmethod
+    def get_legal_ages() -> List:
+        """
+        Get all legal age choices for movie.
+        """
+        ages = Movie.AGE_CHOICES
+        return ages
+
+    @staticmethod
     def get_genres() -> List:
         """
         Get all genres for movie.
@@ -129,7 +137,7 @@ class MovieService:
         """
         Get all techs for movie.
         """
-        genres = Movie.TECHS_CHOICES
+        genres = TECHS_CHOICES
         return genres
 
     @staticmethod

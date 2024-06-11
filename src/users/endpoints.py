@@ -44,7 +44,7 @@ class UsersAdminController(ControllerBase):
         permissions=[IsAdminUser()],
         response=UserOutSchema,
         openapi_extra={
-            "operationId": "update_by_id",
+            "operationId": "update_user_by_id",
             "responses": {
                 403: {
                     "description": "Error: Forbidden",
@@ -59,7 +59,7 @@ class UsersAdminController(ControllerBase):
             },
         },
     )
-    def update_by_id(
+    def update_user_by_id(
             self,
             request: HttpRequest,
             user_id: int,
@@ -99,7 +99,7 @@ class UsersAdminController(ControllerBase):
         auth=CustomJWTAuth(),
         permissions=[IsAdminUser()],
         openapi_extra={
-            "operationId": "get_by_id",
+            "operationId": "get_user_by_id",
             "responses": {
                 404: {
                     "description": "Error: Conflict",
@@ -113,7 +113,7 @@ class UsersAdminController(ControllerBase):
             },
         },
     )
-    def get_by_id(
+    def get_user_by_id(
             self,
             request: HttpRequest,
             user_id: int,
@@ -145,7 +145,7 @@ class UsersAdminController(ControllerBase):
         permissions=[IsAdminUser()],
         response=MessageOutSchema,
         openapi_extra={
-            "operationId": "delete_by_id",
+            "operationId": "delete_user_by_id",
             "responses": {
                 404: {
                     "description": "Error: Conflict",
@@ -159,7 +159,7 @@ class UsersAdminController(ControllerBase):
             },
         },
     )
-    def delete_by_id(
+    def delete_user_by_id(
             self,
             request: HttpRequest,
             user_id: int,
@@ -191,7 +191,7 @@ class UsersAdminController(ControllerBase):
         auth=CustomJWTAuth(),
         permissions=[IsAdminUser()],
         openapi_extra={
-            "operationId": "datatable",
+            "operationId": "users_datatable",
             "responses": {
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -203,7 +203,7 @@ class UsersAdminController(ControllerBase):
         },
     )
     @paginate()
-    def datatable(
+    def users_datatable(
             self,
             request: HttpRequest,
             search_line: str = None,

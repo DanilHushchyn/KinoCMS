@@ -34,10 +34,10 @@ class MovieController(ControllerBase):
         self.movie_service = movie_service
 
     @http_get(
-        "/genres/",
+        "/legal-ages/",
         response=PaginatedResponseSchema[List],
         openapi_extra={
-            "operationId": "get_cinema_genres",
+            "operationId": "get_movie_legal_ages",
             "responses": {
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -50,7 +50,41 @@ class MovieController(ControllerBase):
         },
     )
     @paginate()
-    def get_cinema_genres(
+    def get_movie_legal_ages(
+            self,
+            request: HttpRequest,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> List:
+        """
+        Get movie legal ages for input.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.movie_service.get_legal_ages()
+        return result
+
+    @http_get(
+        "/genres/",
+        response=PaginatedResponseSchema[List],
+        openapi_extra={
+            "operationId": "get_movie_genres",
+            "responses": {
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    @paginate()
+    def get_movie_genres(
             self,
             request: HttpRequest,
             accept_lang: LangEnum =

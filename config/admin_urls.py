@@ -31,6 +31,7 @@ from src.core.endpoints.gallery import GalleryController
 from src.core.endpoints.images import ImageController
 from src.mailing.endpoints import MailingController
 from src.movies.endpoints import MovieController
+from src.pages.endpoints.banners_sliders import SliderController
 from src.users.endpoints import UsersAdminController
 from django.core.cache import cache
 
@@ -46,6 +47,7 @@ admin_api.register_controllers(GalleryController)
 admin_api.register_controllers(CinemaController)
 admin_api.register_controllers(MovieController)
 admin_api.register_controllers(HallController)
+admin_api.register_controllers(SliderController)
 
 
 # admin_api.register_controllers(UsersKinoController)

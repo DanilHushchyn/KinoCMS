@@ -39,6 +39,7 @@ pytils = "^0.4.1"
 django-countries = "^7.6.1"
 requests-tracker = "^0.3.3"
 django-multiselectfield = "^0.1.12"
+matplotlib = "^3.9.0"
 
 [build-system]
 requires = ["poetry-core"]

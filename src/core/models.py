@@ -10,16 +10,15 @@ from src.core.utils import get_timestamp_path
 # Create your models here.
 class Seo(models.Model):
     # url = models.URLField()
-    seo_title = models.CharField(max_length=60, null=True)
+    seo_title = models.CharField(max_length=60)
     seo_description = models.CharField(max_length=160,
-                                       null=True,
                                        validators=
                                        [MinLengthValidator(50)])
 
     seo_image = models.ForeignKey('core.Image',
-                                     on_delete=models.DO_NOTHING,
-                                     null=True,
-                                     related_query_name='seo_img')
+                                  on_delete=models.DO_NOTHING,
+                                  null=True,
+                                  related_query_name='seo_img')
 
     class Meta:
         abstract = True

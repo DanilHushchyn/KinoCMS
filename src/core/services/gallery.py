@@ -36,8 +36,8 @@ class GalleryService:
         if schemas:
             for schema in schemas:
                 if schema.id:
-                    self.image_matches_gallery(gallery, schema.id)
                     img = self.image_service.get_image(schema.id)
+                    self.image_matches_gallery(gallery, schema.id)
                     if schema.delete:
                         self.image_service.delete(img)
                     else:

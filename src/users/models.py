@@ -21,14 +21,14 @@ class User(AbstractUser):
     some methods for creating users
     """
 
-    first_name = models.CharField(max_length=255, null=True)
-    last_name = models.CharField(max_length=255, null=True)
-    nickname = models.CharField(max_length=255, null=True)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    nickname = models.CharField(max_length=255)
     username = (None,)
-    man = models.BooleanField(default=True)
-    phone_number = PhoneNumberField(null=True)
+    man = models.BooleanField()
+    phone_number = PhoneNumberField()
     email = models.EmailField(max_length=255, unique=True)
-    address = models.CharField(max_length=255, null=True)
+    address = models.CharField(max_length=255)
     CITIES_CHOICES = [
       ["інше", _("Інше")],
       ["київ", _("Київ")],
@@ -56,9 +56,8 @@ class User(AbstractUser):
       ["тернопіль", _("Тернопіль")],
       ["луцьк", _("Луцьк")],
     ]
-
-    city = models.CharField(max_length=255, choices=CITIES_CHOICES, default=0)
-    birthday = models.DateField(null=True)
+    city = models.CharField(max_length=255, choices=CITIES_CHOICES)
+    birthday = models.DateField()
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
     objects = CustomUserManager()

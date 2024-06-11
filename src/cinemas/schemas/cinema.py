@@ -1,7 +1,8 @@
-from typing import List
+from typing import List, Any
 
 import ninja_schema
 from django.db.models import Q
+from pydantic.fields import Field
 
 from src.cinemas.models import Cinema
 from ninja import ModelSchema
@@ -10,6 +11,7 @@ from django.utils.translation import gettext as _
 from src.core.schemas.gallery import GalleryItemSchema
 from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
 from src.core.utils import validate_capitalized, validate_max_length
+from pydantic import BaseModel, Json, ValidationError
 
 
 class CinemaInSchema(ninja_schema.ModelSchema):
@@ -31,25 +33,17 @@ class CinemaInSchema(ninja_schema.ModelSchema):
     logo: ImageInSchema
     seo_image: ImageInSchema
     gallery: List[ImageInSchema] = None
+    name_uk: str = Field(max_length=100)
+    name_ru: str = Field(max_length=100)
+    description_uk: str = Field(max_length=2000)
+    description_ru: str = Field(max_length=2000)
+    terms_uk: Json[Any]
+    terms_ru: Json[Any]
 
     class Config:
         model = Cinema
-        include = [
-            'name_uk',
-            'name_ru',
-            'description_uk',
-            'description_ru',
-            'logo',
-            'terms_uk',
-            'terms_ru',
-            'gallery',
-            'banner',
-            'address',
-            'coordinate',
-            'seo_title',
-            'seo_image',
-            'seo_description',
-        ]
+        exclude = ['id', 'name', 'description',
+                   'terms', 'slug', 'date_created']
         optional = ['gallery', ]
 
 
@@ -76,47 +70,21 @@ class CinemaOutSchema(ModelSchema):
 
     class Meta:
         model = Cinema
-        fields = ['name_uk',
-                  'name_ru',
-                  'description_uk',
-                  'description_ru',
-                  'logo',
-                  'terms',
-                  'gallery',
-                  'banner',
-                  'slug',
-                  'address',
-                  'coordinate',
-                  'seo_title',
-                  'seo_image',
-                  'seo_description',
-                  ]
+        exclude = ['id', 'name', 'description',
+                   'terms', 'slug', 'date_created']
 
 
 class CinemaUpdateSchema(CinemaInSchema):
     """
     Pydantic schema for updating cinema.
     """
-
     banner: ImageUpdateSchema = None
     logo: ImageUpdateSchema = None
     seo_image: ImageUpdateSchema = None
     gallery: List[GalleryItemSchema] = None
 
-    class Config(CinemaInSchema.Config):
-        include = [
-            'name_uk',
-            'name_ru',
-            'description_uk',
-            'description_ru',
-            'logo',
-            'terms_uk',
-            'terms_ru',
-            'gallery',
-            'banner',
-            'address',
-            'coordinate',
-            'seo_title',
-            'seo_image',
-            'seo_description',
-        ]
+    class Config:
+        model = Cinema
+        exclude = ['id', 'name', 'description',
+                   'terms', 'slug', 'date_created']
+        optional = "__all__"

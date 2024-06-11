@@ -24,8 +24,8 @@ class ImageService:
 
     @staticmethod
     def check_image(image_base64: str, filename: str):
-        name, extension = filename.split('.')
         try:
+            name, extension = filename.split('.')
             head, image_base64 = image_base64.split(',')
             img_obj = b64decode(image_base64, validate=True)
             if extension != 'svg':

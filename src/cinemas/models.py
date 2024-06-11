@@ -9,10 +9,10 @@ from src.movies.utils import MultiSelectField
 
 # Create your models here.
 class Cinema(Seo):
-    name = models.CharField(max_length=100, unique=True, null=True)
+    name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True, db_index=True, null=True)
-    description = models.TextField(max_length=2000, null=True)
-    terms = models.JSONField(null=True)
+    description = models.TextField(max_length=20000)
+    terms = models.JSONField()
     banner = models.OneToOneField('core.Image',
                                   related_name='cin_bnr',
                                   on_delete=models.DO_NOTHING,
@@ -21,8 +21,8 @@ class Cinema(Seo):
                                 on_delete=models.DO_NOTHING,
                                 related_name='logo',
                                 null=True)
-    address = models.TextField(max_length=2000, null=True)
-    coordinate = models.CharField(max_length=2000, null=True)
+    address = models.TextField(max_length=2000)
+    coordinate = models.URLField(max_length=2000)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.DO_NOTHING,
@@ -38,7 +38,7 @@ class Cinema(Seo):
 
 class Hall(Seo):
     number = models.CharField(max_length=60)
-    description = models.TextField(max_length=2000, null=True)
+    description = models.TextField(max_length=20_000, null=True)
     banner = models.OneToOneField('core.Image', related_name='hall_bnr',
                                   on_delete=models.DO_NOTHING,
                                   null=True)
@@ -54,8 +54,7 @@ class Hall(Seo):
                                    null=True)
 
     tech = models.CharField(choices=TECHS_CHOICES,
-                            default='3d',
-                            max_length=25, null=True)
+                            max_length=25)
     objects = HallManager()
 
     class Meta:

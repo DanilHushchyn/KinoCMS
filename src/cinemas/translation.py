@@ -6,7 +6,7 @@ from src.cinemas.models import Cinema, Hall
 
 @register(Cinema)
 class CinemaTranslationOptions(TranslationOptions):
-    fields = ("name", "description", "terms")
+    fields = ("name", "description", "terms", 'address')
     required_languages = ("uk", "ru")
 
 

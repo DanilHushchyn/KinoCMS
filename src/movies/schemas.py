@@ -4,6 +4,7 @@ from typing import List
 
 import ninja_schema
 from ninja.errors import HttpError
+from pydantic.fields import Field
 
 from src.movies.models import Movie, MovieParticipant, TECHS_CHOICES
 from ninja import ModelSchema
@@ -65,6 +66,10 @@ class MovieInSchema(ninja_schema.ModelSchema):
     countries: List[CountryEnum]
     genres: List[GenresEnum]
     techs: List[TechsEnum]
+    name_uk: str = Field(max_length=60)
+    name_ru: str = Field(max_length=60)
+    description_uk: str = Field(max_length=2000)
+    description_ru: str = Field(max_length=2000)
 
     @ninja_schema.model_validator('year')
     def clean_year(cls, year) -> int:
@@ -186,6 +191,12 @@ class MovieOutSchema(ModelSchema):
         return result
 
     @staticmethod
+    def resolve_legal_age(obj: Movie) -> str:
+        legal_age_display = dict(Movie.AGE_CHOICES)[obj.legal_age]
+        return legal_age_display
+
+
+    @staticmethod
     def resolve_techs(obj: Movie) -> List[str]:
         result = []
         for tech in obj.techs:
@@ -254,6 +265,9 @@ class MovieUpdateSchema(MovieInSchema):
             'description_ru',
             'countries',
             'duration',
+            'budget',
+            'year',
+            'trailer_link',
             'released',
             'participants',
             'genres',
@@ -262,7 +276,7 @@ class MovieUpdateSchema(MovieInSchema):
             'seo_image',
             'seo_description',
         ]
-        optional = ['gallery', "participants"]
+        optional = "__all__"
 
 
 class MovieParticipantOutSchema(ModelSchema):

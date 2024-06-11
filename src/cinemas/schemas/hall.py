@@ -1,5 +1,7 @@
 from typing import List
 import ninja_schema
+from pydantic.fields import Field
+
 from src.cinemas.models import Hall
 from ninja import ModelSchema
 from ninja.errors import HttpError
@@ -14,7 +16,6 @@ class HallInSchema(ninja_schema.ModelSchema):
     """
     Pydantic schema for creating halls to server side.
     """
-
     @ninja_schema.model_validator('description_uk', 'description_ru',
                                   'seo_title', 'seo_description')
     def clean_capitalize(cls, value) -> int:
@@ -27,6 +28,9 @@ class HallInSchema(ninja_schema.ModelSchema):
     banner: ImageInSchema
     seo_image: ImageInSchema
     gallery: List[ImageInSchema] = None
+
+    description_uk: str = Field(max_length=2000)
+    description_ru: str = Field(max_length=2000)
 
     class Config:
         model = Hall
@@ -107,3 +111,4 @@ class HallUpdateSchema(HallInSchema):
             'seo_image',
             'seo_description',
         ]
+        optional = '__all__'

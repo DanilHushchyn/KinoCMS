@@ -170,7 +170,7 @@ class CinemaController(ControllerBase):
         Please provide:
           - **body**  body for creating new cinema
 
-        Returns:
+        Returns
           - **200**: Success response with the data.
           - **403**: Error: Forbidden. \n
             Причини: \n

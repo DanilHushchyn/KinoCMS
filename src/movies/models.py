@@ -61,15 +61,15 @@ class MovieParticipant(models.Model):
 class Movie(Seo):
     slug = models.SlugField(db_index=True, unique=True, null=True)
     name = models.CharField(max_length=60, unique=True)
-    description = models.TextField(max_length=2000)
+    description = models.TextField(max_length=20_000)
     card_img = models.OneToOneField('core.Image',
                                     related_name='movie_card',
                                     on_delete=models.DO_NOTHING,
                                     null=True)
 
-    trailer_link = models.URLField(null=True)
-    year = models.PositiveIntegerField(null=True)
-    budget = models.PositiveIntegerField(null=True)
+    trailer_link = models.URLField()
+    year = models.PositiveIntegerField()
+    budget = models.PositiveIntegerField()
     AGE_CHOICES = [
         ["+0", "+0"],
         ["+6", "+6"],
@@ -77,7 +77,7 @@ class Movie(Seo):
         ["+16", "+16"],
         ["+18", "+18"],
     ]
-    legal_age = models.CharField(null=True, choices=AGE_CHOICES,
+    legal_age = models.CharField(choices=AGE_CHOICES,
                                  default='+0')
     GENRES_CHOICES = [
         ['comedy', _("Комедія")],
@@ -89,8 +89,8 @@ class Movie(Seo):
         ['mysticism', _("Містика")],
         ['detective', _("Детектив")],
     ]
-    duration = models.DurationField(null=True)
-    released = models.DateField(null=True)
+    duration = models.DurationField()
+    released = models.DateField()
     participants = models.ManyToManyField('MovieParticipant')
 
     techs = MultiSelectField(choices=TECHS_CHOICES,
