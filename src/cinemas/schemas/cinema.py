@@ -35,6 +35,8 @@ class CinemaInSchema(ninja_schema.ModelSchema):
     gallery: List[ImageInSchema] = None
     name_uk: str = Field(max_length=100)
     name_ru: str = Field(max_length=100)
+    address_uk: str = Field(max_length=2000)
+    address_ru: str = Field(max_length=2000)
     description_uk: str = Field(max_length=2000)
     description_ru: str = Field(max_length=2000)
     terms_uk: Json[Any]
@@ -42,7 +44,7 @@ class CinemaInSchema(ninja_schema.ModelSchema):
 
     class Config:
         model = Cinema
-        exclude = ['id', 'name', 'description',
+        exclude = ['id', 'name', 'description', 'address',
                    'terms', 'slug', 'date_created']
         optional = ['gallery', ]
 
@@ -70,7 +72,7 @@ class CinemaOutSchema(ModelSchema):
 
     class Meta:
         model = Cinema
-        exclude = ['id', 'name', 'description',
+        exclude = ['id', 'name', 'description', 'address',
                    'terms', 'slug', 'date_created']
 
 
@@ -85,6 +87,6 @@ class CinemaUpdateSchema(CinemaInSchema):
 
     class Config:
         model = Cinema
-        exclude = ['id', 'name', 'description',
+        exclude = ['id', 'name', 'description', 'address',
                    'terms', 'slug', 'date_created']
         optional = "__all__"
