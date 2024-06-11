@@ -32,6 +32,7 @@ class Command(BaseCommand):
         self._create_halls()
         self._create_participants()
         self._create_movies()
+        self._create_sliders()
 
     @classmethod
     def _create_superuser(cls):
@@ -55,7 +56,7 @@ class Command(BaseCommand):
 
     @classmethod
     def _create_users(cls):
-        if User.objects.count() == 1:
+        if User.objects.none():
             users = []
             for i in range(100):
                 first_name = cls._fake_en.first_name()
@@ -96,13 +97,15 @@ class Command(BaseCommand):
                 TopSliderItem.objects.bulk_create(items)
 
         if not BottomSlider.objects.exists():
-            BottomSlider.objects.create(active=True, speed=30)
+            slider = BottomSlider.objects.create(active=True, speed=30)
             if not BottomSliderItem.objects.exists():
                 items = []
                 for i in range(1, 6):
                     item = BottomSliderItem(
                         url='https://www.youtube.com/',
-                        image=cls._create_image('bottom_slider')
+                        image=cls._create_image('bottom_slider'),
+                        slider=slider,
+
                     )
                     items.append(item)
                 BottomSliderItem.objects.bulk_create(items)
