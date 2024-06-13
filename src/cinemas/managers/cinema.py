@@ -17,7 +17,7 @@ class CinemaManager(models.Manager):
 
     def get_by_slug(self, cnm_slug: str) -> 'Cinema':
         """
-        Get cinema with the given id.
+        Get cinema with the given slug.
         :param cnm_slug: slug of cinema
         :rtype: Cinema
         :return: Cinema model instance

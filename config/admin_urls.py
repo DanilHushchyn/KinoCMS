@@ -32,6 +32,8 @@ from src.core.endpoints.images import ImageController
 from src.mailing.endpoints import MailingController
 from src.movies.endpoints import MovieController
 from src.pages.endpoints.banners_sliders import SliderController
+from src.pages.endpoints.news_promo import NewsPromoController
+from src.pages.endpoints.page import CommonController
 from src.users.endpoints import UsersAdminController
 from django.core.cache import cache
 
@@ -42,15 +44,13 @@ admin_api = NinjaExtraAPI(title='Kino', description='KINO API')
 admin_api.register_controllers(CustomTokenObtainPairController)
 admin_api.register_controllers(UsersAdminController)
 admin_api.register_controllers(MailingController)
-# admin_api.register_controllers(ImageController)
 admin_api.register_controllers(GalleryController)
 admin_api.register_controllers(CinemaController)
 admin_api.register_controllers(MovieController)
 admin_api.register_controllers(HallController)
 admin_api.register_controllers(SliderController)
-
-
-# admin_api.register_controllers(UsersKinoController)
+# admin_api.register_controllers(NewsPromoController)
+# admin_api.register_controllers(CommonController)
 
 
 @admin_api.exception_handler(AuthenticationError)

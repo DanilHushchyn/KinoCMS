@@ -3,43 +3,42 @@ from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.schemas.response import PaginatedResponseSchema
 
-from src.cinemas.models import Cinema
-from src.cinemas.schemas.cinema import (CinemaInSchema,
-                                        CinemaCardOutSchema,
-                                        CinemaUpdateSchema,
-                                        CinemaOutSchema)
-from src.cinemas.services.cinema import CinemaService
+from src.pages.models import NewsPromo
+from src.pages.schemas.news_promo import (NewsPromoInSchema,
+                                          NewsPromoCardOutSchema,
+                                          NewsPromoUpdateSchema,
+                                          NewsPromoOutSchema)
+from src.pages.services.news_promo import NewsPromoService
 from src.core.schemas.base import LangEnum, MessageOutSchema
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_post, http_patch, http_delete
 from ninja import Header
-from django.utils.translation import gettext as _
 
 from src.core.utils import CustomJWTAuth
 
 
-@api_controller("/cinema", tags=["cinemas"])
-class CinemaController(ControllerBase):
+@api_controller("/news_promo", tags=["news_promos"])
+class NewsPromoController(ControllerBase):
     """
-    A controller class for managing cinema in system.
+    A controller class for managing news_promo in system.
 
     This class provides endpoints for
-    get, post, update, delete cinema in the site
+    get, post, update, delete news_promo in the site
     """
 
-    def __init__(self, cinema_service: CinemaService):
+    def __init__(self, news_promo_service: NewsPromoService):
         """
-        Use this method to inject "services" to CinemaController.
+        Use this method to inject "services" to NewsPromoController.
 
-        :param cinema_service: variable for managing cinemas
+        :param news_promo_service: variable for managing news_promos
         """
-        self.cinema_service = cinema_service
+        self.news_promo_service = news_promo_service
 
     @http_get(
         "/all-cards/",
-        response=PaginatedResponseSchema[CinemaCardOutSchema],
+        response=PaginatedResponseSchema[NewsPromoCardOutSchema],
         openapi_extra={
-            "operationId": "get_all_cinema_cards",
+            "operationId": "get_all_news_promo_cards",
             "responses": {
                 422: {
                     "description": "Error: Unprocessable Entity",
@@ -52,21 +51,22 @@ class CinemaController(ControllerBase):
         },
     )
     @paginate()
-    def get_all_cinema_cards(
+    def get_all_news_promo_cards(
             self,
             request: HttpRequest,
+            promo: bool,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
-    ) -> Cinema:
+    ) -> NewsPromo:
         """
-        Get all cinema cards.
+        Get all news_promo cards.
 
         Returns:
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.cinema_service.get_all()
+        result = self.news_promo_service.get_all(promo)
         return result
 
     @http_post(
@@ -75,7 +75,7 @@ class CinemaController(ControllerBase):
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
-            "operationId": "create_cinema",
+            "operationId": "create_news_promo",
             "responses": {
                 403: {
                     "description": "Error: Forbidden",
@@ -93,19 +93,19 @@ class CinemaController(ControllerBase):
             },
         },
     )
-    def create_cinema(
+    def create_news_promo(
             self,
             request: HttpRequest,
-            body: CinemaInSchema,
+            body: NewsPromoInSchema,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
     ) -> MessageOutSchema:
         """
-        Create cinema.
+        Create news_promo.
 
         Please provide:
-          - **body**  body for creating new cinema
+          - **body**  body for creating new news_promo
 
         Returns:
           - **200**: Success response with the data.
@@ -120,21 +120,21 @@ class CinemaController(ControllerBase):
           - **422**: Error: Unprocessable Entity. \n
             Причини: \n
                 1) Максимальни довжина description 20_000 символів \n
-                2) Максимальни довжина name 100 символів \n
+                2) Максимальни довжина name 60 символів \n
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
           - **500**: Internal server error if an unexpected error occurs.
         """
-        self.cinema_service.create(schema=body)
-        return MessageOutSchema(detail=_('Кінотеатр успішно створений'))
+        result = self.news_promo_service.create(schema=body)
+        return result
 
     @http_patch(
-        "/{cnm_slug}/",
+        "/{np_slug}/",
         response=MessageOutSchema,
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
-            "operationId": "update_cinema",
+            "operationId": "update_news_promo",
             "responses": {
                 403: {
                     "description": "Error: Forbidden",
@@ -155,20 +155,20 @@ class CinemaController(ControllerBase):
             },
         },
     )
-    def update_cinema(
+    def update_news_promo(
             self,
             request: HttpRequest,
-            cnm_slug: str,
-            body: CinemaUpdateSchema,
+            np_slug: str,
+            body: NewsPromoUpdateSchema,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
     ) -> MessageOutSchema:
         """
-        Update cinema.
+        Update news_promo.
 
         Please provide:
-          - **body**  body for creating new cinema
+          - **body**  body for creating new news_promo
 
         Returns
           - **200**: Success response with the data.
@@ -183,19 +183,19 @@ class CinemaController(ControllerBase):
           - **422**: Error: Unprocessable Entity. \n
             Причини: \n
                 1) Максимальни довжина description 20_000 символів \n
-                2) Максимальни довжина name 100 символів \n
+                2) Максимальни довжина name 60 символів \n
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
           - **500**: Internal server error if an unexpected error occurs.
         """
-        self.cinema_service.update(cnm_slug=cnm_slug, schema=body)
-        return MessageOutSchema(detail=_('Кінотеатр успішно оновлений'))
+        result = self.news_promo_service.update(np_slug=np_slug, schema=body)
+        return result
 
     @http_get(
-        "/{cnm_slug}/",
-        response=CinemaOutSchema,
+        "/{np_slug}/",
+        response=NewsPromoOutSchema,
         openapi_extra={
-            "operationId": "get_cinema_by_slug",
+            "operationId": "get_news_promo_by_slug",
             "responses": {
                 404: {
                     "description": "Error: Not Found",
@@ -210,38 +210,38 @@ class CinemaController(ControllerBase):
             },
         },
     )
-    def get_cinema_by_slug(
+    def get_news_promo_by_slug(
             self,
             request: HttpRequest,
-            cnm_slug: str,
+            np_slug: str,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
-    ) -> Cinema:
+    ) -> NewsPromo:
         """
-        Create cinema.
+        Create news_promo.
 
-        Please provide:
-          - **cinema_id**  id of cinema
+        Please provide slug:
+          - **news_promo_slug**  slug of news_promo
 
         Returns:
           - **200**: Success response with the data.
           - **404**: Error: Forbidden. \n
             Причини: \n
-                1) Не знайдено: немає збігів кінотеатрів
+                1) Не знайдено: немає збігів новин чи акцій
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.cinema_service.get_by_slug(cnm_slug=cnm_slug)
+        result = self.news_promo_service.get_by_slug(np_slug=np_slug)
         return result
 
     @http_delete(
-        "/{cnm_slug}/",
+        "/{np_slug}/",
         response=MessageOutSchema,
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
-            "operationId": "delete_cinema_by_slug",
+            "operationId": "delete_news_promo_by_slug",
             "responses": {
                 404: {
                     "description": "Error: Not Found",
@@ -256,27 +256,27 @@ class CinemaController(ControllerBase):
             },
         },
     )
-    def delete_cinema_by_slug(
+    def delete_news_promo_by_slug(
             self,
             request: HttpRequest,
-            cnm_slug: str,
+            np_slug: str,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
     ) -> MessageOutSchema:
         """
-        Delete cinema by id.
+        Delete news_promo by slug.
 
         Please provide:
-          - **cinema_id**  id of cinema
+          - **news_promo_slug**  slug of news_promo
 
         Returns:
           - **200**: Success response with the data.
           - **404**: Error: Forbidden. \n
             Причини: \n
-                1) Не знайдено: немає збігів кінотеатрів
+                1) Не знайдено: немає збігів новин чи акцій
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.cinema_service.delete_by_slug(cnm_slug=cnm_slug)
+        result = self.news_promo_service.delete_by_slug(np_slug=np_slug)
         return result

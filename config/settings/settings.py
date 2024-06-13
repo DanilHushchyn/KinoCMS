@@ -121,7 +121,7 @@ NINJA_JWT = {
     "TOKEN_VERIFY_INPUT_SCHEMA": "ninja_jwt.schema.TokenVerifyInputSchema",
 }
 
-NINJA_EXTRA={
+NINJA_EXTRA = {
     'PAGINATION_CLASS': 'ninja_extra.pagination.PageNumberPaginationExtra'
 }
 

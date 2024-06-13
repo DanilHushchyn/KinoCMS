@@ -1,8 +1,7 @@
 from typing import List, Any
 import ninja_schema
-from django.db.models import Q
 from pydantic.fields import Field
-from src.cinemas.models import Cinema
+from src.pages.models import NewsPromo
 from ninja import ModelSchema
 from ninja.errors import HttpError
 from django.utils.translation import gettext as _
@@ -12,9 +11,9 @@ from src.core.utils import validate_capitalized, validate_max_length
 from pydantic import BaseModel, Json, ValidationError
 
 
-class CinemaInSchema(ninja_schema.ModelSchema):
+class NewsPromoInSchema(ninja_schema.ModelSchema):
     """
-    Pydantic schema for creating cinemas to server side.
+    Pydantic schema for creating news and promos to server side.
     """
 
     @ninja_schema.model_validator('name_uk', 'name_ru',
@@ -28,63 +27,56 @@ class CinemaInSchema(ninja_schema.ModelSchema):
         return value
 
     banner: ImageInSchema
-    logo: ImageInSchema
     seo_image: ImageInSchema
     gallery: List[ImageInSchema] = None
     name_uk: str = Field(max_length=100)
     name_ru: str = Field(max_length=100)
-    address_uk: str = Field(max_length=2000)
-    address_ru: str = Field(max_length=2000)
     description_uk: str = Field(max_length=2000)
     description_ru: str = Field(max_length=2000)
-    terms_uk: Json[Any]
-    terms_ru: Json[Any]
 
     class Config:
-        model = Cinema
-        exclude = ['id', 'name', 'description', 'address',
-                   'terms', 'slug', 'date_created']
+        model = NewsPromo
+        exclude = ['id', 'name', 'description',
+                   'slug', 'date_created']
         optional = ['gallery', ]
 
 
-class CinemaCardOutSchema(ModelSchema):
+class NewsPromoCardOutSchema(ModelSchema):
     """
-    Pydantic schema for showing cinema card.
+    Pydantic schema for showing news and promo card.
     """
     banner: ImageOutSchema
 
     class Meta:
-        model = Cinema
+        model = NewsPromo
         fields = ['name',
-                  'banner',
+                  'date_created',
                   'slug', ]
 
 
-class CinemaOutSchema(ModelSchema):
+class NewsPromoOutSchema(ModelSchema):
     """
-    Pydantic schema for showing cinema full data.
+    Pydantic schema for showing news and promo full data.
     """
     banner: ImageOutSchema
-    logo: ImageOutSchema
     seo_image: ImageOutSchema
 
     class Meta:
-        model = Cinema
-        exclude = ['id', 'name', 'description', 'address',
-                   'terms', 'slug', 'date_created']
+        model = NewsPromo
+        exclude = ['id', 'name', 'description',
+                   'slug', 'date_created']
 
 
-class CinemaUpdateSchema(CinemaInSchema):
+class NewsPromoUpdateSchema(NewsPromoInSchema):
     """
-    Pydantic schema for updating cinema.
+    Pydantic schema for updating news and promo.
     """
     banner: ImageUpdateSchema = None
-    logo: ImageUpdateSchema = None
     seo_image: ImageUpdateSchema = None
     gallery: List[GalleryItemSchema] = None
 
     class Config:
-        model = Cinema
-        exclude = ['id', 'name', 'description', 'address',
-                   'terms', 'slug', 'date_created']
+        model = NewsPromo
+        exclude = ['id', 'name', 'description',
+                   'slug', 'date_created']
         optional = "__all__"

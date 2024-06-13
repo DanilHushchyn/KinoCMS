@@ -2,6 +2,8 @@ from django.db import models
 
 from src.core.models import Seo
 from src.pages.managers.bottom_slider_item import BottomSliderItemManager
+from src.pages.managers.news_promo import NewsPromoManager
+from src.pages.managers.page import PageManager
 from src.pages.managers.top_slider_item import TopSliderItemManager
 
 
@@ -9,18 +11,17 @@ from src.pages.managers.top_slider_item import TopSliderItemManager
 class Page(Seo):
     name = models.CharField(max_length=60, unique=True, null=True)
     slug = models.SlugField(unique=True, null=True, db_index=True)
-    content = models.TextField(null=True)
+    content = models.JSONField()
     banner = models.OneToOneField('core.Image',
                                   on_delete=models.DO_NOTHING,
                                   null=True, related_name='page_bnr')
-    active = models.BooleanField(null=True)
-    can_delete = models.BooleanField(null=True)
+    active = models.BooleanField()
+    can_delete = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
-    # seo = models.OneToOneField('core.Seo', on_delete=models.CASCADE,
-    #                            parent_link=True, null=True)
     gallery = models.ForeignKey('core.Gallery',
                                 on_delete=models.DO_NOTHING,
                                 null=True)
+    objects = PageManager()
 
     class Meta:
         verbose_name = 'Page'
@@ -31,23 +32,18 @@ class Page(Seo):
 class NewsPromo(Seo):
     name = models.CharField(max_length=60, unique=True, null=True)
     slug = models.SlugField(unique=True, null=True, db_index=True)
-    content = models.TextField(null=True)
+    description = models.TextField(null=True, max_length=20_000)
     banner = models.OneToOneField('core.Image',
                                   on_delete=models.DO_NOTHING,
                                   null=True, related_name='np_bnr')
-    card_img = models.OneToOneField('core.Image',
-                                    on_delete=models.DO_NOTHING,
-                                    null=True, related_name='np_card')
-    cinema = models.ForeignKey('cinemas.Cinema',
-                               on_delete=models.CASCADE,
-                               null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
-    active = models.BooleanField(null=True)
-    promo = models.BooleanField(null=True)
-    video_link = models.URLField(null=True)
+    active = models.BooleanField()
+    promo = models.BooleanField()
+    video_link = models.URLField()
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.DO_NOTHING,
                                    null=True)
+    objects = NewsPromoManager()
 
     class Meta:
         verbose_name = 'News_Promo'

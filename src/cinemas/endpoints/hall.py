@@ -121,7 +121,7 @@ class HallController(ControllerBase):
                 1) Поле name повинно бути унікальним. Ця назва вже зайнята
           - **422**: Error: Unprocessable Entity. \n
             Причини: \n
-                1) Максимальни довжина description 2000 символів \n
+                1) Максимальни довжина description 20_000 символів \n
                 2) Максимальни довжина number 60 символів \n
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
@@ -184,7 +184,7 @@ class HallController(ControllerBase):
                 1) Поле name повинно бути унікальним. Ця назва вже зайнята
           - **422**: Error: Unprocessable Entity. \n
             Причини: \n
-                1) Максимальни довжина description 2000 символів \n
+                1) Максимальни довжина description 20_000 символів \n
                 2) Максимальни довжина number 60 символів \n
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
