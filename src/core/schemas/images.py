@@ -64,6 +64,7 @@ class ImageOutSchema(ModelSchema):
     def resolve_image(obj: Image):
         print(obj.image.url)
         print(obj.image.path)
+        print(obj.image.size)
         return ABSOLUTE_URL + str(obj.image.url)
 
     @staticmethod
