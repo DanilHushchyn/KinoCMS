@@ -1,7 +1,7 @@
 version: '3.3'
 
 services:
-  web1:
+  web:
     build :
       context: .
       dockerfile: Dockerfile
@@ -18,20 +18,20 @@ services:
       - db
     env_file:
       - ./.env.prod
-  web2:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: gunicorn config.kino_cms_wsgi:application --bind 0.0.0.0:8100
-    volumes:
-      - static_volume:/usr/src/app/static
-      - media_volume:/usr/src/app/media
-    expose:
-      - 8100
-    depends_on:
-      - db
-    env_file:
-      - ./.env.prod
+#  web2:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    command: gunicorn config.kino_cms_wsgi:application --bind 0.0.0.0:8100
+#    volumes:
+#      - static_volume:/usr/src/app/static
+#      - media_volume:/usr/src/app/media
+#    expose:
+#      - 8100
+#    depends_on:
+#      - db
+#    env_file:
+#      - ./.env.prod
   db:
     build:
       context: ./docker/postgres/
@@ -56,8 +56,8 @@ services:
     depends_on:
       - db
       - redis
-      - web1
-      - web2
+      - web
+#      - web2
   nginx:
     build: ./docker/nginx/
     volumes:
@@ -67,8 +67,8 @@ services:
       - "127.0.0.1:3034:80"
 #      - "127.0.0.1:1337:80"
     depends_on:
-      - web1
-      - web2
+      - web
+#      - web2
 volumes:
   postgres_data:
   static_volume:
