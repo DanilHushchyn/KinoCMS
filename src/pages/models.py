@@ -24,6 +24,7 @@ class Page(Seo):
     objects = PageManager()
 
     class Meta:
+        ordering = ['-date_created']
         verbose_name = 'Page'
         verbose_name_plural = 'Pages'
         db_table = 'pages'
@@ -46,6 +47,7 @@ class NewsPromo(Seo):
     objects = NewsPromoManager()
 
     class Meta:
+        ordering = ['-date_created']
         verbose_name = 'News_Promo'
         verbose_name_plural = 'News_Promos'
         db_table = 'news_promos'
@@ -68,7 +70,6 @@ class BaseSlider(models.Model):
     speed = models.PositiveSmallIntegerField(null=True,
                                              choices=TIMER_CHOICES,
                                              default=30)
-
     class Meta:
         abstract = True
         verbose_name = 'BaseSlider'
@@ -76,6 +77,7 @@ class BaseSlider(models.Model):
 
 
 class TopSlider(BaseSlider):
+
     class Meta:
         verbose_name = 'TopSlider'
         verbose_name_plural = 'TopSliders'

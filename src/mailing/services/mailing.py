@@ -35,8 +35,11 @@ class MailingService:
         # for key, value in inspector.active().items():
         #     actives = len(value)
         if cache.get(f'mailing_task') is None:
+            temp = MailTemplate.objects.get(id=body.temp_id)
+            with open(f'{temp.file.path}', 'r') as file:
+                html_content = file.read()
             task = make_mailing.delay(user_ids=body.user_ids,
-                                      temp_id=body.temp_id)
+                                      html_content=html_content)
             cache.set(f'mailing_task', task.id)
         else:
             msg = _('Треба зачекати поки закінчиться поточне розсилання')

@@ -42,7 +42,6 @@ class ImageInSchema(ninja_schema.ModelSchema):
             head, image_base64 = value.split(',')
             b64decode(image_base64, validate=True)
         except binascii.Error as e:
-            print('EASY')
             msg = _('Невірний формат base64 був відправлений')
             raise HttpError(403, msg)
         return value
@@ -62,9 +61,6 @@ class ImageOutSchema(ModelSchema):
 
     @staticmethod
     def resolve_image(obj: Image):
-        print(obj.image.url)
-        print(obj.image.path)
-        print(obj.image.size)
         return ABSOLUTE_URL + str(obj.image.url)
 
     @staticmethod

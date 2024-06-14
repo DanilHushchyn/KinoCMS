@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-05 17:05+0300\n"
+"POT-Creation-Date: 2024-06-14 11:48+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,19 +20,19 @@ msgstr ""
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: config/admin_urls.py:58 config/kino_urls.py:38
+#: config/admin_urls.py:59 config/kino_urls.py:38
 msgid "Не авторизований"
 msgstr "Не авторизован"
 
-#: src/cinemas/endpoints/cinema.py:127
+#: src/cinemas/endpoints/cinema.py:129
 msgid "Кінотеатр успішно створений"
 msgstr "Кинотеатр успешно создан"
 
-#: src/cinemas/endpoints/cinema.py:189 src/cinemas/services/cinema.py:86
+#: src/cinemas/endpoints/cinema.py:192 src/cinemas/services/cinema.py:87
 msgid "Кінотеатр успішно оновлений"
 msgstr "Кинотеатр успешно обновлен"
 
-#: src/cinemas/endpoints/hall.py:191 src/cinemas/services/hall.py:69
+#: src/cinemas/endpoints/hall.py:194 src/cinemas/services/hall.py:69
 msgid "Зал успішно оновлений"
 msgstr "Зал успешно обновлен"
 
@@ -44,25 +44,24 @@ msgstr "Не найдено: нет совпадений кинотеатров 
 msgid "Не знайдено: немає збігів залів на заданному запиті."
 msgstr "Не найдено: нет совпадений залов по заданному запросу."
 
-#: src/cinemas/schemas/cinema.py:24 src/movies/schemas.py:56
+#: src/cinemas/schemas/cinema.py:24 src/movies/schemas.py:57
+#: src/pages/schemas/news_promo.py:23
 msgid ""
 "Недійсне значення (не написане великими літерами). З великих літер повинні "
 "починатися (name, description, seo_title, seo_description)"
 msgstr ""
-"Недействительное значение (не написано заглавными буквами). "
-"С заглавных букв должны "
-"начинаться (name, description, seo_title, seo_description)"
+"Недействительное значение (не написано заглавными буквами). С заглавных букв "
+"должны начинаться (name, description, seo_title, seo_description)"
 
-#: src/cinemas/schemas/hall.py:21
+#: src/cinemas/schemas/hall.py:22
 msgid ""
 "Недійсне значення (не написане великими літерами). З великих літер повинні "
 "починатися (description, seo_title, seo_description)"
 msgstr ""
-"Недействительное значение (не написано заглавными буквами). "
-"С заглавных букв должны "
-"начинаться (description, seo_title, seo_description)"
+"Недействительное значение (не написано заглавными буквами). С заглавных букв "
+"должны начинаться (description, seo_title, seo_description)"
 
-#: src/cinemas/services/cinema.py:119
+#: src/cinemas/services/cinema.py:120
 msgid "Кінотеатр успішно видалений"
 msgstr "Кинотеатр успешно удалён"
 
@@ -89,11 +88,12 @@ msgid "Не знайдено: немає збігів картинок на за
 msgstr "Не найдено: нет совпадений галерей по заданному запросу."
 
 #: src/core/schemas/gallery.py:74 src/core/schemas/images.py:36
-#: src/core/schemas/images.py:101
+#: src/core/schemas/images.py:100
+#, python-brace-format
 msgid "Дозволено відправляти тільки {image_types}"
 msgstr "Разрешено отправлять только {image_types}"
 
-#: src/core/schemas/images.py:46 src/core/services/images.py:36
+#: src/core/schemas/images.py:45 src/core/services/images.py:36
 msgid "Невірний формат base64 був відправлений"
 msgstr "Неверный формат base64 был отправлен"
 
@@ -177,15 +177,15 @@ msgstr "Мистика"
 msgid "Детектив"
 msgstr "Детектив"
 
-#: src/movies/schemas.py:72
+#: src/movies/schemas.py:77
 msgid "Expected min year is 1984 "
 msgstr ""
 
-#: src/movies/schemas.py:85 src/movies/schemas.py:98 src/movies/schemas.py:110
+#: src/movies/schemas.py:90 src/movies/schemas.py:103 src/movies/schemas.py:115
 msgid "List should contain any of "
 msgstr ""
 
-#: src/movies/schemas.py:123
+#: src/movies/schemas.py:128
 msgid "Not Found: No MovieParticipant"
 msgstr ""
 
@@ -197,9 +197,103 @@ msgstr "Фильм успешно создан"
 msgid "Фільм успішно оновлений"
 msgstr "Фильм успешно обновлен"
 
-#: src/movies/service.py:158
+#: src/movies/service.py:166
 msgid "Фільм успішно видалений"
 msgstr "Фильм успешно удалён"
+
+#: src/pages/managers/bottom_slider_item.py:27
+msgid ""
+"Не знайдено: немає збігів елементів нижнього банеру на заданному запиті."
+msgstr "Не найдено: нет совпадений элементов нижнего баннера по заданному запросу."
+
+#: src/pages/managers/news_promo.py:32
+msgid "Не знайдено: немає збігів новин чи акцій на заданному запиті."
+msgstr "Не найдено: нет совпадений новостей или акций по заданному запросу."
+
+#: src/pages/managers/page.py:31
+msgid "Не знайдено: немає збігів сторінок на заданному запиті."
+msgstr "Не найдено: нет совпадений страниц по заданному запросу."
+
+#: src/pages/managers/top_slider_item.py:27
+msgid ""
+"Не знайдено: немає збігів елементів верхнього банеру на заданному запиті."
+msgstr "Не найдено: нет совпадений элементов верхнего баннера по заданному запросу."
+
+#: src/pages/schemas/banners_sliders.py:25
+msgid ""
+"Недійсне значення (не написане великими літерами). З великих літер повиннен "
+"починатися text"
+msgstr ""
+"Недействительное значение (не написано заглавными буквами). С заглавных букв "
+"должны начинаться text"
+
+#: src/pages/schemas/banners_sliders.py:171
+msgid "Невірний формат кольору було введено"
+msgstr "Неверный формат цвета был отправлен"
+
+#: src/pages/schemas/page.py:21
+msgid ""
+"Недійсне значення (не написане великими літерами). З великих літер повинні "
+"починатися (name, content, seo_title, seo_description)"
+msgstr ""
+"Недействительное значение (не написано заглавными буквами). С заглавных букв "
+"должны начинаться (name, content, seo_title, seo_description)"
+
+#: src/pages/services/banners_sliders.py:54
+msgid "Верхній слайдер успішно оновлений"
+msgstr "Верхний слайдер успешно обновлен"
+
+#: src/pages/services/banners_sliders.py:70
+msgid "Нижній слайдер успішно оновлений"
+msgstr "Нижний слайдер успешно обновлен"
+
+#: src/pages/services/banners_sliders.py:147
+msgid "Максимальна кількість елементів верхнього банеру, 10"
+msgstr "Максимальное количество элементов верхнего баннера, 10"
+
+#: src/pages/services/banners_sliders.py:296
+msgid "Наскрізний банер успішно оновлений"
+msgstr "Сквозной баннер успешно обновлен"
+
+#: src/pages/services/news_promo.py:57
+msgid "Акція успішно створена"
+msgstr "Акция успешно создана"
+
+#: src/pages/services/news_promo.py:58
+msgid "Новина успішно створена"
+msgstr "Новость успешно создана"
+
+#: src/pages/services/news_promo.py:84
+msgid "Акція успішно оновлена"
+msgstr "Фильм успешно обновлен"
+
+#: src/pages/services/news_promo.py:85
+msgid "Новина успішно оновлена"
+msgstr "Новость успешно обновлена"
+
+#: src/pages/services/news_promo.py:122
+msgid "Акція успішно видалена"
+msgstr "Акция успешно удалена"
+
+#: src/pages/services/news_promo.py:123
+msgid "Новина успішно видалена"
+msgstr "Новость успешно удалена"
+
+#: src/pages/services/page.py:56
+msgid "Сторінка успішно створена"
+msgstr "Страница успешно создана"
+
+#: src/pages/services/page.py:81
+msgid "Сторінка успішно оновлена"
+msgstr "Страница успешно удалена"
+
+#: src/pages/services/page.py:107
+msgid "Цю сторінку заборонено видаляти"
+msgstr "Эту страницу запрещено удалять"
+
+#: src/pages/services/page.py:117
+msgid "Сторінка успішно видалена"
+msgstr "Страница успешно удалена"
 
 #: src/users/managers/user_manager.py:96 src/users/managers/user_manager.py:113
 #: src/users/managers/user_manager.py:133
@@ -351,6 +445,3 @@ msgstr ""
 #: src/users/services/user_service.py:67
 msgid "Ви успішно зареєструвалися"
 msgstr "Вы успешно зарегистрировались"
-
-#~ msgid "Картинка успішно видалена"
-#~ msgstr "Картинка успешно удалена"

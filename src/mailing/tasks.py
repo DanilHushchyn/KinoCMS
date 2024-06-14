@@ -13,24 +13,22 @@ import loguru
 
 
 @shared_task()
-def make_mailing(user_ids: List | None, temp_id: int) -> str:
+def make_mailing(user_ids: List | None,html_content: str) -> str:
     """
     Send letter to user and ask him to confirm registration
     In letter he will find link which redirects him to the site
     for confirmation
+    :param html_content: letter in html format
     :param user_ids: list of users for mailing
-    :param temp_id: mail template's id for mailing
     """
 
     if user_ids is None:
         users = User.objects.only('email').all()
     else:
         users = User.objects.only('id', 'email').filter(id__in=user_ids)
-    temp = MailTemplate.objects.get(id=temp_id)
 
     recipients = [user.email for user in users]
-    with open(f'{temp.file.path}', 'r') as file:
-        html_content = file.read()
+
     for index, recipient in enumerate(recipients, start=1):
 
         email = EmailMultiAlternatives('KinoCMS', '',

@@ -11,7 +11,7 @@ from faker.providers import date_time, phone_number
 from src.cinemas.models import Cinema, Hall
 from src.core.models import Image, Gallery
 from src.movies.models import Movie, TECHS_CHOICES, MovieParticipantRole, MovieParticipantPerson, MovieParticipant
-from src.pages.models import TopSlider, BottomSlider, TopSliderItem, BottomSliderItem, ETEndBBanner
+from src.pages.models import TopSlider, BottomSlider, TopSliderItem, BottomSliderItem, ETEndBBanner, NewsPromo, Page
 from src.users.models import User
 from pytils.translit import slugify
 from django_countries.data import COUNTRIES
@@ -33,6 +33,8 @@ class Command(BaseCommand):
         self._create_participants()
         self._create_movies()
         self._create_sliders()
+        self._create_news_promos()
+        self._create_pages()
 
     @classmethod
     def _create_superuser(cls):
@@ -56,7 +58,7 @@ class Command(BaseCommand):
 
     @classmethod
     def _create_users(cls):
-        if not User.objects.exists():
+        if User.objects.count() == 1:
             users = []
             for i in range(100):
                 first_name = cls._fake_en.first_name()
@@ -209,6 +211,68 @@ class Command(BaseCommand):
                     )
                     halls.append(hall)
             Hall.objects.bulk_create(halls)
+
+    @classmethod
+    def _create_news_promos(cls):
+        if not NewsPromo.objects.exists():
+            news_promos = []
+            for i in range(1, 100):
+                if i % 2 == 0:
+                    promo = True
+                    name_uk = f'Акція - 0{i}'
+                    name_ru = f'Акция - 0{i}'
+                else:
+                    name_uk = f'Новина - 0{i}'
+                    name_ru = f'Новость - 0{i}'
+                    promo = False
+                description_uk = (cls._fake_uk.text(max_nb_chars=2500)
+                                  .capitalize())
+                description_ru = (cls._fake_ru.text(max_nb_chars=2500)
+                                  .capitalize())
+                news_promo = NewsPromo(
+                    name_uk=name_uk,
+                    name_ru=name_ru,
+                    slug=slugify(name_uk),
+                    description_uk=description_uk,
+                    description_ru=description_ru,
+                    video_link="https://www.youtube.com/",
+                    promo=promo,
+                    active=True,
+                    seo_title=name_uk,
+                    seo_description=description_uk[:150],
+                    seo_image=cls._create_image('news_promo'),
+                    banner=cls._create_image('news_promo'),
+                    gallery=cls._create_gallery('news_promo'),
+                )
+                news_promos.append(news_promo)
+            NewsPromo.objects.bulk_create(news_promos)
+
+    @classmethod
+    def _create_pages(cls):
+        if not Page.objects.exists():
+            pages = []
+            for i in range(1, 20):
+                name_uk = f'Сторінка - 0{i}'
+                name_ru = f'Страница - 0{i}'
+                can_delete = True
+                if i in [1, 2, 3, 4, 5]:
+                    can_delete = False
+                page = Page(
+                    name_uk=name_uk,
+                    name_ru=name_ru,
+                    slug=slugify(name_uk),
+                    content_uk={},
+                    content_ru={},
+                    active=True,
+                    can_delete=can_delete,
+                    seo_title=name_uk,
+                    seo_description=name_uk,
+                    seo_image=cls._create_image('cinema/banner'),
+                    banner=cls._create_image('cinema/banner'),
+                    gallery=cls._create_gallery('cinema/gallery'),
+                )
+                pages.append(page)
+            Page.objects.bulk_create(pages)
 
     @classmethod
     def _create_participants(cls) -> None:

@@ -133,8 +133,11 @@ class CustomUserManager(UserManager):
                             _("Не знайдено: немає збігів користувачів"
                               " на заданному запиті."))
         for field, value in user_body.dict().items():
-            if value is not None:
+
+            if value is not None and field != 'password':
                 setattr(user, field, value)
+        if user_body.password:
+            user.set_password(user_body.password.get_secret_value())
         user.save()
         return user
 

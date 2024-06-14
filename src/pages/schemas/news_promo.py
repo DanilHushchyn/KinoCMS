@@ -45,12 +45,12 @@ class NewsPromoCardOutSchema(ModelSchema):
     """
     Pydantic schema for showing news and promo card.
     """
-    banner: ImageOutSchema
 
     class Meta:
         model = NewsPromo
         fields = ['name',
                   'date_created',
+                  'active',
                   'slug', ]
 
 
@@ -67,7 +67,7 @@ class NewsPromoOutSchema(ModelSchema):
                    'slug', 'date_created']
 
 
-class NewsPromoUpdateSchema(NewsPromoInSchema):
+class NewsPromoUpdateSchema(ninja_schema.ModelSchema):
     """
     Pydantic schema for updating news and promo.
     """
@@ -75,8 +75,18 @@ class NewsPromoUpdateSchema(NewsPromoInSchema):
     seo_image: ImageUpdateSchema = None
     gallery: List[GalleryItemSchema] = None
 
+    @ninja_schema.model_validator('name_uk', 'name_ru',
+                                  'description_uk', 'description_ru',
+                                  'seo_title', 'seo_description')
+    def clean_capitalize(cls, value) -> int:
+        msg = _('Недійсне значення (не написане великими літерами). '
+                'З великих літер повинні починатися (name, '
+                'description, seo_title, seo_description)')
+        validate_capitalized(value, msg)
+        return value
+
     class Config:
         model = NewsPromo
-        exclude = ['id', 'name', 'description',
+        exclude = ['id', 'name', 'description', 'promo',
                    'slug', 'date_created']
         optional = "__all__"

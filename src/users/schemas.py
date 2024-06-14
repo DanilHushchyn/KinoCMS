@@ -140,6 +140,28 @@ class UserUpdateSchema(UserInBaseSchema):
     personal data for updating
     """
 
+    password: SecretStr = None
+
+    @staticmethod
+    def check_password(password: str) -> None:
+        password_pattern = ("^(?=.*?[A-Z])(?=.*?[a-z])"
+                            "(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")
+        if re.match(password_pattern, password) is None:
+            raise HttpError(403, _(
+                "Пароль повинен відповідати: "
+                "* Хоча б одній великій літері, "
+                "* Хоча б одній малій літері, "
+                "* Хоча б одній цифрі, "
+                "* Хоча б одному спеціальному символу з набору ?!@%^&- "
+                "* Мінімальна довжина 8 символів"
+            ))
+
+    @ninja_schema.model_validator('password')
+    def clean_password(cls, password: SecretStr) -> SecretStr:
+        value = password.get_secret_value()
+        cls.check_password(value)
+        return password
+
     class Config(UserInBaseSchema.Config):
         optional = "__all__"
 

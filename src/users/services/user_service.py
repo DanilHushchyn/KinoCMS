@@ -3,13 +3,8 @@
     Module contains class for managing users data in the site.
 
 """
-import re
 from typing import List
-
-import loguru
-from django.core.exceptions import ValidationError
 from django.db.models import Q, QuerySet
-from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 
 from src.core.schemas.base import MessageOutSchema, DirectionEnum

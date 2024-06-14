@@ -1,3 +1,5 @@
+from ninja.errors import HttpError
+
 from src.pages.models import Page
 from src.pages.schemas.page import (PageInSchema,
                                     PageUpdateSchema)
@@ -101,6 +103,9 @@ class PageService:
         """
         page = (Page.objects
                 .get_by_slug(pg_slug=pg_slug))
+        if not page.can_delete:
+            msg = _('Цю сторінку заборонено видаляти')
+            raise HttpError(409, msg)
         pg_imgs_ids = [page.seo_image_id,
                        page.banner_id, ]
         gallery = page.gallery
