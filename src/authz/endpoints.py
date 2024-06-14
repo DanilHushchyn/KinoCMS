@@ -75,6 +75,46 @@ class CustomTokenObtainPairController(ControllerBase):
         return user_token.to_response_schema()
 
     @http_post(
+        "/blacklist",
+        response={200: schema.blacklist_schema.get_response_schema()},
+        url_name="token_blacklist",
+        openapi_extra={
+            "operationId": "blacklist_token",
+
+            "responses": {
+                401: {
+                    "description": "Error: Unauthorized",
+                },
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    def blacklist_token(self, request: HttpRequest,
+                        refresh: schema.blacklist_schema,
+                        accept_lang: LangEnum =
+                        Header(alias="Accept-Language",
+                               default="uk"),
+                        ):
+        """
+        Makes refresh token blacklisted.
+
+        Please provide:
+          - **Request body**  data with credentials of user
+
+        Returns:
+          - **200**: Success response with the data.
+          - **422**: Error: Unprocessable Entity.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        return refresh.to_response_schema()
+
+    @http_post(
         "/refresh",
         response=schema.obtain_pair_refresh_schema.get_response_schema(),
         url_name="token_refresh",

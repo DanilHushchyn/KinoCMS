@@ -15,6 +15,8 @@ superuser:
 
 worker:
 	celery -A config worker -l info
+beat:
+	celery -A config beat
 
 dumpdata:
 	$(MANAGE) dumpdata > db.json

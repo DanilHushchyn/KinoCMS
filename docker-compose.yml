@@ -50,14 +50,20 @@ services:
       context: .
     volumes:
       - .:/usr/src/app/web
-#      - static_volume:/usr/src/app/static
-#      - media_volume:/usr/src/app/media
     command: celery -A config worker -l info
     depends_on:
       - db
       - redis
       - web
-#      - web2
+  celery-beat:
+    restart: always
+    build:
+      context: .
+    command: celery -A config beat
+    env_file:
+      - ./.env.prod
+    depends_on:
+      - celery
   nginx:
     build: ./docker/nginx/
     volumes:

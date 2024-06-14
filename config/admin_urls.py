@@ -22,6 +22,7 @@ from ninja_extra import NinjaExtraAPI, status
 from django.conf.urls.static import static
 from django.utils.translation import gettext as _
 from ninja.errors import AuthenticationError, ValidationError
+from ninja_jwt.controller import NinjaJWTDefaultController, TokenBlackListController
 
 from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController

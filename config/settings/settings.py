@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     "modeltranslation",
     # "debug_toolbar",
+    'ninja_jwt.token_blacklist',
     "requests_tracker",
     "corsheaders",
     "imagekit",
@@ -120,7 +121,6 @@ NINJA_JWT = {
     "TOKEN_BLACKLIST_INPUT_SCHEMA": "ninja_jwt.schema.TokenBlacklistInputSchema",
     "TOKEN_VERIFY_INPUT_SCHEMA": "ninja_jwt.schema.TokenVerifyInputSchema",
 }
-
 NINJA_EXTRA = {
     'PAGINATION_CLASS': 'ninja_extra.pagination.PageNumberPaginationExtra'
 }

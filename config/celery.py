@@ -33,4 +33,20 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
+
+
+@app.on_after_configure.connect
+def setup_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(crontab(minute="0", hour="0"),
+                             clear_blacklisted_tokens.s(),
+                             name='clear expired tokens everyday')
+
+
 app.conf.timezone = "Europe/Kiev"
+
+
+@app.task
+def clear_blacklisted_tokens():
+    from ninja_jwt.token_blacklist.models import OutstandingToken
+    from ninja_jwt.utils import aware_utcnow
+    OutstandingToken.objects.filter(expires_at__lte=aware_utcnow()).delete()
