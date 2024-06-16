@@ -25,10 +25,9 @@ from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController
 # from src.users.endpoints import UsersKinoController
 
-kino_api = NinjaExtraAPI(title='Kino', description='KINO API')
+kino_api = NinjaExtraAPI(title='KinoCMS (client-site)', description='CLIENT API')
 
 kino_api.register_controllers(CustomTokenObtainPairController)
-# kino_api.register_controllers(UsersKinoController)
 
 
 @kino_api.exception_handler(AuthenticationError)
@@ -75,6 +74,6 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
-    urlpatterns += [
-        path("__debug__/", include("debug_toolbar.urls")),
-    ]
+    # urlpatterns += [
+    #     path("__debug__/", include("debug_toolbar.urls")),
+    # ]

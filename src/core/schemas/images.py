@@ -7,7 +7,7 @@ import ninja_schema
 from ninja.errors import HttpError
 from pydantic.functional_validators import field_validator
 from django.utils.translation import gettext as _
-from config.settings.settings import ABSOLUTE_URL
+from config.settings.settings import ABSOLUTE_URL, MEDIA_ROOT
 from src.core.models import Image
 
 
@@ -61,15 +61,15 @@ class ImageOutSchema(ModelSchema):
 
     @staticmethod
     def resolve_image(obj: Image):
-        return ABSOLUTE_URL + str(obj.image.url)
+        return str(MEDIA_ROOT) + str(obj.image.url)
 
     @staticmethod
     def resolve_image_webp(obj: Image):
         extension = obj.image.name.split('.')[-1]
         if extension != 'svg':
-            return ABSOLUTE_URL + str(obj.image_webp.url)
+            return str(MEDIA_ROOT) + str(obj.image_webp.url)
         else:
-            return ABSOLUTE_URL + str(obj.image.url)
+            return str(MEDIA_ROOT) + str(obj.image.url)
 
     class Meta:
         model = Image

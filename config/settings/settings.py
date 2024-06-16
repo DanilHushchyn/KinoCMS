@@ -89,8 +89,8 @@ IMAGEKIT_DEFAULT_IMAGE_CACHE_BACKEND = 'django_redis.client.DefaultClient'
 
 SITE_ID = 1
 NINJA_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=25),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": False,
@@ -109,8 +109,8 @@ NINJA_JWT = {
     "TOKEN_USER_CLASS": "ninja_jwt.models.TokenUser",
     "JTI_CLAIM": "jti",
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(days=1),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=5),
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=15),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=90),
     # For Controller Schemas
     # FOR OBTAIN PAIR
     "TOKEN_OBTAIN_PAIR_INPUT_SCHEMA": "ninja_jwt.schema.TokenObtainPairInputSchema",
@@ -157,6 +157,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1",
     "https://goodboost-spacelab.avada-media-dev2.od.ua",
     "https://kinocms-panel.demodev.cc",
+    "https://kinocms.demodev.cc",
 ]
 # ROOT_URLCONF = 'config.urls'
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

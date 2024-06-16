@@ -40,7 +40,7 @@ from django.core.cache import cache
 cache.delete('mailing_task')
 cache = get_cache()
 cache.clear()
-admin_api = NinjaExtraAPI(title='Kino', description='KINO API')
+admin_api = NinjaExtraAPI(title='KinoCMS (admin-panel)', description='ADMIN API')
 admin_api.register_controllers(CustomTokenObtainPairController)
 admin_api.register_controllers(UsersAdminController)
 admin_api.register_controllers(MailingController)
