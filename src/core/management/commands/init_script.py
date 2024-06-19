@@ -33,15 +33,14 @@ class Command(BaseCommand):
 
     def handle(self, null=None, *args, **options):
         self._create_superuser()
-        # self._create_users()
+        self._create_users()
         self._create_cinemas()
         self._create_halls()
         self._create_participants()
         self._create_movies()
-
-    #         self._create_sliders()
-    #         self._create_news_promos()
-    #         self._create_pages()
+        self._create_sliders()
+        self._create_news_promos()
+        self._create_pages()
 
     @classmethod
     def _create_superuser(cls):
