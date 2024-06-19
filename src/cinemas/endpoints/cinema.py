@@ -2,7 +2,6 @@ from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.schemas.response import PaginatedResponseSchema
-
 from src.cinemas.models import Cinema
 from src.cinemas.schemas.cinema import (CinemaInSchema,
                                         CinemaCardOutSchema,
@@ -114,6 +113,7 @@ class CinemaController(ControllerBase):
                 1) Недійсне значення (не написане великими літерами).
                    З великих літер повинні починатися (name, description,
                    seo_title, seo_description) \n
+                2) Введено некоректний номер телефону \n
           - **409**: Error: Conflict.
             Причини: \n
                 1) Поле name повинно бути унікальним. Ця назва вже зайнята
@@ -124,9 +124,28 @@ class CinemaController(ControllerBase):
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
           - **500**: Internal server error if an unexpected error occurs.
+
+        Operations with gallery items:
+         - Delete \n
+             1. Be sure to specify the id field \n
+             2. Be sure to specify the field delete=true \n
+         - Update \n
+             1. Be sure to specify the id field \n
+             2. Be sure to specify the field delete=false \n
+             3. Be sure to specify the image field \n
+                 a) required image if filename is specified. Format base64(svg,png,jpg,jpeg,webp) \n
+                 b) filename is required if image is specified. Example: *filename.png* \n
+                 c) optional alt. If you don't specify it, I'll take the value from filename \n
+         - Create:
+             1. Do not specify the id field \n
+             3. Be sure to specify the image field \n
+                 a) required image if filename is specified. Format base64(svg,png,jpg,jpeg,webp) \n
+                 b) filename is required if image is specified. Example: *filename.png* \n
+                 c) optional alt. If you don't specify it, I'll take the value from filename \n
+             4. Be sure to specify the field delete=false \n
         """
-        self.cinema_service.create(schema=body)
-        return MessageOutSchema(detail=_('Кінотеатр успішно створений'))
+        result = self.cinema_service.create(request=request, schema=body)
+        return result
 
     @http_patch(
         "/{cnm_slug}/",
@@ -177,6 +196,7 @@ class CinemaController(ControllerBase):
                 1) Недійсне значення (не написане великими літерами).
                    З великих літер повинні починатися (name, description,
                    seo_title, seo_description) \n
+                2) Введено некоректний номер телефону \n
           - **409**: Error: Conflict. \n
             Причини: \n
                 1) Поле name повинно бути унікальним. Ця назва вже зайнята
@@ -187,8 +207,30 @@ class CinemaController(ControllerBase):
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
           - **500**: Internal server error if an unexpected error occurs.
+
+
+        Operations with gallery items:
+         - Delete \n
+             1. Be sure to specify the id field \n
+             2. Be sure to specify the field delete=true \n
+         - Update \n
+             1. Be sure to specify the id field \n
+             2. Be sure to specify the field delete=false \n
+             3. Be sure to specify the image field \n
+                 a) required image if filename is specified. Format base64(svg,png,jpg,jpeg,webp) \n
+                 b) filename is required if image is specified. Example: *filename.png* \n
+                 c) optional alt. If you don't specify it, I'll take the value from filename \n
+         - Create:
+             1. Do not specify the id field \n
+             3. Be sure to specify the image field \n
+                 a) required image if filename is specified. Format base64(svg,png,jpg,jpeg,webp) \n
+                 b) filename is required if image is specified. Example: *filename.png* \n
+                 c) optional alt. If you don't specify it, I'll take the value from filename \n
+             4. Be sure to specify the field delete=false \n
         """
-        self.cinema_service.update(cnm_slug=cnm_slug, schema=body)
+        self.cinema_service.update(request=request,
+                                   cnm_slug=cnm_slug,
+                                   schema=body)
         return MessageOutSchema(detail=_('Кінотеатр успішно оновлений'))
 
     @http_get(

@@ -1,6 +1,5 @@
 from enum import Enum
 from ninja import Schema
-import ninja_schema
 
 
 class MessageOutSchema(Schema):

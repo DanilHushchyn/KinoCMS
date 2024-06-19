@@ -3,14 +3,10 @@ from django.db import models
 
 # Create your models here.
 class Seance(models.Model):
-    slug = models.SlugField(db_index=True, unique=True, null=True)
-
-    tech_type = models.CharField(max_length=60)
-    price = models.PositiveIntegerField(null=True)
-    date = models.DateTimeField(auto_now_add=True)
-    hall = models.ForeignKey('cinemas.Cinema', on_delete=models.CASCADE, null=True)
-
-    # hall = models.ForeignKey('cinemas.Cinema', on_delete=models.CASCADE, null=True)
+    price = models.PositiveIntegerField()
+    date = models.DateTimeField()
+    hall = models.ForeignKey('cinemas.Hall', on_delete=models.CASCADE)
+    movie = models.ForeignKey('movies.Movie', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Seance"
@@ -19,10 +15,9 @@ class Seance(models.Model):
 
 
 class Ticket(models.Model):
-    seance = models.ForeignKey('Seance', on_delete=models.CASCADE, null=True)
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True)
-    row = models.PositiveIntegerField(null=True)
-    seat = models.PositiveIntegerField(null=True)
+    seance = models.ForeignKey('Seance', on_delete=models.CASCADE)
+    row = models.PositiveIntegerField()
+    seat = models.PositiveIntegerField()
 
     class Meta:
         verbose_name = "Ticket"

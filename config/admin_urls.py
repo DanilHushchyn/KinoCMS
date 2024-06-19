@@ -17,12 +17,10 @@ Including another URLconf
 from django.http import HttpRequest, HttpResponse
 from django.urls import path, include
 from imagekit.utils import get_cache
-from ninja.openapi.docs import Redoc
 from ninja_extra import NinjaExtraAPI, status
 from django.conf.urls.static import static
 from django.utils.translation import gettext as _
 from ninja.errors import AuthenticationError, ValidationError
-from ninja_jwt.controller import NinjaJWTDefaultController, TokenBlackListController
 
 from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController

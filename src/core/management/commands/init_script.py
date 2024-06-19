@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 import random
+from datetime import timedelta, datetime
+from typing import List
 
 from django.contrib.auth import get_user_model
 from django.core.files import File
@@ -8,6 +10,7 @@ from django.core.management.base import BaseCommand
 from faker import Faker
 from faker.providers import date_time, phone_number
 
+from src.booking.models import Seance
 from src.cinemas.models import Cinema, Hall
 from src.core.models import Image, Gallery
 from src.movies.models import Movie, TECHS_CHOICES, MovieParticipantRole, MovieParticipantPerson, MovieParticipant
@@ -15,6 +18,9 @@ from src.pages.models import TopSlider, BottomSlider, TopSliderItem, BottomSlide
 from src.users.models import User
 from pytils.translit import slugify
 from django_countries.data import COUNTRIES
+from django.utils import timezone
+from django.utils.timezone import make_aware
+import pytz
 
 
 class Command(BaseCommand):
@@ -27,14 +33,15 @@ class Command(BaseCommand):
 
     def handle(self, null=None, *args, **options):
         self._create_superuser()
-        self._create_users()
+        # self._create_users()
         self._create_cinemas()
         self._create_halls()
         self._create_participants()
         self._create_movies()
-        self._create_sliders()
-        self._create_news_promos()
-        self._create_pages()
+
+    #         self._create_sliders()
+    #         self._create_news_promos()
+    #         self._create_pages()
 
     @classmethod
     def _create_superuser(cls):
@@ -60,7 +67,7 @@ class Command(BaseCommand):
     def _create_users(cls):
         if User.objects.count() == 1:
             users = []
-            for i in range(100):
+            for i in range(101):
                 first_name = cls._fake_en.first_name()
                 email = f"{first_name.lower()}0{i}@example.com"
                 user = User(
@@ -155,10 +162,8 @@ class Command(BaseCommand):
                 name_uk = f'Кінотеатр-0{i}'
                 name_ru = f'Кинотеатр-0{i}'
                 slug = slugify(name_uk)
-                description_uk = (cls._fake_uk.text(max_nb_chars=2500)
-                                  .capitalize())
-                description_ru = (cls._fake_ru.text(max_nb_chars=2500)
-                                  .capitalize())
+                description_uk = cls._fake_uk.text(max_nb_chars=2500)
+                description_ru = cls._fake_ru.text(max_nb_chars=2500)
                 cinema = Cinema(
                     name_uk=name_uk,
                     name_ru=name_ru,
@@ -167,6 +172,8 @@ class Command(BaseCommand):
                     description_ru=description_ru,
                     terms_uk={},
                     terms_ru={},
+                    phone_1=f'+3809{cls._fake_uk.msisdn()[4:]}',
+                    phone_2=f'+3809{cls._fake_uk.msisdn()[4:]}',
                     seo_title=name_uk,
                     seo_description=description_uk[:150],
                     seo_image=cls._create_image('cinema/banner'),
@@ -186,16 +193,24 @@ class Command(BaseCommand):
             Cinema.objects.bulk_create(cinemas)
 
     @classmethod
+    def _create_hall_schema(cls) -> List:
+        number = random.choice(range(4, 16))
+        schema = []
+        for i in range(1, number + 1):
+            schema.append({
+                "number": i,
+            })
+        return schema
+
+    @classmethod
     def _create_halls(cls):
         if not Hall.objects.exists():
             halls = []
             cinemas = Cinema.objects.all()
             for cinema in cinemas:
                 for i in range(1, 6):
-                    description_uk = (cls._fake_uk.text(max_nb_chars=2500)
-                                      .capitalize())
-                    description_ru = (cls._fake_ru.text(max_nb_chars=2500)
-                                      .capitalize())
+                    description_uk = cls._fake_uk.text(max_nb_chars=2500)
+                    description_ru = cls._fake_ru.text(max_nb_chars=2500)
                     hall = Hall(
                         number=f'0{i}',
                         description_uk=description_uk,
@@ -204,6 +219,7 @@ class Command(BaseCommand):
                         tech=random.choice([key for key, _ in
                                             TECHS_CHOICES]),
                         seo_title=f'0{i}',
+                        schema={},
                         seo_description=description_uk[:150],
                         seo_image=cls._create_image('hall/banner'),
                         banner=cls._create_image('hall/banner'),
@@ -216,7 +232,7 @@ class Command(BaseCommand):
     def _create_news_promos(cls):
         if not NewsPromo.objects.exists():
             news_promos = []
-            for i in range(1, 100):
+            for i in range(1, 101):
                 if i % 2 == 0:
                     promo = True
                     name_uk = f'Акція - 0{i}'
@@ -251,7 +267,7 @@ class Command(BaseCommand):
     def _create_pages(cls):
         if not Page.objects.exists():
             pages = []
-            for i in range(1, 20):
+            for i in range(1, 21):
                 name_uk = f'Сторінка - 0{i}'
                 name_ru = f'Страница - 0{i}'
                 can_delete = True
@@ -273,6 +289,28 @@ class Command(BaseCommand):
                 )
                 pages.append(page)
             Page.objects.bulk_create(pages)
+
+    @classmethod
+    def _create_seances(cls, movie: Movie):
+        import zoneinfo
+        seances = []
+        hall_ids = list(Hall.objects.values_list('id', flat=True))
+
+        for i in range(1, 21):
+            start_date = movie.released
+            end_date = movie.released + timedelta(days=30)
+            tzinfo = zoneinfo.ZoneInfo('Europe/Kiev')
+            date = cls._fake_uk.date_time_between(start_date=start_date,
+                                                  end_date=end_date,
+                                                  tzinfo=tzinfo)
+            seance = Seance(
+                movie=movie,
+                price=random.choice([150, 100, 250, 500, 600, 350, 420]),
+                hall_id=random.choice(hall_ids),
+                date=date,
+            )
+            seances.append(seance)
+        Seance.objects.bulk_create(seances)
 
     @classmethod
     def _create_participants(cls) -> None:
@@ -323,7 +361,7 @@ class Command(BaseCommand):
     def _create_movies(cls):
         if not Movie.objects.exists():
             movies = []
-            for i in range(1, 21):
+            for i in range(1, 41):
                 name_uk = f'Фільм-0{i}'
                 name_ru = f'Фильм-0{i}'
                 slug = slugify(name_uk)
@@ -368,3 +406,4 @@ class Command(BaseCommand):
             for movie in movies:
                 movie.participants.set(movie_participants)
                 movie.save()
+                cls._create_seances(movie)

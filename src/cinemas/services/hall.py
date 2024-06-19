@@ -3,6 +3,7 @@ from src.cinemas.models import Hall, Cinema
 from src.cinemas.schemas.hall import HallInSchema, HallUpdateSchema
 from django.utils.translation import gettext as _
 from src.cinemas.services.cinema import CinemaService
+from src.core.exceptions import FieldNotUniqueError
 from src.core.schemas.base import MessageOutSchema
 from src.core.services.gallery import GalleryService
 from src.core.services.images import ImageService
@@ -79,12 +80,15 @@ class HallService:
         if halls and hall:
             halls = halls.exclude(id=hall.id)
         if halls.count():
-            msg = _('Поле number повинно бути унікальним '
+            msg = _('Це поле повинно бути унікальним '
                     'по відношенню до конкретного кінотеатру. '
-                    f'{number} - Цей номер вже зайнятий. '
+                    f'*{number}* - цей номер вже зайнятий. '
                     f'Для кінотеатру {cinema.name}'
                     )
-            raise HttpError(404, msg)
+            raise FieldNotUniqueError(detail={
+                        "detail": msg,
+                        "field": 'number',
+                    })
 
     @staticmethod
     def get_by_id(hall_id: int) -> Hall:

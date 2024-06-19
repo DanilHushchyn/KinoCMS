@@ -1,15 +1,16 @@
 from typing import List, Any
 import ninja_schema
-from django.db.models import Q
+from ninja.errors import HttpError
+from phonenumber_field.validators import validate_international_phonenumber
 from pydantic.fields import Field
 from src.cinemas.models import Cinema
 from ninja import ModelSchema
-from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 from src.core.schemas.gallery import GalleryItemSchema
 from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
-from src.core.utils import validate_capitalized, validate_max_length
-from pydantic import BaseModel, Json, ValidationError
+from src.core.utils import validate_capitalized
+from pydantic import Json
+from django.core.exceptions import ValidationError
 
 
 class CinemaInSchema(ninja_schema.ModelSchema):
@@ -25,6 +26,14 @@ class CinemaInSchema(ninja_schema.ModelSchema):
                 'З великих літер повинні починатися (name, '
                 'description, seo_title, seo_description)')
         validate_capitalized(value, msg)
+        return value
+
+    @ninja_schema.model_validator('phone_1', 'phone_2')
+    def clean_phone_number(cls, value) -> str:
+        try:
+            validate_international_phonenumber(value)
+        except ValidationError:
+            raise HttpError(403, _("Введено некоректний номер телефону."))
         return value
 
     banner: ImageInSchema
@@ -67,6 +76,14 @@ class CinemaOutSchema(ModelSchema):
     banner: ImageOutSchema
     logo: ImageOutSchema
     seo_image: ImageOutSchema
+
+    @staticmethod
+    def resolve_phone_1(obj: Cinema):
+        return str(obj.phone_1)
+
+    @staticmethod
+    def resolve_phone_2(obj: Cinema):
+        return str(obj.phone_2)
 
     class Meta:
         model = Cinema

@@ -1,5 +1,4 @@
-from django.db.models import Q
-from ninja.errors import HttpError
+from django.http import HttpRequest
 
 from src.cinemas.models import Cinema
 from src.cinemas.schemas.cinema import CinemaInSchema, CinemaUpdateSchema
@@ -27,20 +26,27 @@ class CinemaService:
         self.gallery_service = gallery_service
         self.core_service = core_service
 
-    def create(self, schema: CinemaInSchema) -> Cinema:
+    def create(self, request: HttpRequest,
+               schema: CinemaInSchema) -> MessageOutSchema:
         """
         Create cinema.
         """
-        self.core_service.check_name_unique(value=schema.name_uk,
-                                            model=Cinema)
-        self.core_service.check_name_unique(value=schema.name_ru,
-                                            model=Cinema)
+        (self.core_service
+         .check_field_unique(request=request,
+                             value=schema.name_uk,
+                             field_name='name_uk',
+                             model=Cinema))
+        (self.core_service
+         .check_field_unique(request=request,
+                             value=schema.name_ru,
+                             field_name='name_ru',
+                             model=Cinema))
         bodies = [schema.banner, schema.logo, schema.seo_image]
         banner, logo, seo_image = (self.image_service
                                    .bulk_create(schemas=bodies))
         gallery = self.gallery_service.create(images=schema.gallery)
 
-        cinema = Cinema.objects.create(
+        Cinema.objects.create(
             name_uk=schema.name_uk,
             name_ru=schema.name_ru,
             slug=slugify(schema.name_uk),
@@ -48,6 +54,8 @@ class CinemaService:
             description_ru=schema.description_ru,
             banner=banner,
             logo=logo,
+            phone_1=schema.phone_1,
+            phone_2=schema.phone_2,
             terms_uk=schema.terms_uk,
             terms_ru=schema.terms_ru,
             address_ru=schema.address_ru,
@@ -58,20 +66,24 @@ class CinemaService:
             seo_description=schema.seo_description,
             seo_image=seo_image,
         )
-        return cinema
+        return MessageOutSchema(detail=_('Кінотеатр успішно створений'))
 
-    def update(self, cnm_slug: str, schema: CinemaUpdateSchema) \
+    def update(self, request: HttpRequest, cnm_slug: str, schema: CinemaUpdateSchema) \
             -> MessageOutSchema:
         """
         Update cinema.
         """
         cinema = Cinema.objects.get_by_slug(cnm_slug=cnm_slug)
-        self.core_service.check_name_unique(value=schema.name_uk,
-                                            instance=cinema,
-                                            model=Cinema)
-        self.core_service.check_name_unique(value=schema.name_ru,
-                                            instance=cinema,
-                                            model=Cinema)
+        self.core_service.check_field_unique(value=schema.name_uk,
+                                             field_name='name_uk',
+                                             instance=cinema,
+                                             request=request,
+                                             model=Cinema)
+        self.core_service.check_field_unique(value=schema.name_ru,
+                                             field_name='name_ru',
+                                             instance=cinema,
+                                             request=request,
+                                             model=Cinema)
         self.image_service.update(schema.banner, cinema.banner)
         self.image_service.update(schema.logo, cinema.logo)
         self.image_service.update(schema.seo_image, cinema.seo_image)

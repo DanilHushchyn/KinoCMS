@@ -28,6 +28,7 @@ extensions-install:
 	# 'django_extensions'                                | add to the INSTALLED_APPS in settings.py
 
 fix:
+	sudo service postgresql restart
 	$(MANAGE) reset_db --noinput
 	$(MANAGE) migrate
 	rm -rf ./media/*
@@ -70,3 +71,4 @@ run1:
 
 run2:
 	$(MANAGE) runserver --settings config.settings.kino_cms 7000
+

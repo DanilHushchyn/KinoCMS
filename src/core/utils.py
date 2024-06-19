@@ -1,16 +1,12 @@
-import uuid
-from datetime import datetime, timedelta
+from datetime import datetime
 from os.path import splitext
 from typing import Any
 
 from django.core.paginator import EmptyPage, Paginator
-from django.core.exceptions import ValidationError
 from django.http import HttpRequest
 
 from ninja.errors import HttpError
 from django.db.models import QuerySet
-from django.utils.translation import gettext as _
-import loguru
 from ninja.security import HttpBearer
 from ninja_jwt.authentication import JWTBaseAuthentication
 from pydantic_core._pydantic_core import Url

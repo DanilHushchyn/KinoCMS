@@ -292,6 +292,25 @@ class MovieController(ControllerBase):
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
           - **500**: Internal server error if an unexpected error occurs.
+
+        Operations with gallery items:
+         - Delete \n
+             1. Be sure to specify the id field \n
+             2. Be sure to specify the field delete=true \n
+         - Update \n
+             1. Be sure to specify the id field \n
+             2. Be sure to specify the field delete=false \n
+             3. Be sure to specify the image field \n
+                 a) required image if filename is specified. Format base64(svg,png,jpg,jpeg,webp) \n
+                 b) filename is required if image is specified. Example: *filename.png* \n
+                 c) optional alt. If you don't specify it, I'll take the value from filename \n
+         - Create:
+             1. Do not specify the id field \n
+             3. Be sure to specify the image field \n
+                 a) required image if filename is specified. Format base64(svg,png,jpg,jpeg,webp) \n
+                 b) filename is required if image is specified. Example: *filename.png* \n
+                 c) optional alt. If you don't specify it, I'll take the value from filename \n
+             4. Be sure to specify the field delete=false \n
         """
         result = self.movie_service.create(schema=body)
         return result
@@ -355,6 +374,25 @@ class MovieController(ControllerBase):
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
           - **500**: Internal server error if an unexpected error occurs.
+
+        Operations with gallery items:
+         - Delete \n
+             1. Be sure to specify the id field \n
+             2. Be sure to specify the field delete=true \n
+         - Update \n
+             1. Be sure to specify the id field \n
+             2. Be sure to specify the field delete=false \n
+             3. Be sure to specify the image field \n
+                 a) required image if filename is specified. Format base64(svg,png,jpg,jpeg,webp) \n
+                 b) filename is required if image is specified. Example: *filename.png* \n
+                 c) optional alt. If you don't specify it, I'll take the value from filename \n
+         - Create:
+             1. Do not specify the id field \n
+             3. Be sure to specify the image field \n
+                 a) required image if filename is specified. Format base64(svg,png,jpg,jpeg,webp) \n
+                 b) filename is required if image is specified. Example: *filename.png* \n
+                 c) optional alt. If you don't specify it, I'll take the value from filename \n
+             4. Be sure to specify the field delete=false \n
         """
         result = self.movie_service.update(mv_slug=mv_slug, schema=body)
         return result

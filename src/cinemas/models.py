@@ -1,4 +1,5 @@
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 from src.cinemas.managers.cinema import CinemaManager
 from src.cinemas.managers.hall import HallManager
@@ -13,6 +14,8 @@ class Cinema(Seo):
     slug = models.SlugField(unique=True, db_index=True, null=True)
     description = models.TextField(max_length=20000)
     terms = models.JSONField()
+    phone_1 = PhoneNumberField()
+    phone_2 = PhoneNumberField()
     banner = models.OneToOneField('core.Image',
                                   related_name='cin_bnr',
                                   on_delete=models.DO_NOTHING,
@@ -42,9 +45,7 @@ class Hall(Seo):
     banner = models.OneToOneField('core.Image', related_name='hall_bnr',
                                   on_delete=models.DO_NOTHING,
                                   null=True)
-    schema = models.OneToOneField('core.Image', related_name='schema',
-                                  on_delete=models.DO_NOTHING,
-                                  null=True)
+    schema = models.JSONField()
     date_created = models.DateTimeField(auto_now_add=True)
     cinema = models.ForeignKey('Cinema',
                                on_delete=models.CASCADE,

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-14 11:48+0300\n"
+"POT-Creation-Date: 2024-06-19 09:24+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,19 +21,15 @@ msgstr ""
 "100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
 "(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: config/admin_urls.py:59 config/kino_urls.py:38
+#: config/admin_urls.py:58 config/kino_urls.py:37
 msgid "Не авторизований"
 msgstr ""
 
-#: src/cinemas/endpoints/cinema.py:129
-msgid "Кінотеатр успішно створений"
-msgstr ""
-
-#: src/cinemas/endpoints/cinema.py:192 src/cinemas/services/cinema.py:87
+#: src/cinemas/endpoints/cinema.py:234 src/cinemas/services/cinema.py:99
 msgid "Кінотеатр успішно оновлений"
 msgstr ""
 
-#: src/cinemas/endpoints/hall.py:194 src/cinemas/services/hall.py:69
+#: src/cinemas/endpoints/hall.py:234 src/cinemas/services/hall.py:70
 msgid "Зал успішно оновлений"
 msgstr ""
 
@@ -45,11 +41,15 @@ msgstr ""
 msgid "Не знайдено: немає збігів залів на заданному запиті."
 msgstr ""
 
-#: src/cinemas/schemas/cinema.py:24 src/movies/schemas.py:57
-#: src/pages/schemas/news_promo.py:23
+#: src/cinemas/schemas/cinema.py:25 src/movies/schemas.py:57
+#: src/pages/schemas/news_promo.py:23 src/pages/schemas/news_promo.py:82
 msgid ""
 "Недійсне значення (не написане великими літерами). З великих літер повинні "
 "починатися (name, description, seo_title, seo_description)"
+msgstr ""
+
+#: src/cinemas/schemas/cinema.py:36 src/users/schemas.py:72
+msgid "Введено некоректний номер телефону."
 msgstr ""
 
 #: src/cinemas/schemas/hall.py:22
@@ -58,21 +58,29 @@ msgid ""
 "починатися (description, seo_title, seo_description)"
 msgstr ""
 
-#: src/cinemas/services/cinema.py:120
+#: src/cinemas/services/cinema.py:69
+msgid "Кінотеатр успішно створений"
+msgstr ""
+
+#: src/cinemas/services/cinema.py:132
 msgid "Кінотеатр успішно видалений"
 msgstr ""
 
-#: src/cinemas/services/hall.py:48
+#: src/cinemas/services/hall.py:49
 msgid "Зал успішно створений"
 msgstr ""
 
-#: src/cinemas/services/hall.py:82
+#: src/cinemas/services/hall.py:83
 msgid ""
-"Поле number повинно бути унікальним по відношенню до конкретного кінотеатру. "
+"Це поле повинно бути унікальним по відношенню до конкретного кінотеатру. "
 msgstr ""
 
-#: src/cinemas/services/hall.py:121
+#: src/cinemas/services/hall.py:125
 msgid "Зал успішно видалений"
+msgstr ""
+
+#: src/core/exceptions.py:10 src/core/services/core.py:38
+msgid "Поле повинно бути унікальним. "
 msgstr ""
 
 #: src/core/managers/gallery.py:24
@@ -93,47 +101,43 @@ msgstr ""
 msgid "Невірний формат base64 був відправлений"
 msgstr ""
 
-#: src/core/services/core.py:27
-msgid "Поле name повинно бути унікальним. Ця назва вже зайнята"
-msgstr ""
-
 #: src/core/services/images.py:39
 msgid "Файл пошкоджений"
 msgstr ""
 
-#: src/core/services/images.py:41 src/mailing/services/mailing.py:89
+#: src/core/services/images.py:41 src/mailing/services/mailing.py:92
 msgid "Максимально дозволений розмір файлу 1MB"
 msgstr ""
 
-#: src/mailing/schemas.py:47 src/mailing/services/mailing.py:105
+#: src/mailing/schemas.py:47 src/mailing/services/mailing.py:108
 msgid "Не знайдено: немає збігів шаблонів на заданному запиті"
 msgstr ""
 
-#: src/mailing/services/mailing.py:42
+#: src/mailing/services/mailing.py:45
 msgid "Треба зачекати поки закінчиться поточне розсилання"
 msgstr ""
 
-#: src/mailing/services/mailing.py:44
+#: src/mailing/services/mailing.py:47
 msgid "Розсилання почалося"
 msgstr ""
 
-#: src/mailing/services/mailing.py:58
+#: src/mailing/services/mailing.py:61
 msgid "Розсилання успішно виконане"
 msgstr ""
 
-#: src/mailing/services/mailing.py:67
+#: src/mailing/services/mailing.py:70
 msgid "На теперішній час розсилання не активне"
 msgstr ""
 
-#: src/mailing/services/mailing.py:86
+#: src/mailing/services/mailing.py:89
 msgid "Дозволено відправляти тільки html"
 msgstr ""
 
-#: src/mailing/services/mailing.py:111
+#: src/mailing/services/mailing.py:114
 msgid "Не можна видаляти шаблони поки йде розсилання."
 msgstr ""
 
-#: src/mailing/services/mailing.py:114
+#: src/mailing/services/mailing.py:117
 msgid "Шаблон успішно видалений"
 msgstr ""
 
@@ -225,10 +229,10 @@ msgstr ""
 msgid "Невірний формат кольору було введено"
 msgstr ""
 
-#: src/pages/schemas/page.py:21
+#: src/pages/schemas/page.py:22
 msgid ""
 "Недійсне значення (не написане великими літерами). З великих літер повинні "
-"починатися (name, content, seo_title, seo_description)"
+"починатися (name, seo_title, seo_description)"
 msgstr ""
 
 #: src/pages/services/banners_sliders.py:54
@@ -296,11 +300,11 @@ msgstr ""
 msgid "Користувач успішно видалений"
 msgstr ""
 
-#: src/users/managers/user_manager.py:151
+#: src/users/managers/user_manager.py:154
 msgid "Паролі не співпадають"
 msgstr ""
 
-#: src/users/managers/user_manager.py:154
+#: src/users/managers/user_manager.py:157
 msgid "Ця електронна адреса вже використовується"
 msgstr ""
 
@@ -404,10 +408,6 @@ msgstr ""
 msgid "Луцьк"
 msgstr ""
 
-#: src/users/schemas.py:72
-msgid "Введено некоректний номер телефону."
-msgstr ""
-
 #: src/users/schemas.py:82
 msgid ""
 "Ім'я повинно починатися з великої літери(наступні маленькі), доступна "
@@ -420,13 +420,13 @@ msgid ""
 "кирилиця та латиниця, доступні спецсимволи('-)"
 msgstr ""
 
-#: src/users/schemas.py:114
+#: src/users/schemas.py:114 src/users/schemas.py:151
 msgid ""
 "Пароль повинен відповідати: * Хоча б одній великій літері, * Хоча б одній "
 "малій літері, * Хоча б одній цифрі, * Хоча б одному спеціальному символу з "
 "набору ?!@%^&- * Мінімальна довжина 8 символів"
 msgstr ""
 
-#: src/users/services/user_service.py:67
+#: src/users/services/user_service.py:62
 msgid "Ви успішно зареєструвалися"
 msgstr ""
