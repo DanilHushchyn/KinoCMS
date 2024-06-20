@@ -143,7 +143,7 @@ class PageController(ControllerBase):
                  c) optional alt. If you don't specify it, I'll take the value from filename \n
              4. Be sure to specify the field delete=false \n
         """
-        result = self.page_service.create(schema=body)
+        result = self.page_service.create(request=request, schema=body)
         return result
 
     @http_patch(
@@ -225,7 +225,9 @@ class PageController(ControllerBase):
                  c) optional alt. If you don't specify it, I'll take the value from filename \n
              4. Be sure to specify the field delete=false \n
         """
-        result = self.page_service.update(pg_slug=pg_slug, schema=body)
+        result = self.page_service.update(request=request,
+                                          pg_slug=pg_slug,
+                                          schema=body)
         return result
 
     @http_get(

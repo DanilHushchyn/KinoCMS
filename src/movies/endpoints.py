@@ -486,3 +486,97 @@ class MovieController(ControllerBase):
         """
         result = self.movie_service.delete_by_slug(mv_slug=mv_slug)
         return result
+
+
+@api_controller("/movie", tags=["movies"])
+class MovieClientController(ControllerBase):
+    """
+    A controller class for managing movie in client site.
+
+    This class provides endpoints for
+    get, movie in the site
+    """
+
+    def __init__(self, movie_service: MovieService):
+        """
+        Use this method to inject "services" to MovieClientController.
+
+        :param movie_service: variable for managing movies
+        """
+        self.movie_service = movie_service
+
+    get_all_movie_cards = MovieController.get_all_movie_cards
+
+    @http_get(
+        "/seances-today-cards/",
+        response=PaginatedResponseSchema[MovieCardOutSchema],
+        openapi_extra={
+            "operationId": "search_movies",
+            "responses": {
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    @paginate()
+    def get_movie_today_cards(
+            self,
+            request: HttpRequest,
+            cnm_slug: str = None,
+            hall_id: int = None,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> QuerySet[Movie]:
+        """
+        Search movies by search line.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.movie_service.get_today_movies(cnm_slug=cnm_slug,
+                                                     hall_id=hall_id)
+        return result
+
+    @http_get(
+        "/search/",
+        response=PaginatedResponseSchema[MovieSearchOutSchema],
+        openapi_extra={
+            "operationId": "search_movies",
+            "responses": {
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    @paginate()
+    def search_movies(
+            self,
+            request: HttpRequest,
+            search_line: str = None,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> QuerySet[Movie]:
+        """
+        Search movies by search line.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.movie_service.search(search_line)
+        return result
+
+    get_movie_by_slug = MovieController.get_movie_by_slug

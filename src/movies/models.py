@@ -37,7 +37,7 @@ TECHS_CHOICES = [
     ['3d', "3D"],
     ['2d', "2D"],
     ['imax', "IMAX"],
-    ['4dx', "4DX"],
+    ['4dx.json', "4DX"],
     ['5d', "5D"],
 ]
 

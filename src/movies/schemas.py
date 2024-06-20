@@ -167,6 +167,7 @@ class MovieCardOutSchema(ModelSchema):
         fields = ['name',
                   'legal_age',
                   'card_img',
+                  'released',
                   'slug', ]
 
 
@@ -194,7 +195,6 @@ class MovieOutSchema(ModelSchema):
     def resolve_legal_age(obj: Movie) -> str:
         legal_age_display = dict(Movie.AGE_CHOICES)[obj.legal_age]
         return legal_age_display
-
 
     @staticmethod
     def resolve_techs(obj: Movie) -> List[str]:
@@ -296,3 +296,17 @@ class MovieParticipantOutSchema(ModelSchema):
         fields = [
             'id',
         ]
+
+
+class MovieSearchOutSchema(ModelSchema):
+    """
+    Pydantic schema for searching movies in site.
+    """
+    card_img: ImageOutSchema
+
+    class Meta:
+        model = Movie
+        fields = ['name',
+                  'card_img',
+                  'slug'
+                  ]

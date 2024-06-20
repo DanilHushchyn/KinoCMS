@@ -1,4 +1,5 @@
 from django.db.models import QuerySet
+from django.http import HttpRequest
 from injector import inject
 from src.core.schemas.base import MessageOutSchema
 from src.core.services.core import CoreService
@@ -23,14 +24,20 @@ class MovieService:
         self.image_service = image_service
         self.gall_service = gall_service
 
-    def create(self, schema: MovieInSchema) -> MessageOutSchema:
+    def create(self, request: HttpRequest, schema: MovieInSchema) -> MessageOutSchema:
         """
         Create Movie.
         """
-        self.core_service.check_name_unique(value=schema.name_uk,
-                                            model=Movie)
-        self.core_service.check_name_unique(value=schema.name_ru,
-                                            model=Movie)
+        self.core_service.check_field_unique(
+            request=request,
+            value=schema.name_uk,
+            field_name='name_uk',
+            model=Movie)
+        self.core_service.check_field_unique(
+            request=request,
+            value=schema.name_ru,
+            field_name='name_ru',
+            model=Movie)
         bodies = [schema.card_img, schema.seo_image]
         card_img, seo_image = (self.image_service
                                .bulk_create(schemas=bodies))
@@ -60,18 +67,25 @@ class MovieService:
         movie.save()
         return MessageOutSchema(detail=_('Фільм успішно створений'))
 
-    def update(self, mv_slug: str, schema: MovieUpdateSchema) \
+    def update(self, request: HttpRequest, mv_slug: str,
+               schema: MovieUpdateSchema) \
             -> MessageOutSchema:
         """
         Update Movie.
         """
         movie = Movie.objects.get_by_slug(mv_slug=mv_slug)
-        self.core_service.check_name_unique(value=schema.name_uk,
-                                            instance=movie,
-                                            model=Movie)
-        self.core_service.check_name_unique(value=schema.name_ru,
-                                            instance=movie,
-                                            model=Movie)
+        self.core_service.check_field_unique(
+            request=request,
+            value=schema.name_uk,
+            field_name='name_uk',
+            instance=movie,
+            model=Movie)
+        self.core_service.check_field_unique(
+            request=request,
+            value=schema.name_ru,
+            field_name='name_ru',
+            instance=movie,
+            model=Movie)
         self.image_service.update(schema.card_img, movie.card_img)
         self.image_service.update(schema.seo_image, movie.seo_image)
 
@@ -95,16 +109,32 @@ class MovieService:
         Get movie by slug.
         """
         movie = Movie.objects.get_by_slug(mv_slug=mv_slug)
-
-        # print(Movie.objects.filter(genres__contains='1,').count())
-        # keys = [key for key in movie.genres]
-        # print(keys)
         return movie
+
+    @staticmethod
+    def search(search_line: str) -> QuerySet[Movie]:
+        """
+        Get movies queryset by search_line.
+        """
+        movies = Movie.objects.get_by_search_line(search_line=search_line)
+        return movies
+
+    @staticmethod
+    def get_today_movies(cnm_slug: str, hall_id: int) -> QuerySet[Movie]:
+        """
+        Get movies queryset with séances for today;
+        :param cnm_slug for filtering séances by cinema
+        :param hall_id for filtering séances by hall
+        """
+        movies = Movie.objects.get_today_movies(cnm_slug=cnm_slug,
+                                                hall_id=hall_id)
+        return movies
 
     @staticmethod
     def get_all(release: str) -> QuerySet:
         """
-        Get all movies.
+        Get all movies;
+        :param release for sorting movie by release(soon or current) date
         """
         movie = Movie.objects.select_related('card_img').all()
         today = datetime.date.today()

@@ -87,7 +87,7 @@ class Migration(migrations.Migration):
                 ('legal_age', models.CharField(choices=[('+0', '+0'), ('+6', '+6'), ('+12', '+12'), ('+16', '+16'), ('+18', '+18')], default='+0', null=True)),
                 ('duration', models.DurationField(null=True)),
                 ('released', models.DateField(null=True)),
-                ('techs', src.movies.utils.MultiSelectField(choices=[('3d', '3D'), ('2d', '2D'), ('imax', 'IMAX'), ('4dx', '4DX'), ('5d', '5D')], max_length=255, null=True)),
+                ('techs', src.movies.utils.MultiSelectField(choices=[('3d', '3D'), ('2d', '2D'), ('imax', 'IMAX'), ('4dx.json', '4DX'), ('5d', '5D')], max_length=255, null=True)),
                 ('genres', src.movies.utils.MultiSelectField(choices=[('comedy', 'Комедія'), ('fantasy', 'Фантастика'), ('horror', 'Жахи'), ('action', 'Бойовик'), ('melodramas', 'Мелодрами'), ('thriller', 'Трилер'), ('mysticism', 'Містика'), ('detective', 'Детектив')], max_length=255, null=True)),
                 ('countries', django_countries.fields.CountryField(blank=True, max_length=746, multiple=True)),
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True)),

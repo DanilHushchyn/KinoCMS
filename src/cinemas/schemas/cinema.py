@@ -91,6 +91,28 @@ class CinemaOutSchema(ModelSchema):
                    'terms', 'slug', 'date_created']
 
 
+class CinemaContactOutSchema(ModelSchema):
+    """
+    Pydantic schema for showing cinema contacts.
+    """
+    banner: ImageOutSchema
+    logo: ImageOutSchema
+
+    @staticmethod
+    def resolve_phone_1(obj: Cinema):
+        return str(obj.phone_1)
+
+    @staticmethod
+    def resolve_phone_2(obj: Cinema):
+        return str(obj.phone_2)
+
+    class Meta:
+        model = Cinema
+        fields = ['slug', 'name', 'address',
+                   'phone_1', 'phone_2',
+                   'coordinate', 'date_created']
+
+
 class CinemaUpdateSchema(CinemaInSchema):
     """
     Pydantic schema for updating cinema.

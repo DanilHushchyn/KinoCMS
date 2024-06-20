@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                 ('description_uk', models.TextField(max_length=2000, null=True)),
                 ('description_ru', models.TextField(max_length=2000, null=True)),
                 ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('tech', models.CharField(choices=[('3d', '3D'), ('2d', '2D'), ('imax', 'IMAX'), ('4dx', '4DX'), ('5d', '5D')], default='3d', max_length=25, null=True)),
+                ('tech', models.CharField(choices=[('3d', '3D'), ('2d', '2D'), ('imax', 'IMAX'), ('4dx.json', '4DX'), ('5d', '5D')], default='3d', max_length=25, null=True)),
                 ('banner', models.OneToOneField(null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='hall_bnr', to='core.image')),
                 ('cinema', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='cinemas.cinema')),
                 ('gallery', models.OneToOneField(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='core.gallery')),

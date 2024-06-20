@@ -134,18 +134,25 @@ class NewsPromoController(ControllerBase):
              1. Be sure to specify the id field \n
              2. Be sure to specify the field delete=false \n
              3. Be sure to specify the image field \n
-                 a) required image if filename is specified. Format base64(svg,png,jpg,jpeg,webp) \n
-                 b) filename is required if image is specified. Example: *filename.png* \n
-                 c) optional alt. If you don't specify it, I'll take the value from filename \n
+                 a) required image if filename is specified.
+                    Format base64(svg,png,jpg,jpeg,webp) \n
+                 b) filename is required if image is specified.
+                    Example: *filename.png* \n
+                 c) optional alt. If you don't specify it,
+                    I'll take the value from filename \n
          - Create:
              1. Do not specify the id field \n
              3. Be sure to specify the image field \n
-                 a) required image if filename is specified. Format base64(svg,png,jpg,jpeg,webp) \n
-                 b) filename is required if image is specified. Example: *filename.png* \n
-                 c) optional alt. If you don't specify it, I'll take the value from filename \n
+                 a) required image if filename is specified.
+                    Format base64(svg,png,jpg,jpeg,webp) \n
+                 b) filename is required if image is specified.
+                    Example: *filename.png* \n
+                 c) optional alt. If you don't specify it,
+                    I'll take the value from filename \n
              4. Be sure to specify the field delete=false \n
         """
-        result = self.news_promo_service.create(schema=body)
+        result = self.news_promo_service.create(schema=body,
+                                                request=request)
         return result
 
     @http_patch(
@@ -228,7 +235,9 @@ class NewsPromoController(ControllerBase):
                  c) optional alt. If you don't specify it, I'll take the value from filename \n
              4. Be sure to specify the field delete=false \n
         """
-        result = self.news_promo_service.update(np_slug=np_slug, schema=body)
+        result = self.news_promo_service.update(request=request,
+                                                np_slug=np_slug,
+                                                schema=body)
         return result
 
     @http_get(

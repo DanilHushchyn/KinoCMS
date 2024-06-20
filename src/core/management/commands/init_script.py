@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+import json
 import os
 import random
 from datetime import timedelta, datetime
-from typing import List
+from typing import List, Dict
 
 from django.contrib.auth import get_user_model
 from django.core.files import File
@@ -192,14 +193,17 @@ class Command(BaseCommand):
             Cinema.objects.bulk_create(cinemas)
 
     @classmethod
-    def _create_hall_schema(cls) -> List:
-        number = random.choice(range(4, 16))
-        schema = []
-        for i in range(1, number + 1):
-            schema.append({
-                "number": i,
-            })
-        return schema
+    def _create_hall_schema(cls) -> Dict:
+        random_schema = random.choice(os.listdir(
+            os.path.join("seed", 'hall_schemas')))
+        schema = open(os.path.join("seed", 'hall_schemas', random_schema), "rb")
+        # Open the file in read mode
+        with open(schema.name, "r") as f:
+            # Read the entire content of the file
+            data = f.read()
+        # Parse the JSON string into a Python dictionary
+        data_dict = json.loads(data)
+        return data_dict
 
     @classmethod
     def _create_halls(cls):
@@ -218,7 +222,7 @@ class Command(BaseCommand):
                         tech=random.choice([key for key, _ in
                                             TECHS_CHOICES]),
                         seo_title=f'0{i}',
-                        schema={},
+                        schema=cls._create_hall_schema(),
                         seo_description=description_uk[:150],
                         seo_image=cls._create_image('hall/banner'),
                         banner=cls._create_image('hall/banner'),

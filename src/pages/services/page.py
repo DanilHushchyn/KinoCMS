@@ -1,3 +1,4 @@
+from django.http import HttpRequest
 from ninja.errors import HttpError
 
 from src.pages.models import Page
@@ -27,14 +28,21 @@ class PageService:
         self.gallery_service = gallery_service
         self.core_service = core_service
 
-    def create(self, schema: PageInSchema) -> MessageOutSchema:
+    def create(self, request: HttpRequest, schema: PageInSchema) \
+            -> MessageOutSchema:
         """
         Create page.
         """
-        self.core_service.check_name_unique(value=schema.name_uk,
-                                            model=Page)
-        self.core_service.check_name_unique(value=schema.name_ru,
-                                            model=Page)
+        self.core_service.check_field_unique(
+            value=schema.name_uk,
+            request=request,
+            field_name='name_uk',
+            model=Page)
+        self.core_service.check_field_unique(
+            value=schema.name_uk,
+            request=request,
+            field_name='name_uk',
+            model=Page)
         bodies = [schema.banner, schema.seo_image]
         banner, seo_image = (self.image_service
                              .bulk_create(schemas=bodies))
@@ -55,18 +63,25 @@ class PageService:
         )
         return MessageOutSchema(detail=_('Сторінка успішно створена'))
 
-    def update(self, pg_slug: str, schema: PageUpdateSchema) \
+    def update(self, request: HttpRequest, pg_slug: str,
+               schema: PageUpdateSchema) \
             -> MessageOutSchema:
         """
         Update page.
         """
         page = Page.objects.get_by_slug(pg_slug=pg_slug)
-        self.core_service.check_name_unique(value=schema.name_uk,
-                                            instance=page,
-                                            model=Page)
-        self.core_service.check_name_unique(value=schema.name_ru,
-                                            instance=page,
-                                            model=Page)
+        self.core_service.check_field_unique(
+            value=schema.name_uk,
+            request=request,
+            field_name='name_uk',
+            instance=page,
+            model=Page)
+        self.core_service.check_field_unique(
+            value=schema.name_ru,
+            request=request,
+            field_name='name_ru',
+            instance=page,
+            model=Page)
         self.image_service.update(schema.banner, page.banner)
         self.image_service.update(schema.seo_image, page.seo_image)
 

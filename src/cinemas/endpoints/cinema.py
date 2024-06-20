@@ -6,11 +6,13 @@ from src.cinemas.models import Cinema
 from src.cinemas.schemas.cinema import (CinemaInSchema,
                                         CinemaCardOutSchema,
                                         CinemaUpdateSchema,
-                                        CinemaOutSchema)
+                                        CinemaOutSchema, CinemaContactOutSchema)
 from src.cinemas.services.cinema import CinemaService
 from src.core.schemas.base import LangEnum, MessageOutSchema
 from ninja_extra.permissions import IsAdminUser
-from ninja_extra import http_get, http_post, http_patch, http_delete
+from ninja_extra import (http_get, http_post, http_patch,
+                         http_delete,
+                         route)
 from ninja import Header
 from django.utils.translation import gettext as _
 
@@ -20,7 +22,7 @@ from src.core.utils import CustomJWTAuth
 @api_controller("/cinema", tags=["cinemas"])
 class CinemaController(ControllerBase):
     """
-    A controller class for managing cinema in system.
+    A controller class for managing cinema in admin site.
 
     This class provides endpoints for
     get, post, update, delete cinema in the site
@@ -322,3 +324,59 @@ class CinemaController(ControllerBase):
         """
         result = self.cinema_service.delete_by_slug(cnm_slug=cnm_slug)
         return result
+
+
+@api_controller("/cinema", tags=["cinemas"])
+class CinemaClientController(ControllerBase):
+    """
+    A controller class for managing cinema in client site.
+
+    This class provides endpoints for
+    get, cinema in the site
+    """
+
+    def __init__(self, cinema_service: CinemaService):
+        """
+        Use this method to inject "services" to CinemaController.
+
+        :param cinema_service: variable for managing cinemas
+        """
+        self.cinema_service = cinema_service
+    get_all_cinema_cards = CinemaController.get_all_cinema_cards
+
+    @http_get(
+        "/all-contacts/",
+        response=PaginatedResponseSchema[CinemaContactOutSchema],
+        openapi_extra={
+            "operationId": "get_all_cinema_contacts",
+            "responses": {
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    @paginate()
+    def get_all_cinema_contacts(
+            self,
+            request: HttpRequest,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> Cinema:
+        """
+        Get all cinema cards.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.cinema_service.get_all()
+        return result
+
+    get_cinema_by_slug = CinemaController.get_cinema_by_slug
+

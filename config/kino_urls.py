@@ -23,11 +23,17 @@ from ninja.errors import AuthenticationError, ValidationError
 
 from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController
-# from src.users.endpoints import UsersKinoController
+from src.booking.endpoints.seance import SeanceController
+from src.cinemas.endpoints.cinema import CinemaClientController
+from src.core.endpoints.gallery import GalleryController
+from src.movies.endpoints import MovieClientController
 
 kino_api = NinjaExtraAPI(title='KinoCMS (client-site)', description='CLIENT API')
-
 kino_api.register_controllers(CustomTokenObtainPairController)
+kino_api.register_controllers(GalleryController)
+kino_api.register_controllers(CinemaClientController)
+kino_api.register_controllers(MovieClientController)
+kino_api.register_controllers(SeanceController)
 
 
 @kino_api.exception_handler(AuthenticationError)

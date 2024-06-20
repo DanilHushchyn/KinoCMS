@@ -1,5 +1,7 @@
 from django.db import models
 
+from src.booking.managers.seance import SeanceManager
+
 
 # Create your models here.
 class Seance(models.Model):
@@ -7,6 +9,7 @@ class Seance(models.Model):
     date = models.DateTimeField()
     hall = models.ForeignKey('cinemas.Hall', on_delete=models.CASCADE)
     movie = models.ForeignKey('movies.Movie', on_delete=models.CASCADE)
+    objects = SeanceManager()
 
     class Meta:
         verbose_name = "Seance"

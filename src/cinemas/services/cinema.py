@@ -31,16 +31,16 @@ class CinemaService:
         """
         Create cinema.
         """
-        (self.core_service
-         .check_field_unique(request=request,
-                             value=schema.name_uk,
-                             field_name='name_uk',
-                             model=Cinema))
-        (self.core_service
-         .check_field_unique(request=request,
-                             value=schema.name_ru,
-                             field_name='name_ru',
-                             model=Cinema))
+        self.core_service.check_field_unique(
+            request=request,
+            value=schema.name_uk,
+            field_name='name_uk',
+            model=Cinema)
+        self.core_service.check_field_unique(
+            request=request,
+            value=schema.name_ru,
+            field_name='name_ru',
+            model=Cinema)
         bodies = [schema.banner, schema.logo, schema.seo_image]
         banner, logo, seo_image = (self.image_service
                                    .bulk_create(schemas=bodies))

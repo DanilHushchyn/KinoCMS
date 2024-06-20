@@ -1,3 +1,5 @@
+from django.http import HttpRequest
+
 from src.pages.models import NewsPromo
 from src.pages.schemas.news_promo import (NewsPromoInSchema,
                                           NewsPromoUpdateSchema)
@@ -25,14 +27,20 @@ class NewsPromoService:
         self.gallery_service = gallery_service
         self.core_service = core_service
 
-    def create(self, schema: NewsPromoInSchema) -> MessageOutSchema:
+    def create(self, request: HttpRequest, schema: NewsPromoInSchema) -> MessageOutSchema:
         """
         Create news_promo.
         """
-        self.core_service.check_name_unique(value=schema.name_uk,
-                                            model=NewsPromo)
-        self.core_service.check_name_unique(value=schema.name_ru,
-                                            model=NewsPromo)
+        self.core_service.check_field_unique(
+            value=schema.name_uk,
+            request=request,
+            field_name='name_uk',
+            model=NewsPromo)
+        self.core_service.check_field_unique(
+            value=schema.name_ru,
+            request=request,
+            field_name='name_ru',
+            model=NewsPromo)
         bodies = [schema.banner, schema.seo_image]
         banner, seo_image = (self.image_service
                              .bulk_create(schemas=bodies))
@@ -57,18 +65,25 @@ class NewsPromoService:
             return MessageOutSchema(detail=_('Акція успішно створена'))
         return MessageOutSchema(detail=_('Новина успішно створена'))
 
-    def update(self, np_slug: str, schema: NewsPromoUpdateSchema) \
+    def update(self, request: HttpRequest, np_slug: str,
+               schema: NewsPromoUpdateSchema) \
             -> MessageOutSchema:
         """
         Update news_promo.
         """
         news_promo = NewsPromo.objects.get_by_slug(np_slug=np_slug)
-        self.core_service.check_name_unique(value=schema.name_uk,
-                                            instance=news_promo,
-                                            model=NewsPromo)
-        self.core_service.check_name_unique(value=schema.name_ru,
-                                            instance=news_promo,
-                                            model=NewsPromo)
+        self.core_service.check_field_unique(
+            value=schema.name_uk,
+            request=request,
+            instance=news_promo,
+            field_name='name_uk',
+            model=NewsPromo)
+        self.core_service.check_field_unique(
+            value=schema.name_ru,
+            instance=news_promo,
+            request=request,
+            field_name='name_ru',
+            model=NewsPromo)
         self.image_service.update(schema.banner, news_promo.banner)
         self.image_service.update(schema.seo_image, news_promo.seo_image)
 
