@@ -1,4 +1,6 @@
+from django.db.models import QuerySet
 from django.http import HttpRequest
+from ninja.errors import HttpError
 
 from src.pages.models import NewsPromo
 from src.pages.schemas.news_promo import (NewsPromoInSchema,
@@ -108,6 +110,18 @@ class NewsPromoService:
         return news_promo
 
     @staticmethod
+    def get_active_by_slug(np_slug: str) -> NewsPromo:
+        """
+        Get news or promo by slug.
+        """
+        news_promo = NewsPromo.objects.get_by_slug(np_slug=np_slug)
+        if news_promo.active is False:
+            msg = _('Не знайдено: немає збігів новин и акцій '
+                    'на заданному запиті.')
+            raise HttpError(404, msg)
+        return news_promo
+
+    @staticmethod
     def get_all(promo: bool) -> NewsPromo:
         """
         Get all news_promos.
@@ -116,6 +130,20 @@ class NewsPromoService:
             news_promo = NewsPromo.objects.filter(promo=True)
         else:
             news_promo = NewsPromo.objects.filter(promo=False)
+        return news_promo
+
+    @staticmethod
+    def get_all_active(promo: bool) -> QuerySet[NewsPromo]:
+        """
+        Get all news_promos.
+        """
+        if promo:
+            news_promo = NewsPromo.objects.filter(promo=True,
+                                                  active=True)
+        else:
+            news_promo = NewsPromo.objects.filter(promo=False,
+                                                  active=True)
+
         return news_promo
 
     def delete_by_slug(self, np_slug: str) -> MessageOutSchema:

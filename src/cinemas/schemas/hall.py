@@ -16,6 +16,7 @@ class HallInSchema(ninja_schema.ModelSchema):
     """
     Pydantic schema for creating halls to server side.
     """
+
     @ninja_schema.model_validator('description_uk', 'description_ru',
                                   'seo_title', 'seo_description')
     def clean_capitalize(cls, value) -> int:
@@ -86,6 +87,32 @@ class HallOutSchema(ModelSchema):
                   'banner',
                   'id',
                   'tech',
+                  'seo_title',
+                  'seo_image',
+                  'seo_description',
+                  ]
+
+
+class HallClientOutSchema(ModelSchema):
+    """
+    Pydantic schema for showing hall full data in the client site.
+    """
+    banner: ImageOutSchema
+    seo_image: ImageOutSchema
+    tech_display: str
+
+    @staticmethod
+    def resolve_tech_display(obj: Hall) -> str:
+        tech_display = dict(TECHS_CHOICES)[obj.tech]
+        return tech_display
+
+    class Meta:
+        model = Hall
+        fields = ['number',
+                  'description',
+                  'gallery',
+                  'banner',
+                  'id',
                   'seo_title',
                   'seo_image',
                   'seo_description',

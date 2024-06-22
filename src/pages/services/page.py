@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 from django.http import HttpRequest
 from ninja.errors import HttpError
 
@@ -104,13 +105,34 @@ class PageService:
         return page
 
     @staticmethod
-    def get_all() -> Page:
+    def get_active_by_slug(pg_slug: str) -> Page:
+        """
+        Get page by slug.
+        """
+        page = Page.objects.get_by_slug(pg_slug=pg_slug)
+        if page.active is False:
+            msg = _('Не знайдено: немає збігів сторінок '
+                    'на заданному запиті.')
+            raise HttpError(404, msg)
+        return page
+
+    @staticmethod
+    def get_all() -> QuerySet[Page]:
         """
         Get all pages.
         """
 
-        page = Page.objects.all()
-        return page
+        pages = Page.objects.all()
+        return pages
+
+    @staticmethod
+    def get_all_active() -> QuerySet[Page]:
+        """
+        Get all active pages.
+        """
+
+        pages = Page.objects.filter(active=True)
+        return pages
 
     def delete_by_slug(self, pg_slug: str) -> MessageOutSchema:
         """

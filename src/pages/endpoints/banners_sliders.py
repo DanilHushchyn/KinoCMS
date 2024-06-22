@@ -7,28 +7,23 @@ from ninja_extra.pagination.decorator import paginate
 from ninja_extra.schemas.response import PaginatedResponseSchema
 from src.core.schemas.base import LangEnum, MessageOutSchema
 from ninja_extra.permissions import IsAdminUser
-from ninja_extra import http_get, http_post, http_patch, http_delete
+from ninja_extra import http_get, http_patch
 from ninja import Header
-from django.utils.translation import gettext as _
 
 from src.core.utils import CustomJWTAuth
 from src.pages.models import TopSlider, BottomSlider, ETEndBBanner
-from src.pages.schemas import *
 from src.pages.schemas.banners_sliders import TopSliderUpdateSchema, TopSliderOutSchema, BottomSliderOutSchema, \
     BottomSliderUpdateSchema, ETEndBBannerUpdateSchema, ETEndBBannerOutSchema
 from src.pages.services.banners_sliders import SliderService
 
 
-# from src.pages.services import SliderService
-
-
 @api_controller("/slider", tags=["sliders"])
 class SliderController(ControllerBase):
     """
-    A controller class for managing slider in system.
+    A controller class for managing slider in admin site.
 
     This class provides endpoints for
-    get, update, delete slider in the admin panel
+    get, update, delete slider in the admin site
     """
 
     def __init__(self, slider_service: SliderService):
@@ -378,3 +373,24 @@ class SliderController(ControllerBase):
         """
         result = self.slider_service.get_etend_banner()
         return result
+
+
+@api_controller("/slider", tags=["sliders"])
+class SliderClientController(ControllerBase):
+    """
+    A controller class for managing slider in client site.
+
+    This class provides endpoints for
+    get,  slider in the client site
+    """
+
+    def __init__(self, slider_service: SliderService):
+        """
+        Use this method to inject "services" to SliderClientController.
+
+        :param slider_service: variable for managing sliders
+        """
+        self.slider_service = slider_service
+    get_top_slider = SliderController.get_top_slider
+    get_bottom_slider = SliderController.get_bottom_slider
+    get_etend_banner = SliderController.get_etend_banner

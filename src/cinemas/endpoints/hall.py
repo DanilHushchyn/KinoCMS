@@ -7,7 +7,7 @@ from src.cinemas.models import Hall
 from src.cinemas.schemas.hall import (HallInSchema,
                                       HallCardOutSchema,
                                       HallUpdateSchema,
-                                      HallOutSchema)
+                                      HallOutSchema, HallClientOutSchema)
 from src.cinemas.services.hall import HallService
 from src.core.schemas.base import LangEnum, MessageOutSchema
 from ninja_extra.permissions import IsAdminUser
@@ -24,7 +24,7 @@ class HallController(ControllerBase):
     A controller class for managing hall in system.
 
     This class provides endpoints for
-    get, post, update, delete hall in the site
+    get, post, update, delete hall in the admin site
     """
 
     def __init__(self, hall_service: HallService):
@@ -321,4 +321,68 @@ class HallController(ControllerBase):
           - **500**: Internal server error if an unexpected error occurs.
         """
         result = self.hall_service.delete_by_id(hall_id=hall_id)
+        return result
+
+
+@api_controller("/hall", tags=["halls"])
+class HallClientController(ControllerBase):
+    """
+    A controller class for managing hall in system.
+
+    This class provides endpoints for
+    get, hall in the client site
+    """
+
+    def __init__(self, hall_service: HallService):
+        """
+        Use this method to inject "services" to HallClientController.
+
+        :param hall_service: variable for managing halls
+        """
+        self.hall_service = hall_service
+
+    get_all_hall_cards = HallController.get_all_hall_cards
+
+    @http_get(
+        "/{hall_id}/",
+        response=HallClientOutSchema,
+        openapi_extra={
+            "operationId": "get_hall_by_id",
+            "responses": {
+                404: {
+                    "description": "Error: Not Found",
+                },
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    def get_hall_by_id(
+            self,
+            request: HttpRequest,
+            hall_id: int,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> Hall:
+        """
+        Create hall.
+
+        Please provide:
+          - **hall_id**  id of hall
+
+        Returns:
+          - **200**: Success response with the data.
+          - **404**: Error: Forbidden. \n
+            Причини: \n
+                1) Не знайдено: немає збігів залів
+                   на заданному запиті. \n
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.hall_service.get_by_id(hall_id=hall_id)
         return result

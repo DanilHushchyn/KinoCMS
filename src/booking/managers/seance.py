@@ -44,3 +44,13 @@ class SeanceManager(models.Manager):
         seances = (self.model.objects
                    .filter(date__gte=today))
         return seances
+
+    def get_all_expired(self) -> QuerySet['Seance']:
+        """
+        Get all expired séances in site.
+        :return: Séance model instance
+        """
+        today = timezone.now()
+        seances = (self.model.objects.prefetch_related('ticket_set')
+                   .exclude(date__gte=today))
+        return seances

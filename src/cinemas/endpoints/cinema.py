@@ -6,7 +6,7 @@ from src.cinemas.models import Cinema
 from src.cinemas.schemas.cinema import (CinemaInSchema,
                                         CinemaCardOutSchema,
                                         CinemaUpdateSchema,
-                                        CinemaOutSchema, CinemaContactOutSchema)
+                                        CinemaOutSchema, CinemaContactOutSchema, CinemaClientOutSchema)
 from src.cinemas.services.cinema import CinemaService
 from src.core.schemas.base import LangEnum, MessageOutSchema
 from ninja_extra.permissions import IsAdminUser
@@ -342,6 +342,7 @@ class CinemaClientController(ControllerBase):
         :param cinema_service: variable for managing cinemas
         """
         self.cinema_service = cinema_service
+
     get_all_cinema_cards = CinemaController.get_all_cinema_cards
 
     @http_get(
@@ -378,5 +379,46 @@ class CinemaClientController(ControllerBase):
         result = self.cinema_service.get_all()
         return result
 
-    get_cinema_by_slug = CinemaController.get_cinema_by_slug
+    @http_get(
+        "/{cnm_slug}/",
+        response=CinemaClientOutSchema,
+        openapi_extra={
+            "operationId": "get_cinema_by_slug",
+            "responses": {
+                404: {
+                    "description": "Error: Not Found",
+                },
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    def get_cinema_by_slug(
+            self,
+            request: HttpRequest,
+            cnm_slug: str,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> Cinema:
+        """
+        Create cinema.
 
+        Please provide:
+          - **cinema_id**  id of cinema
+
+        Returns:
+          - **200**: Success response with the data.
+          - **404**: Error: Forbidden. \n
+            Причини: \n
+                1) Не знайдено: немає збігів кінотеатрів
+                   на заданному запиті. \n
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.cinema_service.get_by_slug(cnm_slug=cnm_slug)
+        return result

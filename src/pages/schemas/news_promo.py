@@ -54,6 +54,19 @@ class NewsPromoCardOutSchema(ModelSchema):
                   'slug', ]
 
 
+class NewsPromoCardClientOutSchema(ModelSchema):
+    """
+    Pydantic schema for showing news and promo card in the client site.
+    """
+    banner: ImageOutSchema
+
+    class Meta:
+        model = NewsPromo
+        fields = ['name',
+                  'banner',
+                  'slug', ]
+
+
 class NewsPromoOutSchema(ModelSchema):
     """
     Pydantic schema for showing news and promo full data.
@@ -65,6 +78,29 @@ class NewsPromoOutSchema(ModelSchema):
         model = NewsPromo
         exclude = ['id', 'name', 'description',
                    'slug', 'date_created']
+
+
+class NewsPromoClientOutSchema(ModelSchema):
+    """
+    Pydantic schema for showing news and promo full data.
+    """
+    banner: ImageOutSchema
+    seo_image: ImageOutSchema
+
+    class Meta:
+        model = NewsPromo
+        fields = [
+            'name',
+            'description',
+            'seo_title',
+            'seo_description',
+            'seo_image',
+            'promo',
+            'gallery',
+            'video_link',
+            'active',
+            'banner',
+            'slug', ]
 
 
 class NewsPromoUpdateSchema(ninja_schema.ModelSchema):

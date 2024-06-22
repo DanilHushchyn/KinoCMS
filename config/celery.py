@@ -41,6 +41,10 @@ def setup_periodic_tasks(sender, **kwargs):
                              clear_blacklisted_tokens.s(),
                              name='clear expired tokens everyday')
 
+    sender.add_periodic_task(crontab(minute="0", hour="0"),
+                             clear_expired_seances.s(),
+                             name='clear expired seances')
+
 
 app.conf.timezone = "Europe/Kiev"
 
@@ -50,3 +54,11 @@ def clear_blacklisted_tokens():
     from ninja_jwt.token_blacklist.models import OutstandingToken
     from ninja_jwt.utils import aware_utcnow
     OutstandingToken.objects.filter(expires_at__lte=aware_utcnow()).delete()
+
+
+@app.task
+def clear_expired_seances():
+    from src.booking.models import Seance
+    seances = Seance.objects.get_all_expired()
+    seances.delete()
+

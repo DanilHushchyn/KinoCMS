@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
@@ -6,7 +7,7 @@ from ninja_extra.schemas.response import PaginatedResponseSchema
 from src.pages.schemas.page import (PageInSchema,
                                     PageCardOutSchema,
                                     PageUpdateSchema,
-                                    PageOutSchema)
+                                    PageOutSchema, PageClientOutSchema, PageCardClientOutSchema)
 from src.core.schemas.base import LangEnum, MessageOutSchema
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_post, http_patch, http_delete
@@ -37,6 +38,8 @@ class PageController(ControllerBase):
     @http_get(
         "/all-cards/",
         response=PaginatedResponseSchema[PageCardOutSchema],
+        permissions=[IsAdminUser()],
+        auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "get_all_page_cards",
             "responses": {
@@ -57,7 +60,7 @@ class PageController(ControllerBase):
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
-    ) -> Page:
+    ) -> QuerySet[Page]:
         """
         Get all page cards.
 
@@ -233,6 +236,8 @@ class PageController(ControllerBase):
     @http_get(
         "/{pg_slug}/",
         response=PageOutSchema,
+        permissions=[IsAdminUser()],
+        auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "get_page_by_slug",
             "responses": {
@@ -321,4 +326,100 @@ class PageController(ControllerBase):
           - **500**: Internal server error if an unexpected error occurs.
         """
         result = self.page_service.delete_by_slug(pg_slug=pg_slug)
+        return result
+
+
+@api_controller("/page", tags=["pages"])
+class PageClientController(ControllerBase):
+    """
+    A controller class for managing pages in system.
+
+    This class provides endpoints for
+    get, post, update, delete page in the site
+    """
+
+    def __init__(self, page_service: PageService):
+        """
+        Use this method to inject "services" to PageController.
+
+        :param page_service: variable for managing pages
+        """
+        self.page_service = page_service
+
+    @http_get(
+        "/all/",
+        response=PaginatedResponseSchema[PageCardClientOutSchema],
+        openapi_extra={
+            "operationId": "get_all_page_cards",
+            "responses": {
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    @paginate()
+    def get_all_page_cards(
+            self,
+            request: HttpRequest,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> QuerySet[Page]:
+        """
+        Get all page cards.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.page_service.get_all_active()
+        return result
+
+    @http_get(
+        "/{pg_slug}/",
+        response=PageClientOutSchema,
+        openapi_extra={
+            "operationId": "get_page_by_slug",
+            "responses": {
+                404: {
+                    "description": "Error: Not Found",
+                },
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    def get_page_by_slug(
+            self,
+            request: HttpRequest,
+            pg_slug: str,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> Page:
+        """
+        Create page.
+
+        Please provide:
+          - **pg_slug**  slug of page
+
+        Returns:
+          - **200**: Success response with the data.
+          - **404**: Error: Forbidden. \n
+            Причини: \n
+                1) Не знайдено: немає збігів сторінок
+                   на заданному запиті. \n
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.page_service.get_active_by_slug(pg_slug=pg_slug)
         return result

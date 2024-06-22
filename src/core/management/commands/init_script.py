@@ -168,6 +168,7 @@ class Command(BaseCommand):
                     name_uk=name_uk,
                     name_ru=name_ru,
                     slug=slug,
+                    email=f"cinema0{i}@example.com",
                     description_uk=description_uk,
                     description_ru=description_ru,
                     terms_uk={},

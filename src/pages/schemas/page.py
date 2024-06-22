@@ -1,4 +1,3 @@
-from typing import List
 import ninja_schema
 from pydantic.fields import Field
 from src.pages.models import Page
@@ -54,6 +53,16 @@ class PageCardOutSchema(ModelSchema):
                   'slug', ]
 
 
+class PageCardClientOutSchema(ModelSchema):
+    """
+    Pydantic schema for showing pages card.
+    """
+    class Meta:
+        model = Page
+        fields = ['name',
+                  'slug', ]
+
+
 class PageOutSchema(ModelSchema):
     """
     Pydantic schema for showing pages full data.
@@ -65,6 +74,27 @@ class PageOutSchema(ModelSchema):
         model = Page
         exclude = ['id', 'name', 'content',
                    'slug', 'date_created']
+
+
+class PageClientOutSchema(ModelSchema):
+    """
+    Pydantic schema for showing pages full data.
+    """
+    banner: ImageOutSchema
+    seo_image: ImageOutSchema
+
+    class Meta:
+        model = Page
+        fields = ['name',
+                  'content',
+                  'slug',
+                  'gallery',
+                  'banner',
+                  'seo_title',
+                  'seo_description',
+                  'seo_image',
+                  'active',
+                  'date_created']
 
 
 class PageUpdateSchema(PageInSchema):

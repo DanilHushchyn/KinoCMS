@@ -12,6 +12,7 @@ class Seance(models.Model):
     objects = SeanceManager()
 
     class Meta:
+        ordering = ['date']
         verbose_name = "Seance"
         verbose_name_plural = "Seances"
         db_table = 'seances'

@@ -580,3 +580,47 @@ class MovieClientController(ControllerBase):
         return result
 
     get_movie_by_slug = MovieController.get_movie_by_slug
+
+    @http_get(
+        "/{mv_slug}/",
+        response=MovieClientOutSchema,
+        openapi_extra={
+            "operationId": "get_movie_by_slug",
+            "responses": {
+                404: {
+                    "description": "Error: Not Found",
+                },
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    def get_movie_by_slug(
+            self,
+            request: HttpRequest,
+            mv_slug: str,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> Movie:
+        """
+        Get movie by slug.
+
+        Please provide:
+          - **mv_slug**  slug of movie
+
+        Returns:
+          - **200**: Success response with the data.
+          - **404**: Error: Forbidden. \n
+            Причини: \n
+                1) Не знайдено: немає збігів фільмів
+                   на заданному запиті. \n
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.movie_service.get_by_slug(mv_slug=mv_slug)
+        return result

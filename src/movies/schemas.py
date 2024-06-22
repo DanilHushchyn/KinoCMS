@@ -234,11 +234,83 @@ class MovieOutSchema(ModelSchema):
                   'genres',
                   'duration',
                   'legal_age',
+                  'trailer_link',
                   'year',
                   'techs',
                   'released',
+                  'budget',
                   'participants',
                   'countries',
+                  'seo_title',
+                  'seo_image',
+                  'seo_description',
+                  ]
+
+
+class MovieParticipantClientOutSchema(ModelSchema):
+    """
+    Pydantic schema for showing Participants of movie
+    """
+    person: str
+    role: str
+
+    @staticmethod
+    def resolve_person(obj: MovieParticipant) -> str:
+        return str(obj.person.fullname)
+
+    @staticmethod
+    def resolve_role(obj: MovieParticipant) -> str:
+        return str(obj.role.name)
+
+    class Meta:
+        model = MovieParticipant
+        fields = ['person',
+                  'role', ]
+
+
+class MovieClientOutSchema(ModelSchema):
+    """
+    Pydantic schema for showing Movie full data.
+    """
+    card_img: ImageOutSchema
+    seo_image: ImageOutSchema
+    genres_display: str
+    countries_display: str
+    techs_display: str
+    participants: List[MovieParticipantClientOutSchema]
+
+    @staticmethod
+    def resolve_legal_age(obj: Movie) -> str:
+        legal_age_display = dict(Movie.AGE_CHOICES)[obj.legal_age]
+        return legal_age_display
+
+    @staticmethod
+    def resolve_genres_display(obj: Movie) -> str:
+        return str(obj.genres)
+
+    @staticmethod
+    def resolve_techs_display(obj: Movie) -> str:
+        return str(obj.techs)
+
+    @staticmethod
+    def resolve_countries_display(obj: Movie) -> str:
+        result = [country.name for country in obj.countries]
+        return ', '.join(result)
+
+    class Meta:
+        model = Movie
+        fields = ['name',
+                  'description',
+                  'gallery',
+                  'slug',
+                  'card_img',
+                  'duration',
+                  'trailer_link',
+                  'legal_age',
+                  'year',
+                  'budget',
+                  'released',
+                  'participants',
                   'seo_title',
                   'seo_image',
                   'seo_description',

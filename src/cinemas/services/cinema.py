@@ -52,6 +52,7 @@ class CinemaService:
             slug=slugify(schema.name_uk),
             description_uk=schema.description_uk,
             description_ru=schema.description_ru,
+            email=schema.email,
             banner=banner,
             logo=logo,
             phone_1=schema.phone_1,

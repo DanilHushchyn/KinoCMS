@@ -16,6 +16,7 @@ class Cinema(Seo):
     terms = models.JSONField()
     phone_1 = PhoneNumberField()
     phone_2 = PhoneNumberField()
+    email = models.EmailField()
     banner = models.OneToOneField('core.Image',
                                   related_name='cin_bnr',
                                   on_delete=models.DO_NOTHING,
@@ -59,6 +60,7 @@ class Hall(Seo):
     objects = HallManager()
 
     class Meta:
+        ordering = ['-date_created']
         verbose_name = "Hall"
         unique_together = [['cinema', 'number'], ]
         verbose_name_plural = "Halls"

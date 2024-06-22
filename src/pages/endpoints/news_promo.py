@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
@@ -7,7 +8,7 @@ from src.pages.models import NewsPromo
 from src.pages.schemas.news_promo import (NewsPromoInSchema,
                                           NewsPromoCardOutSchema,
                                           NewsPromoUpdateSchema,
-                                          NewsPromoOutSchema)
+                                          NewsPromoOutSchema, NewsPromoClientOutSchema)
 from src.pages.services.news_promo import NewsPromoService
 from src.core.schemas.base import LangEnum, MessageOutSchema
 from ninja_extra.permissions import IsAdminUser
@@ -37,6 +38,8 @@ class NewsPromoController(ControllerBase):
     @http_get(
         "/all-cards/",
         response=PaginatedResponseSchema[NewsPromoCardOutSchema],
+        permissions=[IsAdminUser()],
+        auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "get_all_news_promo_cards",
             "responses": {
@@ -243,6 +246,8 @@ class NewsPromoController(ControllerBase):
     @http_get(
         "/{np_slug}/",
         response=NewsPromoOutSchema,
+        permissions=[IsAdminUser()],
+        auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "get_news_promo_by_slug",
             "responses": {
@@ -268,10 +273,10 @@ class NewsPromoController(ControllerBase):
                    default="uk"),
     ) -> NewsPromo:
         """
-        Create news_promo.
+        Get news or promo by slug.
 
         Please provide slug:
-          - **news_promo_slug**  slug of news_promo
+          - **news_promo_slug**  slug of news or promo
 
         Returns:
           - **200**: Success response with the data.
@@ -328,4 +333,102 @@ class NewsPromoController(ControllerBase):
           - **500**: Internal server error if an unexpected error occurs.
         """
         result = self.news_promo_service.delete_by_slug(np_slug=np_slug)
+        return result
+
+
+@api_controller("/news_promo", tags=["news_promos"])
+class NewsPromoClientController(ControllerBase):
+    """
+    A controller class for managing news_promo in system.
+
+    This class provides endpoints for
+    get, post, update, delete news_promo in the site
+    """
+
+    def __init__(self, news_promo_service: NewsPromoService):
+        """
+        Use this method to inject "services" to NewsPromoController.
+
+        :param news_promo_service: variable for managing news_promos
+        """
+        self.news_promo_service = news_promo_service
+
+    @http_get(
+        "/all-cards/",
+        response=PaginatedResponseSchema[NewsPromoCardOutSchema],
+        openapi_extra={
+            "operationId": "get_all_news_promo_cards",
+            "responses": {
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    @paginate()
+    def get_all_news_promo_cards(
+            self,
+            request: HttpRequest,
+            promo: bool,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> QuerySet[NewsPromo]:
+        """
+        Get all news_promo cards for client site.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.news_promo_service.get_all_active(promo)
+        return result
+
+    @http_get(
+        "/{np_slug}/",
+        response=NewsPromoClientOutSchema,
+        openapi_extra={
+            "operationId": "get_news_promo_by_slug",
+            "responses": {
+                404: {
+                    "description": "Error: Not Found",
+                },
+                422: {
+                    "description": "Error: Unprocessable Entity",
+                },
+                500: {
+                    "description": "Internal server error "
+                                   "if an unexpected error occurs.",
+                },
+            },
+        },
+    )
+    def get_news_promo_by_slug(
+            self,
+            request: HttpRequest,
+            np_slug: str,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> NewsPromo:
+        """
+        Get news or promo by slug.
+
+        Please provide slug:
+          - **news_promo_slug**  slug of news or promo
+
+        Returns:
+          - **200**: Success response with the data.
+          - **404**: Error: Forbidden. \n
+            Причини: \n
+                1) Не знайдено: немає збігів новин чи акцій
+                   на заданному запиті. \n
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = (self.news_promo_service
+                  .get_active_by_slug(np_slug=np_slug))
         return result

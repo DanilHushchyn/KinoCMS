@@ -6,7 +6,6 @@ from ninja_extra.controllers.base import ControllerBase, api_controller
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.permissions.common import AllowAny
 from ninja_extra.schemas.response import PaginatedResponseSchema
-from ninja_jwt.authentication import JWTAuth
 from ninja_jwt.schema_control import SchemaControl
 from ninja_jwt.settings import api_settings
 from src.authz.schemas import LoginSchema, LoginResponseSchema

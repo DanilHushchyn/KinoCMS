@@ -25,15 +25,24 @@ from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController
 from src.booking.endpoints.seance import SeanceController
 from src.cinemas.endpoints.cinema import CinemaClientController
+from src.cinemas.endpoints.hall import HallClientController
 from src.core.endpoints.gallery import GalleryController
 from src.movies.endpoints import MovieClientController
+from src.pages.endpoints.page import PageClientController
+from src.pages.endpoints.news_promo import NewsPromoClientController
+from src.pages.endpoints.banners_sliders import SliderClientController
 
 kino_api = NinjaExtraAPI(title='KinoCMS (client-site)', description='CLIENT API')
 kino_api.register_controllers(CustomTokenObtainPairController)
 kino_api.register_controllers(GalleryController)
 kino_api.register_controllers(CinemaClientController)
+kino_api.register_controllers(HallClientController)
 kino_api.register_controllers(MovieClientController)
 kino_api.register_controllers(SeanceController)
+kino_api.register_controllers(PageClientController)
+kino_api.register_controllers(NewsPromoClientController)
+kino_api.register_controllers(SeanceController)
+kino_api.register_controllers(SliderClientController)
 
 
 @kino_api.exception_handler(AuthenticationError)
