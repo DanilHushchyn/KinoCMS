@@ -11,6 +11,7 @@ from src.core.schemas.base import MessageOutSchema, DirectionEnum
 from src.core.utils import paginate
 from src.users.models import User
 from src.users.schemas import UserRegisterSchema, UserUpdateSchema, UserFieldsEnum
+from dateutil.parser import parse
 
 
 class UserService:
@@ -102,6 +103,10 @@ class UserService:
         """
         users = User.objects.all()
         if search_line:
+            try:
+                search_line = str(parse(search_line, dayfirst=True).date())
+            except ValueError:
+                pass
             users = users.filter(
                 Q(id__icontains=search_line) |
                 Q(first_name__icontains=search_line) |

@@ -175,6 +175,8 @@ class UserOutSchema(ModelSchema):
     """
 
     city_display: str
+    date_joined: str
+    birthday: str
 
     @staticmethod
     def resolve_city_display(obj: User):
@@ -184,6 +186,16 @@ class UserOutSchema(ModelSchema):
     def resolve_phone_number(obj: User):
         return str(obj.phone_number)
 
+    @staticmethod
+    def resolve_date_joined(obj: User):
+        dj = obj.date_joined.strftime("%d.%m.%Y")
+        return dj
+
+    @staticmethod
+    def resolve_birthday(obj: User):
+        birth = obj.birthday.strftime("%d.%m.%Y")
+        return birth
+
     class Meta:
         model = User
         fields = [
@@ -191,6 +203,7 @@ class UserOutSchema(ModelSchema):
             "first_name",
             "last_name",
             "nickname",
+            "date_joined",
             "city",
             "man",
             "phone_number",

@@ -890,6 +890,17 @@ files = [
 python-dateutil = ">=2.4"
 
 [[package]]
+name = "fastapi-errors"
+version = "0.0.6"
+description = "Fastapi errors module."
+optional = false
+python-versions = "*"
+files = [
+    {file = "fastapi_errors-0.0.6-py2.py3-none-any.whl", hash = "sha256:a7d8ed19da6f4de99b8bc1bc37add8d5f9ab6f9335288938370a49fea86b4631"},
+    {file = "fastapi_errors-0.0.6.tar.gz", hash = "sha256:ad29a51e811087eb760a2858b49eefa45a03f2171d8cc608967fe5841e66e794"},
+]
+
+[[package]]
 name = "filelock"
 version = "3.14.0"
 description = "A platform independent file lock."
@@ -2568,4 +2579,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "aaa7d0610709f0b0eaeb98244ca19b9d939eda15b85f20aac9f474e3e45d85ba"
+content-hash = "c3102aa77f908241a0e9f7ce97e0573fc5ccfb34eef5d4973f4cb573de6a198c"

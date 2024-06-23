@@ -20,7 +20,7 @@ from imagekit.utils import get_cache
 from ninja_extra import NinjaExtraAPI, status
 from django.conf.urls.static import static
 from django.utils.translation import gettext as _
-from ninja.errors import AuthenticationError, ValidationError
+from ninja.errors import AuthenticationError, ValidationError, HttpError
 
 from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController
@@ -53,6 +53,16 @@ admin_api.register_controllers(PageController)
 
 @admin_api.exception_handler(AuthenticationError)
 def user_unauthorized(request, exc):
+    return admin_api.create_response(
+        request,
+        {"message": _("Не авторизований")},
+        status=status.HTTP_401_UNAUTHORIZED,
+    )
+
+
+@admin_api.exception_handler(HttpError)
+def user_exc(request, exc):
+
     return admin_api.create_response(
         request,
         {"message": _("Не авторизований")},

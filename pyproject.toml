@@ -41,6 +41,7 @@ requests-tracker = "^0.3.3"
 django-multiselectfield = "^0.1.12"
 matplotlib = "^3.9.0"
 pytz = "^2024.1"
+fastapi-errors = "^0.0.6"
 
 [build-system]
 requires = ["poetry-core"]

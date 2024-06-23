@@ -32,6 +32,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = [env('DJANGO_ALLOWED_HOSTS')]
+DATE_INPUT_FORMATS = ["%d.%m.%Y"]
 
 # Application definition
 
