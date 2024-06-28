@@ -2,6 +2,7 @@ from typing import List
 
 from ninja.errors import HttpError
 
+from src.core.errors import NotFoundExceptionError
 from src.core.models import Gallery, Image
 from src.core.schemas.gallery import GalleryInSchema, GalleryItemSchema
 from src.core.schemas.images import ImageInSchema
@@ -63,4 +64,4 @@ class GalleryService:
         ids = gallery.images.values_list('id', flat=True)
         if img_id not in ids:
             msg = "Given image id doesn't belongs to cinema's gallery"
-            raise HttpError(404, msg)
+            raise NotFoundExceptionError(message=msg)

@@ -4,11 +4,9 @@ from pydantic.fields import Field
 
 from src.cinemas.models import Hall
 from ninja import ModelSchema
-from ninja.errors import HttpError
-from django.utils.translation import gettext as _
 from src.core.schemas.gallery import GalleryItemSchema
-from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
-from src.core.utils import validate_capitalized
+from src.core.schemas.images import (ImageOutSchema, ImageInSchema,
+                                     ImageUpdateSchema)
 from src.movies.models import TECHS_CHOICES
 
 
@@ -16,15 +14,6 @@ class HallInSchema(ninja_schema.ModelSchema):
     """
     Pydantic schema for creating halls to server side.
     """
-
-    @ninja_schema.model_validator('description_uk', 'description_ru',
-                                  'seo_title', 'seo_description')
-    def clean_capitalize(cls, value) -> int:
-        msg = _('Недійсне значення (не написане великими літерами). '
-                'З великих літер повинні починатися ('
-                'description, seo_title, seo_description)')
-        validate_capitalized(value, msg)
-        return value
 
     banner: ImageInSchema
     seo_image: ImageInSchema

@@ -1,15 +1,13 @@
-from typing import Type, Dict
-
-import loguru
 from celery.result import AsyncResult
 from django.db.models import QuerySet
-from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 from ninja import File
 from ninja.files import UploadedFile
 from django.core.cache import cache
 
+from src.core.errors import UnprocessableEntityExceptionError, NotFoundExceptionError
 from src.core.schemas.base import MessageOutSchema
+from src.mailing.errors import MailingIsActiveExceptionError, MailingIsNotActiveExceptionError
 from src.mailing.models import MailTemplate
 from src.mailing.schemas import MailingInSchema, TaskInfoOutSchema
 from src.mailing.tasks import make_mailing
@@ -30,10 +28,6 @@ class MailingService:
         for mailing
         :return: message that everything is ok and mailing started
         """
-        # inspector = app.control.inspect()
-        # actives = 0
-        # for key, value in inspector.active().items():
-        #     actives = len(value)
         if cache.get(f'mailing_task') is None:
             temp = MailTemplate.objects.get(id=body.temp_id)
             with open(f'{temp.file.path}', 'r') as file:
@@ -43,7 +37,7 @@ class MailingService:
             cache.set(f'mailing_task', task.id)
         else:
             msg = _('Треба зачекати поки закінчиться поточне розсилання')
-            raise HttpError(400, msg)
+            raise MailingIsActiveExceptionError(message=msg)
         return MessageOutSchema(detail=_('Розсилання почалося'))
 
     @staticmethod
@@ -61,14 +55,12 @@ class MailingService:
                 msg = _('Розсилання успішно виконане')
                 return 201, MessageOutSchema(detail=msg)
             data = task.result
-            print(data)
-            print(data['current'])
-            print(data['total'])
+
             result = (data['current'] / data['total']) * 100
             return 200, TaskInfoOutSchema(progress=int(result))
         else:
             msg = _('На теперішній час розсилання не активне')
-            raise HttpError(400, msg)
+            raise MailingIsNotActiveExceptionError(message=msg)
 
     @staticmethod
     def get_templates() -> QuerySet:
@@ -87,10 +79,10 @@ class MailingService:
         """
         if file.content_type != 'text/html':
             msg = _('Дозволено відправляти тільки html')
-            raise HttpError(403, msg)
+            raise UnprocessableEntityExceptionError(message=msg)
         if file.size > 1_000_000:
             msg = _('Максимально дозволений розмір файлу 1MB')
-            raise HttpError(403, msg)
+            raise UnprocessableEntityExceptionError(message=msg)
         name = file.name.split('.')[0]
         template = MailTemplate.objects.create(file=file, name=name)
         return template
@@ -107,11 +99,10 @@ class MailingService:
         except MailTemplate.DoesNotExist:
             msg = _('Не знайдено: немає збігів шаблонів '
                     'на заданному запиті')
-            raise HttpError(404, msg)
-
+            raise NotFoundExceptionError(message=msg)
         task_id = cache.get(f'mailing_task')
         if task_id:
-            msg = _('Не можна видаляти шаблони поки йде розсилання.')
-            raise HttpError(403, msg)
+            msg = _('Треба зачекати поки закінчиться поточне розсилання')
+            raise MailingIsActiveExceptionError(message=msg)
         template.delete()
         return MessageOutSchema(detail=_('Шаблон успішно видалений'))

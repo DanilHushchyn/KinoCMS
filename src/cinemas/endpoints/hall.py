@@ -9,7 +9,9 @@ from src.cinemas.schemas.hall import (HallInSchema,
                                       HallUpdateSchema,
                                       HallOutSchema, HallClientOutSchema)
 from src.cinemas.services.hall import HallService
-from src.core.schemas.base import LangEnum, MessageOutSchema
+from src.core.errors import NotFoundExceptionError, UnprocessableEntityExceptionError, NotUniqueFieldExceptionError, \
+    InvalidTokenExceptionError
+from src.core.schemas.base import LangEnum, MessageOutSchema, errors_to_docs
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_post, http_patch, http_delete
 from ninja import Header
@@ -40,15 +42,14 @@ class HallController(ControllerBase):
         response=PaginatedResponseSchema[HallCardOutSchema],
         openapi_extra={
             "operationId": "get_all_hall_cards",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -77,21 +78,20 @@ class HallController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "create_hall",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                409: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                409: [
+                    NotUniqueFieldExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def create_hall(
@@ -111,11 +111,6 @@ class HallController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
-            Причини: \n
-                1) Недійсне значення (не написане великими літерами).
-                   З великих літер повинні починатися (description,
-                   seo_title, seo_description) \n
           - **409**: Error: Conflict.
             Причини: \n
                 1) Поле name повинно бути унікальним. Ця назва вже зайнята
@@ -157,24 +152,20 @@ class HallController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "update_hall",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                404: {
-                    "description": "Error: Not Found",
-                },
-                409: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                409: [
+                    NotUniqueFieldExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def update_hall(
@@ -194,11 +185,12 @@ class HallController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
+          - **404**: Error: Found. \n
             Причини: \n
-                1) Недійсне значення (не написане великими літерами).
-                   З великих літер повинні починатися (description,
-                   seo_title, seo_description) \n
+                1) Не знайдено: немає збігів залів
+                   на заданному запиті. \n
+                2) Не знайдено: немає збігів картинок
+                   на заданному запиті. \n
           - **409**: Error: Conflict. \n
             Причини: \n
                 1) Поле name повинно бути унікальним. Ця назва вже зайнята
@@ -238,18 +230,14 @@ class HallController(ControllerBase):
         response=HallOutSchema,
         openapi_extra={
             "operationId": "get_hall_by_id",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_hall_by_id(
@@ -268,9 +256,11 @@ class HallController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **404**: Error: Forbidden. \n
+          - **404**: Error: Not Found. \n
             Причини: \n
                 1) Не знайдено: немає збігів залів
+                   на заданному запиті. \n
+                2) Не знайдено: немає збігів картинок
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
         """
@@ -284,18 +274,17 @@ class HallController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "delete_hall_by_slug",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def delete_hall_by_slug(
@@ -317,6 +306,8 @@ class HallController(ControllerBase):
           - **404**: Error: Forbidden. \n
             Причини: \n
                 1) Не знайдено: немає збігів залів
+                   на заданному запиті. \n
+                2) Не знайдено: немає збігів картинок
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
         """
@@ -348,18 +339,14 @@ class HallClientController(ControllerBase):
         response=HallClientOutSchema,
         openapi_extra={
             "operationId": "get_hall_by_id",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_hall_by_id(

@@ -1,16 +1,13 @@
-import re
 from typing import List
-
 import ninja_schema
-from ninja.errors import HttpError
-
 from ninja import ModelSchema
 from django.utils.translation import gettext as _
-from pydantic.functional_validators import field_validator
 from matplotlib.colors import is_color_like
-from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
-from src.core.utils import validate_capitalized
-from src.pages.models import TopSlider, TopSliderItem, BottomSliderItem, BottomSlider, ETEndBBanner
+from src.core.errors import UnprocessableEntityExceptionError
+from src.core.schemas.images import ImageOutSchema, ImageUpdateSchema
+from src.pages.models import (TopSlider, TopSliderItem,
+                              BottomSliderItem, BottomSlider,
+                              ETEndBBanner)
 
 
 class TopSliderItemUpdateSchema(ninja_schema.ModelSchema):
@@ -19,13 +16,6 @@ class TopSliderItemUpdateSchema(ninja_schema.ModelSchema):
     """
     delete: bool
     image: ImageUpdateSchema = None
-
-    @ninja_schema.model_validator('text_uk', 'text_ru')
-    def clean_capitalize(cls, value) -> str:
-        msg = _('Недійсне значення (не написане великими літерами). '
-                'З великих літер повиннен починатися text')
-        validate_capitalized(value, msg)
-        return value
 
     class Config:
         model = TopSliderItem
@@ -169,7 +159,7 @@ class ETEndBBannerUpdateSchema(ninja_schema.ModelSchema):
             return color
         else:
             msg = _('Невірний формат кольору було введено')
-            raise HttpError(403, msg)
+            raise UnprocessableEntityExceptionError(message=msg)
 
     class Config:
         model = ETEndBBanner

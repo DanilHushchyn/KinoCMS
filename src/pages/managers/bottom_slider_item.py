@@ -1,9 +1,7 @@
 from typing import TYPE_CHECKING
-
-from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 from django.db import models
-
+from src.core.errors import NotFoundExceptionError
 if TYPE_CHECKING:
     from src.pages.models import BottomSliderItem
 
@@ -27,5 +25,5 @@ class BottomSliderItemManager(models.Manager):
             msg = _('Не знайдено: немає збігів елементів '
                     'нижнього банеру '
                     'на заданному запиті.')
-            raise HttpError(404, msg)
+            raise NotFoundExceptionError(message=msg)
         return slider

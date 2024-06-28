@@ -7,15 +7,13 @@ object and json
 """
 import enum
 import re
-from typing import List
 from phonenumber_field.validators import (
     validate_international_phonenumber)
 from django.core.exceptions import ValidationError
 import ninja_schema
-from ninja import Schema, ModelSchema
-from ninja.errors import HttpError
-import loguru
+from ninja import ModelSchema
 from pydantic.types import SecretStr
+from src.core.errors import UnprocessableEntityExceptionError
 from src.users.models import User
 from django.utils.translation import gettext as _
 
@@ -29,10 +27,6 @@ class UserFieldsEnum(enum.Enum):
     fio = "fio"
     nickname = "nickname"
     city = "city"
-
-    # @classmethod
-    # def _missing_(cls, value):
-    #     return cls._
 
 
 class UserInBaseSchema(ninja_schema.ModelSchema):
@@ -65,11 +59,13 @@ class UserInBaseSchema(ninja_schema.ModelSchema):
             return False
 
     @ninja_schema.model_validator('phone_number')
-    def clean_phone_number(cls, value) -> str:
+    def validate_phone_number(cls, value) -> str:
         try:
             validate_international_phonenumber(value)
         except ValidationError:
-            raise HttpError(403, _("Введено некоректний номер телефону."))
+            msg = _("Введено некоректний номер телефону.")
+            raise UnprocessableEntityExceptionError(message=msg)
+
         return value
 
     @ninja_schema.model_validator('city')
@@ -82,7 +78,7 @@ class UserInBaseSchema(ninja_schema.ModelSchema):
             msg = _("Ім'я повинно починатися з великої літери"
                     "(наступні маленькі), доступна кирилиця та латиниця, "
                     "доступні спецсимволи('-)")
-            raise HttpError(403, msg)
+            raise UnprocessableEntityExceptionError(msg)
         return value
 
     @ninja_schema.model_validator('last_name')
@@ -91,7 +87,7 @@ class UserInBaseSchema(ninja_schema.ModelSchema):
             msg = _("Прізвище повинно починатися з великої літери"
                     "(наступні маленькі), доступна кирилиця та латиниця, "
                     "доступні спецсимволи('-)")
-            raise HttpError(403, msg)
+            raise UnprocessableEntityExceptionError(msg)
         return value
 
 
@@ -110,14 +106,15 @@ class UserRegisterSchema(UserInBaseSchema):
         password_pattern = ("^(?=.*?[A-Z])(?=.*?[a-z])"
                             "(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")
         if re.match(password_pattern, password) is None:
-            raise HttpError(403, _(
+            msg = _(
                 "Пароль повинен відповідати: "
                 "* Хоча б одній великій літері, "
                 "* Хоча б одній малій літері, "
                 "* Хоча б одній цифрі, "
                 "* Хоча б одному спеціальному символу з набору ?!@%^&- "
                 "* Мінімальна довжина 8 символів"
-            ))
+            )
+            raise UnprocessableEntityExceptionError(msg)
 
     @ninja_schema.model_validator('password1')
     def clean_password1(cls, password1: SecretStr) -> SecretStr:
@@ -147,14 +144,15 @@ class UserUpdateSchema(UserInBaseSchema):
         password_pattern = ("^(?=.*?[A-Z])(?=.*?[a-z])"
                             "(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")
         if re.match(password_pattern, password) is None:
-            raise HttpError(403, _(
+            msg = _(
                 "Пароль повинен відповідати: "
                 "* Хоча б одній великій літері, "
                 "* Хоча б одній малій літері, "
                 "* Хоча б одній цифрі, "
                 "* Хоча б одному спеціальному символу з набору ?!@%^&- "
                 "* Мінімальна довжина 8 символів"
-            ))
+            )
+            raise UnprocessableEntityExceptionError(msg)
 
     @ninja_schema.model_validator('password')
     def clean_password(cls, password: SecretStr) -> SecretStr:

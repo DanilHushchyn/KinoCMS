@@ -70,6 +70,7 @@ class BaseSlider(models.Model):
     speed = models.PositiveSmallIntegerField(null=True,
                                              choices=TIMER_CHOICES,
                                              default=30)
+
     class Meta:
         abstract = True
         verbose_name = 'BaseSlider'
@@ -77,7 +78,6 @@ class BaseSlider(models.Model):
 
 
 class TopSlider(BaseSlider):
-
     class Meta:
         verbose_name = 'TopSlider'
         verbose_name_plural = 'TopSliders'

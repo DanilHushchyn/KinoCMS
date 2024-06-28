@@ -3,13 +3,12 @@ from typing import List
 from pydantic import field_validator
 
 from config.settings.settings import ABSOLUTE_URL
+from src.core.errors import NotFoundExceptionError
 from src.mailing.models import MailTemplate
 import ninja_schema
 from django.utils.translation import gettext as _
 
-from ninja import Schema, ModelSchema
-
-from ninja.errors import HttpError
+from ninja import ModelSchema
 
 
 class MailTemplateOutSchema(ModelSchema):
@@ -18,9 +17,10 @@ class MailTemplateOutSchema(ModelSchema):
 
     Purpose of this schema to return mail template data
     """
+
     @staticmethod
     def resolve_file(obj: MailTemplate):
-        return ABSOLUTE_URL+str(obj.file.url)
+        return ABSOLUTE_URL + str(obj.file.url)
 
     class Meta:
         model = MailTemplate
@@ -46,7 +46,7 @@ class MailingInSchema(ninja_schema.Schema):
         except MailTemplate.DoesNotExist:
             msg = _('Не знайдено: немає збігів шаблонів '
                     'на заданному запиті')
-            raise HttpError(404, msg)
+            raise NotFoundExceptionError(message=msg)
         return temp_id
 
 

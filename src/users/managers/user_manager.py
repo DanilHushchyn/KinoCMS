@@ -1,14 +1,12 @@
-import re
-
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import AbstractUser, UserManager
-from ninja.errors import HttpError
+from django.contrib.auth.models import UserManager
 from django.utils.translation import gettext as _
 
-from loguru import logger
-from typing import TYPE_CHECKING, List, Optional
-
+from typing import TYPE_CHECKING
+from src.authz.errors import EmailAlreadyExistsExceptionError
+from src.core.errors import NotFoundExceptionError, UnprocessableEntityExceptionError
 from src.core.schemas.base import MessageOutSchema
+from src.core.services.core import CoreService
 
 if TYPE_CHECKING:
     from src.users.schemas import UserRegisterSchema, UserUpdateSchema
@@ -92,9 +90,9 @@ class CustomUserManager(UserManager):
         try:
             user = self.model.objects.get(id=user_id)
         except self.model.DoesNotExist:
-            raise HttpError(404,
-                            _("Не знайдено: немає збігів користувачів"
-                              " на заданному запиті."))
+            msg = _("Не знайдено: немає збігів користувачів"
+                    " на заданному запиті.")
+            raise NotFoundExceptionError(message=msg)
         return user
 
     def delete_by_id(self, user_id: int) -> MessageOutSchema:
@@ -109,9 +107,9 @@ class CustomUserManager(UserManager):
             user = self.model.objects.get(id=user_id)
             user.delete()
         except self.model.DoesNotExist:
-            raise HttpError(404,
-                            _("Не знайдено: немає збігів користувачів"
-                              " на заданному запиті."))
+            msg = _("Не знайдено: немає збігів користувачів"
+                    " на заданному запиті.")
+            raise NotFoundExceptionError(message=msg)
         msg = _("Користувач успішно видалений")
         return MessageOutSchema(detail=msg)
 
@@ -129,11 +127,19 @@ class CustomUserManager(UserManager):
         try:
             user = self.model.objects.get(id=user_id)
         except self.model.DoesNotExist:
-            raise HttpError(404,
-                            _("Не знайдено: немає збігів користувачів"
-                              " на заданному запиті."))
+            msg = _("Не знайдено: немає збігів користувачів"
+                    " на заданному запиті.")
+            raise NotFoundExceptionError(message=msg)
+        if user_body.email:
+            try:
+                CoreService.check_field_unique(value=user_body.email,
+                                               field_name='email',
+                                               instance=user,
+                                               model=self.model)
+            except Exception as exc:
+                msg = _("Ця електронна адреса вже використовується")
+                raise EmailAlreadyExistsExceptionError(msg)
         for field, value in user_body.dict().items():
-
             if value is not None and field != 'password':
                 setattr(user, field, value)
         if user_body.password:
@@ -151,11 +157,12 @@ class CustomUserManager(UserManager):
         pass1 = user_body.password1.get_secret_value()
         pass2 = user_body.password2.get_secret_value()
         if pass1 != pass2:
-            raise HttpError(403, _("Паролі не співпадають"))
+            msg = _("Паролі не співпадають")
+            raise UnprocessableEntityExceptionError(message=msg)
 
         if self.model.objects.filter(email=user_body.email).exists():
             msg = _("Ця електронна адреса вже використовується")
-            raise HttpError(409, msg)
+            raise EmailAlreadyExistsExceptionError(msg)
 
         self.model.objects.create(
             first_name=user_body.first_name,

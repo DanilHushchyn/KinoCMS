@@ -2,10 +2,8 @@ import ninja_schema
 from pydantic.fields import Field
 from src.pages.models import Page
 from ninja import ModelSchema
-from django.utils.translation import gettext as _
 from src.core.schemas.gallery import GalleryItemSchema
 from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
-from src.core.utils import validate_capitalized
 from typing import List, Any
 from pydantic import Json
 
@@ -14,15 +12,6 @@ class PageInSchema(ninja_schema.ModelSchema):
     """
     Pydantic schema for creating pages to server side.
     """
-
-    @ninja_schema.model_validator('name_uk', 'name_ru',
-                                  'seo_title', 'seo_description')
-    def clean_capitalize(cls, value) -> int:
-        msg = _('Недійсне значення (не написане великими літерами). '
-                'З великих літер повинні починатися '
-                '(name, seo_title, seo_description)')
-        validate_capitalized(value, msg)
-        return value
 
     banner: ImageInSchema
     seo_image: ImageInSchema
@@ -57,6 +46,7 @@ class PageCardClientOutSchema(ModelSchema):
     """
     Pydantic schema for showing pages card.
     """
+
     class Meta:
         model = Page
         fields = ['name',

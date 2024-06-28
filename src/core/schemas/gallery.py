@@ -1,15 +1,12 @@
 import re
 from typing import List
-
 import ninja_schema
-from ninja.errors import HttpError
 from pydantic.functional_validators import field_validator
 from django.utils.translation import gettext as _
-
 from config.settings.settings import ABSOLUTE_URL
+from src.core.errors import UnprocessableEntityExceptionError
 from src.core.models import Gallery, Image
 from ninja import ModelSchema
-
 from src.core.schemas.images import ImageOutSchema
 
 
@@ -57,21 +54,21 @@ class GalleryItemSchema(ninja_schema.ModelSchema):
     filename: str = None
 
     @field_validator('filename')
-    @classmethod
     def clean_filename(cls, filename: str) -> str:
         image_types = ['jpeg', 'jpg', 'png',
                        'svg', 'webp', ]
         pattern = r'^[a-zA-Z0-9_-]{1,255}\.[a-zA-Z0-9]+$'
         if re.match(pattern, filename) is None:
-            raise HttpError(403,
-                            f"Field filename is not valid "
-                            f"filename have to correspond "
-                            f"to next regular expression "
-                            f"{pattern}")
+            msg = f"Field filename is not valid " \
+                  f"filename have to correspond " \
+                  f"to next regular expression " \
+                  f"{pattern}"
+            raise UnprocessableEntityExceptionError(msg, field="filename")
         name, extension = filename.split('.')
         if extension not in image_types:
-            raise HttpError(403,
-                            _(f'Дозволено відправляти тільки {image_types}'))
+            msg = _(f'Дозволено відправляти тільки {image_types}')
+            raise UnprocessableEntityExceptionError(msg, field="filename")
+
         return filename
 
     class Config:

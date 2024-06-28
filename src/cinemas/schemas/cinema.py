@@ -1,16 +1,13 @@
 from typing import List, Any
 import ninja_schema
-from ninja.errors import HttpError
-from phonenumber_field.validators import validate_international_phonenumber
 from pydantic.fields import Field
 from src.cinemas.models import Cinema
 from ninja import ModelSchema
-from django.utils.translation import gettext as _
 from src.core.schemas.gallery import GalleryItemSchema
-from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
-from src.core.utils import validate_capitalized
+from src.core.schemas.images import (ImageOutSchema, ImageInSchema,
+                                     ImageUpdateSchema)
 from pydantic import Json
-from django.core.exceptions import ValidationError
+from src.core.utils import check_phone_number
 
 
 class CinemaInSchema(ninja_schema.ModelSchema):
@@ -18,22 +15,14 @@ class CinemaInSchema(ninja_schema.ModelSchema):
     Pydantic schema for creating cinemas to server side.
     """
 
-    @ninja_schema.model_validator('name_uk', 'name_ru',
-                                  'description_uk', 'description_ru',
-                                  'seo_title', 'seo_description')
-    def clean_capitalize(cls, value) -> int:
-        msg = _('Недійсне значення (не написане великими літерами). '
-                'З великих літер повинні починатися (name, '
-                'description, seo_title, seo_description)')
-        validate_capitalized(value, msg)
+    @ninja_schema.model_validator('phone_1')
+    def validate_phone_1(cls, value) -> str:
+        check_phone_number(value)
         return value
 
-    @ninja_schema.model_validator('phone_1', 'phone_2')
-    def clean_phone_number(cls, value) -> str:
-        try:
-            validate_international_phonenumber(value)
-        except ValidationError:
-            raise HttpError(403, _("Введено некоректний номер телефону."))
+    @ninja_schema.model_validator('phone_2')
+    def validate_phone_2(cls, value) -> str:
+        check_phone_number(value)
         return value
 
     banner: ImageInSchema

@@ -1,6 +1,3 @@
-from typing import Optional
-
-from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from ninja import Header
@@ -8,17 +5,18 @@ from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra.schemas.response import PaginatedResponseSchema
-from ninja_jwt.authentication import JWTAuth
 
+from src.authz.errors import EmailAlreadyExistsExceptionError
+from src.core.errors import InvalidTokenExceptionError, UnprocessableEntityExceptionError
 from src.core.schemas.base import (LangEnum, MessageOutSchema,
-                                   DirectionEnum)
+                                   DirectionEnum, errors_to_docs)
 from src.core.utils import CustomJWTAuth
 from src.users.models import User
-from src.users.schemas import (UserRegisterSchema, UserUpdateSchema,
+from src.users.schemas import (UserUpdateSchema,
                                UserOutSchema,
                                UserFieldsEnum)
 from src.users.services.user_service import UserService
-from ninja_extra import http_delete, http_get, http_patch, http_post
+from ninja_extra import http_delete, http_get, http_patch
 
 
 @api_controller("/users", tags=["users"])
@@ -45,18 +43,20 @@ class UsersAdminController(ControllerBase):
         response=UserOutSchema,
         openapi_extra={
             "operationId": "update_user_by_id",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    InvalidTokenExceptionError()
+                ],
+                409: [
+                    EmailAlreadyExistsExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def update_user_by_id(
@@ -76,17 +76,16 @@ class UsersAdminController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
-            Причини: \n
-                1) Введено некоректний номер телефону \n
-                2) Ім'я та прізвище повинно починатися з великої літери
-                   (наступні маленькі), доступна кирилиця,
-                   доступні спецсимволи('-)
           - **404**: Error: Conflict. \n
             Причини: \n
                 1) Не знайдено: немає збігів користувачів
                    на заданному запиті.
           - **422**: Error: Unprocessable Entity.
+            Причини: \n
+                1) Введено некоректний номер телефону \n
+                2) Ім'я та прізвище повинно починатися з великої літери
+                   (наступні маленькі), доступна кирилиця,
+                   доступні спецсимволи('-)
           - **500**: Internal server error if an unexpected error occurs.
         """
         user = self.user_service.update_by_id(user_id=user_id,
@@ -100,17 +99,17 @@ class UsersAdminController(ControllerBase):
         permissions=[IsAdminUser()],
         openapi_extra={
             "operationId": "get_user_by_id",
-            "responses": {
-                404: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error if" " an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    InvalidTokenExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_user_by_id(
@@ -146,17 +145,17 @@ class UsersAdminController(ControllerBase):
         response=MessageOutSchema,
         openapi_extra={
             "operationId": "delete_user_by_id",
-            "responses": {
-                404: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error if" " an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    InvalidTokenExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def delete_user_by_id(
@@ -192,14 +191,14 @@ class UsersAdminController(ControllerBase):
         permissions=[IsAdminUser()],
         openapi_extra={
             "operationId": "users_datatable",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()

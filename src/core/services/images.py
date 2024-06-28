@@ -4,12 +4,11 @@ import shutil
 from base64 import b64decode
 from pathlib import Path
 from typing import List
-
 from django.core.files.base import ContentFile
-from ninja.errors import HttpError
 import src.core.models as im
 from django.utils.translation import gettext as _
 from PIL import Image
+from src.core.errors import UnprocessableEntityExceptionError
 from src.core.schemas.images import ImageInSchema, ImageUpdateSchema
 
 
@@ -34,12 +33,13 @@ class ImageService:
             image_field = ContentFile(img_obj, filename)
         except binascii.Error as e:
             msg = _('Невірний формат base64 був відправлений')
-            raise HttpError(403, msg)
+            raise UnprocessableEntityExceptionError(message=msg)
         except Exception as e:
-            raise HttpError(403, _('Файл пошкоджений'))
+            msg = _('Файл пошкоджений')
+            raise UnprocessableEntityExceptionError(message=msg)
         if image_field.size > 1_000_000:
             msg = _('Максимально дозволений розмір файлу 1MB')
-            raise HttpError(403, msg)
+            raise UnprocessableEntityExceptionError(message=msg)
         return image_field
 
     def create(self, schema: ImageInSchema) \

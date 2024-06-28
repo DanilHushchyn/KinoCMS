@@ -5,12 +5,9 @@
     and access control system in our site
 """
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
-
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
-
 from src.users.managers.user_manager import CustomUserManager
 
 

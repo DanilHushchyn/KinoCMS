@@ -5,7 +5,10 @@ from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.schemas.response import PaginatedResponseSchema
-from src.core.schemas.base import LangEnum, MessageOutSchema
+
+from src.core.errors import UnprocessableEntityExceptionError, NotUniqueFieldExceptionError, NotFoundExceptionError, \
+    InvalidTokenExceptionError
+from src.core.schemas.base import LangEnum, MessageOutSchema, errors_to_docs
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_patch
 from ninja import Header
@@ -39,15 +42,11 @@ class SliderController(ControllerBase):
         response=PaginatedResponseSchema[List],
         openapi_extra={
             "operationId": "get_speed_choices",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -75,24 +74,20 @@ class SliderController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "update_top_slider",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                404: {
-                    "description": "Error: Not Found",
-                },
-                409: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                409: [
+                    NotUniqueFieldExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def update_top_slider(
@@ -111,10 +106,6 @@ class SliderController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
-            Причини: \n
-                1) Недійсне значення (не написане великими літерами).
-                   З великих літер повиннен починатися text \n
           - **422**: Error: Unprocessable Entity. \n
           - **500**: Internal server error if an unexpected error occurs.
 
@@ -149,18 +140,14 @@ class SliderController(ControllerBase):
         response=TopSliderOutSchema,
         openapi_extra={
             "operationId": "get_top_slider",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_top_slider(
@@ -186,24 +173,20 @@ class SliderController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "update_bottom_slider",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                404: {
-                    "description": "Error: Not Found",
-                },
-                409: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                409: [
+                    NotUniqueFieldExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def update_bottom_slider(
@@ -222,7 +205,6 @@ class SliderController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
           - **422**: Error: Unprocessable Entity. \n
           - **500**: Internal server error if an unexpected error occurs.
 
@@ -255,18 +237,14 @@ class SliderController(ControllerBase):
         response=BottomSliderOutSchema,
         openapi_extra={
             "operationId": "get_bottom_slider",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_bottom_slider(
@@ -293,24 +271,17 @@ class SliderController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "update_etend_banner",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                404: {
-                    "description": "Error: Not Found",
-                },
-                409: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def update_etend_banner(
@@ -343,18 +314,14 @@ class SliderController(ControllerBase):
         response=ETEndBBannerOutSchema,
         openapi_extra={
             "operationId": "get_etend_banner",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_etend_banner(

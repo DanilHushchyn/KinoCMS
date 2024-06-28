@@ -21,12 +21,14 @@ from ninja_extra import NinjaExtraAPI, status
 from django.conf.urls.static import static
 from django.utils.translation import gettext as _
 from ninja.errors import AuthenticationError, ValidationError, HttpError
+from ninja_extra.exceptions import APIException
 
 from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController
 from src.cinemas.endpoints.cinema import CinemaController
 from src.cinemas.endpoints.hall import HallController
 from src.core.endpoints.gallery import GalleryController
+from src.core.errors import AuthenticationExceptionError, InvalidTokenExceptionError
 from src.mailing.endpoints import MailingController
 from src.movies.endpoints import MovieController
 from src.pages.endpoints.banners_sliders import SliderController
@@ -34,12 +36,14 @@ from src.pages.endpoints.news_promo import NewsPromoController
 from src.pages.endpoints.page import PageController
 from src.users.endpoints import UsersAdminController
 from django.core.cache import cache
+from ninja_jwt.exceptions import InvalidToken, AuthenticationFailed
 
 cache.delete('mailing_task')
 cache = get_cache()
 cache.clear()
 admin_api = NinjaExtraAPI(title='KinoCMS (admin-panel)', description='ADMIN API')
 admin_api.register_controllers(CustomTokenObtainPairController)
+
 admin_api.register_controllers(UsersAdminController)
 admin_api.register_controllers(MailingController)
 admin_api.register_controllers(GalleryController)
@@ -51,21 +55,30 @@ admin_api.register_controllers(NewsPromoController)
 admin_api.register_controllers(PageController)
 
 
-@admin_api.exception_handler(AuthenticationError)
-def user_unauthorized(request, exc):
+@admin_api.exception_handler(AuthenticationFailed)
+def authentication_failed_handler(request, exc):
     return admin_api.create_response(
         request,
-        {"message": _("Не авторизований")},
+        data={
+            "status": status.HTTP_401_UNAUTHORIZED,
+            "error": AuthenticationExceptionError(
+                message=exc.detail['detail']
+            ).error_detail,
+        },
         status=status.HTTP_401_UNAUTHORIZED,
     )
 
 
-@admin_api.exception_handler(HttpError)
-def user_exc(request, exc):
-
+@admin_api.exception_handler(InvalidToken)
+def invalid_token_handler(request, exc):
     return admin_api.create_response(
         request,
-        {"message": _("Не авторизований")},
+        data={
+            "status": status.HTTP_401_UNAUTHORIZED,
+            "error": InvalidTokenExceptionError(
+                message=exc.detail['detail']
+            ).error_detail,
+        },
         status=status.HTTP_401_UNAUTHORIZED,
     )
 
@@ -84,7 +97,7 @@ def http_exceptions_handler(request: HttpRequest, exc: ValidationError) \
         error_list.append(
             {
                 "location": location,
-                "field": field_full,
+                "field": field_full.split('.')[1],
                 "message": message,
             }
         )
@@ -92,7 +105,8 @@ def http_exceptions_handler(request: HttpRequest, exc: ValidationError) \
     return admin_api.create_response(
         request,
         data={
-            "error": {"status": status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "status": status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "error": {"code": "UNPROCESSABLE_ENTITY",
                       "details": error_list},
         },
         status=status.HTTP_422_UNPROCESSABLE_ENTITY,

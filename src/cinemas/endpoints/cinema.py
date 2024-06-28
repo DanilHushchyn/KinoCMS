@@ -6,13 +6,19 @@ from src.cinemas.models import Cinema
 from src.cinemas.schemas.cinema import (CinemaInSchema,
                                         CinemaCardOutSchema,
                                         CinemaUpdateSchema,
-                                        CinemaOutSchema, CinemaContactOutSchema, CinemaClientOutSchema)
+                                        CinemaOutSchema,
+                                        CinemaContactOutSchema,
+                                        CinemaClientOutSchema)
 from src.cinemas.services.cinema import CinemaService
-from src.core.schemas.base import LangEnum, MessageOutSchema
+from src.core.schemas.base import (LangEnum, MessageOutSchema,
+                                   errors_to_docs)
+from src.core.errors import (NotUniqueFieldExceptionError,
+                             NotFoundExceptionError,
+                             UnprocessableEntityExceptionError,
+                             )
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra import (http_get, http_post, http_patch,
-                         http_delete,
-                         route)
+                         http_delete, )
 from ninja import Header
 from django.utils.translation import gettext as _
 
@@ -41,15 +47,11 @@ class CinemaController(ControllerBase):
         response=PaginatedResponseSchema[CinemaCardOutSchema],
         openapi_extra={
             "operationId": "get_all_cinema_cards",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -77,21 +79,17 @@ class CinemaController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "create_cinema",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                409: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                409: [
+                    NotUniqueFieldExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def create_cinema(
@@ -110,12 +108,6 @@ class CinemaController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
-            Причини: \n
-                1) Недійсне значення (не написане великими літерами).
-                   З великих літер повинні починатися (name, description,
-                   seo_title, seo_description) \n
-                2) Введено некоректний номер телефону \n
           - **409**: Error: Conflict.
             Причини: \n
                 1) Поле name повинно бути унікальним. Ця назва вже зайнята
@@ -125,6 +117,7 @@ class CinemaController(ControllerBase):
                 2) Максимальни довжина name 100 символів \n
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
+                5) Введено некоректний номер телефону \n
           - **500**: Internal server error if an unexpected error occurs.
 
         Operations with gallery items:
@@ -151,29 +144,22 @@ class CinemaController(ControllerBase):
 
     @http_patch(
         "/{cnm_slug}/",
-        response=MessageOutSchema,
+        response={200: MessageOutSchema},
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "update_cinema",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                404: {
-                    "description": "Error: Not Found",
-                },
-                409: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                409: [
+                    NotUniqueFieldExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def update_cinema(
@@ -193,21 +179,15 @@ class CinemaController(ControllerBase):
 
         Returns
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
+          - **404**: Error: Forbidden. \n
             Причини: \n
-                1) Недійсне значення (не написане великими літерами).
-                   З великих літер повинні починатися (name, description,
-                   seo_title, seo_description) \n
-                2) Введено некоректний номер телефону \n
+                1) Не знайдено: немає збігів кінотеатрів
+                   на заданному запиті. \n
+                2) Не знайдено: немає збігів картинок
+                   на заданному запиті. \n
           - **409**: Error: Conflict. \n
             Причини: \n
                 1) Поле name повинно бути унікальним. Ця назва вже зайнята
-          - **422**: Error: Unprocessable Entity. \n
-            Причини: \n
-                1) Максимальни довжина description 20_000 символів \n
-                2) Максимальни довжина name 100 символів \n
-                3) Максимальни довжина seo_title 60 символів \n
-                4) Максимальни довжина seo_description 160 символів \n
           - **500**: Internal server error if an unexpected error occurs.
 
 
@@ -240,18 +220,14 @@ class CinemaController(ControllerBase):
         response=CinemaOutSchema,
         openapi_extra={
             "operationId": "get_cinema_by_slug",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_cinema_by_slug(
@@ -266,13 +242,15 @@ class CinemaController(ControllerBase):
         Create cinema.
 
         Please provide:
-          - **cinema_id**  id of cinema
+          - **cnm_slug**  slug of cinema
 
         Returns:
           - **200**: Success response with the data.
           - **404**: Error: Forbidden. \n
             Причини: \n
                 1) Не знайдено: немає збігів кінотеатрів
+                   на заданному запиті. \n
+                2) Не знайдено: немає збігів картинок
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
         """
@@ -286,18 +264,14 @@ class CinemaController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "delete_cinema_by_slug",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def delete_cinema_by_slug(
@@ -312,13 +286,15 @@ class CinemaController(ControllerBase):
         Delete cinema by id.
 
         Please provide:
-          - **cinema_id**  id of cinema
+          - **cnm_slug**  slug of cinema
 
         Returns:
           - **200**: Success response with the data.
-          - **404**: Error: Forbidden. \n
+          - **404**: Error: Found. \n
             Причини: \n
                 1) Не знайдено: немає збігів кінотеатрів
+                   на заданному запиті. \n
+                2) Не знайдено: немає збігів картинок
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
         """
@@ -350,15 +326,11 @@ class CinemaClientController(ControllerBase):
         response=PaginatedResponseSchema[CinemaContactOutSchema],
         openapi_extra={
             "operationId": "get_all_cinema_contacts",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -384,18 +356,14 @@ class CinemaClientController(ControllerBase):
         response=CinemaClientOutSchema,
         openapi_extra={
             "operationId": "get_cinema_by_slug",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_cinema_by_slug(
@@ -410,13 +378,15 @@ class CinemaClientController(ControllerBase):
         Create cinema.
 
         Please provide:
-          - **cinema_id**  id of cinema
+          - **cnm_slug**  slug of cinema
 
         Returns:
           - **200**: Success response with the data.
-          - **404**: Error: Forbidden. \n
+          - **404**: Error: Not Found. \n
             Причини: \n
                 1) Не знайдено: немає збігів кінотеатрів
+                   на заданному запиті. \n
+                2) Не знайдено: немає збігів картинок
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
         """

@@ -3,17 +3,21 @@ from typing import Tuple, List
 from django.http import HttpRequest
 from ninja_extra import http_post, http_get, http_patch
 from ninja_extra.controllers.base import ControllerBase, api_controller
+from ninja_extra.exceptions import AuthenticationFailed
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.permissions.common import AllowAny
 from ninja_extra.schemas.response import PaginatedResponseSchema
 from ninja_jwt.schema_control import SchemaControl
 from ninja_jwt.settings import api_settings
+
+from src.authz.errors import EmailAlreadyExistsExceptionError
 from src.authz.schemas import LoginSchema, LoginResponseSchema
+from src.core.errors import UnprocessableEntityExceptionError, InvalidTokenExceptionError, AuthenticationExceptionError
 from src.core.utils import CustomJWTAuth
 from src.users.models import User
 from src.users.schemas import UserOutSchema, UserUpdateSchema, UserRegisterSchema
 from src.users.services.user_service import UserService
-from src.core.schemas.base import LangEnum, MessageOutSchema
+from src.core.schemas.base import LangEnum, MessageOutSchema, errors_to_docs
 from ninja import Header
 
 schema = SchemaControl(api_settings)
@@ -36,19 +40,15 @@ class CustomTokenObtainPairController(ControllerBase):
         url_name="token_obtain_pair",
         openapi_extra={
             "operationId": "obtain_token",
-
-            "responses": {
-                401: {
-                    "description": "Error: Unauthorized",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    AuthenticationExceptionError(),
+                    InvalidTokenExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def obtain_token(self, request: HttpRequest,
@@ -80,18 +80,11 @@ class CustomTokenObtainPairController(ControllerBase):
         openapi_extra={
             "operationId": "blacklist_token",
 
-            "responses": {
-                401: {
-                    "description": "Error: Unauthorized",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def blacklist_token(self, request: HttpRequest,
@@ -120,18 +113,14 @@ class CustomTokenObtainPairController(ControllerBase):
         openapi_extra={
             "operationId": "refresh_token",
 
-            "responses": {
-                401: {
-                    "description": "Error: Unauthorized",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def refresh_token(
@@ -164,21 +153,17 @@ class CustomTokenObtainPairController(ControllerBase):
         openapi_extra={
             "operationId": "register",
 
-            "responses": {
-                409: {
-                    "description": "Error: Conflict",
-                },
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                409: [
+                    EmailAlreadyExistsExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def register(
@@ -197,7 +182,10 @@ class CustomTokenObtainPairController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
+          - **409**: Error: Conflict. \n
+            Причини: \n
+                1) Ця електронна адреса вже використовується
+          - **422**: Error: Unprocessable Entity.
             Причини: \n
                 1) Паролі не співпадають \n
                 2) Пароль повинен бути: \n
@@ -210,10 +198,6 @@ class CustomTokenObtainPairController(ControllerBase):
                 4) Ім'я та прізвище повинно починатися з великої літери \n
                    (наступні маленькі), доступна кирилиця,
                    доступні спецсимволи('-) \n
-          - **409**: Error: Conflict. \n
-            Причини: \n
-                1) Ця електронна адреса вже використовується
-          - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
         result = self.user_service.register(user_body=user_body)
@@ -222,18 +206,14 @@ class CustomTokenObtainPairController(ControllerBase):
     @http_get(
         "/cities/choices/",
         response=PaginatedResponseSchema[List],
-        # auth=JWTAuth(),
         openapi_extra={
             "operationId": "get_cities",
 
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -262,17 +242,14 @@ class CustomTokenObtainPairController(ControllerBase):
         openapi_extra={
             "operationId": "get_my_profile",
 
-            "responses": {
-                401: {
-                    "description": "Error: Unauthorized",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_my_profile(
@@ -294,7 +271,6 @@ class CustomTokenObtainPairController(ControllerBase):
           - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
-        # result = self.user_service.get_by_id(request.user.id)
         return request.user
 
     @http_patch(
@@ -304,17 +280,17 @@ class CustomTokenObtainPairController(ControllerBase):
         openapi_extra={
             "operationId": "update_my_profile",
 
-            "responses": {
-                401: {
-                    "description": "Error: Unauthorized",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                409: [
+                    EmailAlreadyExistsExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def update_my_profile(

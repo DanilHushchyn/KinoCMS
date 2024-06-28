@@ -29,12 +29,10 @@ class MovieService:
         Create Movie.
         """
         self.core_service.check_field_unique(
-            request=request,
             value=schema.name_uk,
             field_name='name_uk',
             model=Movie)
         self.core_service.check_field_unique(
-            request=request,
             value=schema.name_ru,
             field_name='name_ru',
             model=Movie)
@@ -75,13 +73,11 @@ class MovieService:
         """
         movie = Movie.objects.get_by_slug(mv_slug=mv_slug)
         self.core_service.check_field_unique(
-            request=request,
             value=schema.name_uk,
             field_name='name_uk',
             instance=movie,
             model=Movie)
         self.core_service.check_field_unique(
-            request=request,
             value=schema.name_ru,
             field_name='name_ru',
             instance=movie,

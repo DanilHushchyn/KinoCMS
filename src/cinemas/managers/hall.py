@@ -1,14 +1,11 @@
 from typing import TYPE_CHECKING
-
-from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 from django.db import models
-
+from src.core.errors import NotFoundExceptionError
 if TYPE_CHECKING:
     from src.cinemas.models import Hall
 
 
-# um1.User
 class HallManager(models.Manager):
     """
     Custom hall manager. It's manager for making request to Hall model
@@ -30,5 +27,5 @@ class HallManager(models.Manager):
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів залів '
                     'на заданному запиті.')
-            raise HttpError(404, msg)
+            raise NotFoundExceptionError(message=msg)
         return hall

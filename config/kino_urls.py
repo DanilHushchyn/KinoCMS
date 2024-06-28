@@ -20,6 +20,7 @@ from ninja_extra import NinjaExtraAPI, status
 from django.conf.urls.static import static
 from django.utils.translation import gettext as _
 from ninja.errors import AuthenticationError, ValidationError
+from ninja_jwt.exceptions import InvalidToken, AuthenticationFailed
 
 from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController
@@ -27,6 +28,7 @@ from src.booking.endpoints.seance import SeanceController
 from src.cinemas.endpoints.cinema import CinemaClientController
 from src.cinemas.endpoints.hall import HallClientController
 from src.core.endpoints.gallery import GalleryController
+from src.core.errors import AuthenticationExceptionError, InvalidTokenExceptionError
 from src.movies.endpoints import MovieClientController
 from src.pages.endpoints.page import PageClientController
 from src.pages.endpoints.news_promo import NewsPromoClientController
@@ -45,11 +47,30 @@ kino_api.register_controllers(SeanceController)
 kino_api.register_controllers(SliderClientController)
 
 
-@kino_api.exception_handler(AuthenticationError)
-def user_unauthorized(request, exc):
+@kino_api.exception_handler(AuthenticationFailed)
+def authentication_failed_handler(request, exc):
     return kino_api.create_response(
         request,
-        {"message": _("Не авторизований")},
+        data={
+            "status": status.HTTP_401_UNAUTHORIZED,
+            "error": AuthenticationExceptionError(
+                message=exc.detail['detail']
+            ).error_detail,
+        },
+        status=status.HTTP_401_UNAUTHORIZED,
+    )
+
+
+@kino_api.exception_handler(InvalidToken)
+def invalid_token_handler(request, exc):
+    return kino_api.create_response(
+        request,
+        data={
+            "status": status.HTTP_401_UNAUTHORIZED,
+            "error": InvalidTokenExceptionError(
+                message=exc.detail['detail']
+            ).error_detail,
+        },
         status=status.HTTP_401_UNAUTHORIZED,
     )
 
@@ -68,15 +89,16 @@ def http_exceptions_handler(request: HttpRequest, exc: ValidationError) \
         error_list.append(
             {
                 "location": location,
-                "field": field_full,
-                "message": message.capitalize(),
+                "field": field_full.split('.')[1],
+                "message": message,
             }
         )
 
     return kino_api.create_response(
         request,
         data={
-            "error": {"status": status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "status": status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "error": {"code": "UNPROCESSABLE_ENTITY",
                       "details": error_list},
         },
         status=status.HTTP_422_UNPROCESSABLE_ENTITY,

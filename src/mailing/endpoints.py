@@ -1,6 +1,5 @@
 # Create your views here.
-import time
-from typing import Dict, Any, List
+from typing import List
 
 from django.db.models import QuerySet
 from ninja import File
@@ -8,16 +7,21 @@ from ninja.files import UploadedFile
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 
-from src.core.schemas.base import MessageOutSchema, LangEnum
+from src.core.errors import (InvalidTokenExceptionError,
+                             UnprocessableEntityExceptionError,
+                             NotFoundExceptionError)
+from src.core.schemas.base import (MessageOutSchema, LangEnum,
+                                   errors_to_docs)
 from src.core.utils import CustomJWTAuth
+from src.mailing.errors import MailingIsActiveExceptionError, \
+    MailingIsNotActiveExceptionError
 from src.mailing.models import MailTemplate
 from src.mailing.schemas import (MailTemplateOutSchema, MailingInSchema,
                                  TaskInfoOutSchema)
 from src.mailing.services.mailing import MailingService
 from src.users.services.user_service import UserService
 from ninja_extra.permissions import IsAdminUser
-from ninja_jwt.authentication import JWTAuth
-from ninja_extra import http_delete, http_get, http_patch, http_post
+from ninja_extra import http_delete, http_get, http_post
 from ninja import Header
 
 
@@ -48,18 +52,14 @@ class MailingController(ControllerBase):
         response=MailTemplateOutSchema,
         openapi_extra={
             "operationId": "create_template",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def create_template(
@@ -78,11 +78,10 @@ class MailingController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
+          - **422**: Error: Unprocessable Entity.
             Причини: \n
                 1) Дозволено відправляти тільки html \n
                 2) Максимально дозволений розмір файлу 1MB \n
-          - **422**: Error: Unprocessable Entity.
           - **500**: Internal server error if an unexpected error occurs.
         """
         result = self.mailing_service.create_template(file)
@@ -94,15 +93,14 @@ class MailingController(ControllerBase):
         openapi_extra={
             "operationId": "get_templates",
 
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_templates(
@@ -128,18 +126,20 @@ class MailingController(ControllerBase):
         response=MessageOutSchema,
         openapi_extra={
             "operationId": "delete_template",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                400: [
+                    MailingIsActiveExceptionError()
+                ],
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def delete_template(
@@ -155,7 +155,7 @@ class MailingController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **403**: Error: Not Found.\n
+          - **400**: Error: Not Found.\n
             Причини: \n
                 1) Не можна видаляти шаблони поки йде розсилання.
           - **404**: Error: Not Found.\n
@@ -173,18 +173,20 @@ class MailingController(ControllerBase):
         response=MessageOutSchema,
         openapi_extra={
             "operationId": "start_mailing",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                400: [
+                    MailingIsActiveExceptionError()
+                ],
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def start_mailing(
@@ -201,7 +203,7 @@ class MailingController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **404**: Error: Not Found. \n
+          - **400**: Error: Not Found. \n
             Причини: \n
                 1) Треба зачекати поки закінчиться поточне розсилання.
           - **404**: Error: Not Found.\n
@@ -219,18 +221,17 @@ class MailingController(ControllerBase):
         response={200: TaskInfoOutSchema, 201: MessageOutSchema},
         openapi_extra={
             "operationId": "status_mailing",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                400: [
+                    MailingIsNotActiveExceptionError()
+                ],
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def status_mailing(
@@ -246,6 +247,9 @@ class MailingController(ControllerBase):
         Returns:
           - **200**: Success response with the data.
           - **201**: Success mailing completed.
+          - **400**: Error: Not Found. \n
+            Причини: \n
+                1) Hа теперішній час розсилання не активне.
           - **404**: Error: Not Found. \n
             Причини: \n
                 1) Не знайдено: немає збігів шаблонів

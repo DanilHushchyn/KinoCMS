@@ -4,11 +4,15 @@ from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.schemas.response import PaginatedResponseSchema
 
+from src.core.errors import UnprocessableEntityExceptionError, InvalidTokenExceptionError, NotFoundExceptionError, \
+    NotUniqueFieldExceptionError
+from src.pages.errors import PageUnableToDeleteExceptionError
 from src.pages.schemas.page import (PageInSchema,
                                     PageCardOutSchema,
                                     PageUpdateSchema,
-                                    PageOutSchema, PageClientOutSchema, PageCardClientOutSchema)
-from src.core.schemas.base import LangEnum, MessageOutSchema
+                                    PageOutSchema, PageClientOutSchema,
+                                    PageCardClientOutSchema)
+from src.core.schemas.base import LangEnum, MessageOutSchema, errors_to_docs
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_post, http_patch, http_delete
 from ninja import Header
@@ -42,15 +46,14 @@ class PageController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "get_all_page_cards",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -78,21 +81,17 @@ class PageController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "create_page",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                409: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses":errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                409: [
+                    NotUniqueFieldExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def create_page(
@@ -111,11 +110,6 @@ class PageController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
-            Причини: \n
-                1) Недійсне значення (не написане великими літерами).
-                   З великих літер повинні починатися (name,
-                   seo_title, seo_description) \n
           - **409**: Error: Conflict.
             Причини: \n
                 1) Поле name повинно бути унікальним. Ця назва вже зайнята
@@ -156,24 +150,20 @@ class PageController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "update_page",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                404: {
-                    "description": "Error: Not Found",
-                },
-                409: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                409: [
+                    NotUniqueFieldExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def update_page(
@@ -193,11 +183,6 @@ class PageController(ControllerBase):
 
         Returns
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
-            Причини: \n
-                1) Недійсне значення (не написане великими літерами).
-                   З великих літер повинні починатися (name,
-                   seo_title, seo_description) \n
           - **409**: Error: Conflict. \n
             Причини: \n
                 1) Поле name повинно бути унікальним. Ця назва вже зайнята
@@ -235,23 +220,24 @@ class PageController(ControllerBase):
 
     @http_get(
         "/{pg_slug}/",
-        response=PageOutSchema,
+        response={
+            200: PageOutSchema,
+        },
         permissions=[IsAdminUser()],
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "get_page_by_slug",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_page_by_slug(
@@ -286,18 +272,20 @@ class PageController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "delete_page_by_slug",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                406: [
+                    PageUnableToDeleteExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def delete_page_by_slug(
@@ -316,7 +304,7 @@ class PageController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data. \n
-          - **409**: Error: Conflict. \n
+          - **406**: Error: Conflict. \n
             Причини: \n
                 1) Цю сторінку заборонено видаляти. \n
           - **404**: Error: Forbidden. \n
@@ -351,15 +339,11 @@ class PageClientController(ControllerBase):
         response=PaginatedResponseSchema[PageCardClientOutSchema],
         openapi_extra={
             "operationId": "get_all_page_cards",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -385,18 +369,14 @@ class PageClientController(ControllerBase):
         response=PageClientOutSchema,
         openapi_extra={
             "operationId": "get_page_by_slug",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_page_by_slug(

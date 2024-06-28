@@ -1,12 +1,10 @@
 from typing import Type
 
-from django.db.models import Model, Q
-from django.http import HttpRequest, HttpResponse
-from ninja.errors import HttpError, ValidationError
+from django.db.models import Model
+from django.http import HttpRequest
 from django.utils.translation import gettext as _
-from ninja_extra.exceptions import ParseError, APIException
-from src.core.exceptions import FieldNotUniqueError
-from ninja_extra import status
+
+from src.core.errors import NotUniqueFieldExceptionError
 
 
 class CoreService:
@@ -15,15 +13,14 @@ class CoreService:
     """
 
     @staticmethod
-    def check_field_unique(request: HttpRequest,
+    def check_field_unique(
                            field_name: str,
                            value: str,
                            model: Type[Model],
                            instance: Model = None) \
-            -> HttpResponse:
+            -> None:
         """
         Check field for unique in model;
-        :param request: HttpRequest
         :param field_name: contain field name for unique checking;
         :param value contain field value for unique checking;
         :param model for checking for unique
@@ -37,8 +34,4 @@ class CoreService:
             if instances.count():
                 msg = _(f'Поле повинно бути унікальним. '
                         f'*{value}* - Ця назва вже зайнята')
-                raise FieldNotUniqueError(
-                    detail={
-                        "detail": msg,
-                        "field": field_name,
-                    })
+                raise NotUniqueFieldExceptionError(message=msg, field=field_name)

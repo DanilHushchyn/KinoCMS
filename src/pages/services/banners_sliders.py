@@ -1,22 +1,21 @@
-from typing import Type, List
-
-from django.db.models import Model, Q
+from typing import List
 from injector import inject
-from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 
+from src.core.errors import (NotFoundExceptionError,
+                             UnprocessableEntityExceptionError)
 from src.core.schemas.base import MessageOutSchema
 from src.core.services.images import ImageService
 from src.core.utils import primitives
-from src.pages.models import (TopSlider, TopSliderItem, BaseSlider,
-                              BottomSlider, BottomSliderItem,
+from src.pages.errors import TooMuchElementsExceptionError
+from src.pages.models import (TopSlider, BaseSlider,
+                              BottomSlider,
                               ETEndBBanner)
 from src.pages.schemas.banners_sliders import (TopSliderUpdateSchema,
                                                TopSliderItemUpdateSchema,
                                                BottomSliderUpdateSchema,
                                                BottomSliderItemUpdateSchema,
                                                ETEndBBannerUpdateSchema)
-
 from django.db import transaction
 
 
@@ -82,7 +81,7 @@ class SliderService:
                           .get(id=1))
         except TopSlider.DoesNotExist:
             msg = "TopSlider doesn't exist.Backend have to add"
-            raise HttpError(404, msg)
+            raise NotFoundExceptionError(message=msg)
         return top_slider
 
     @staticmethod
@@ -97,7 +96,7 @@ class SliderService:
                              .get(id=1))
         except BottomSlider.DoesNotExist:
             msg = "BottomSlider doesn't exist.Backend have to add"
-            raise HttpError(404, msg)
+            raise NotFoundExceptionError(message=msg)
         return bottom_slider
 
     def update_slider_items(self,
@@ -126,7 +125,7 @@ class SliderService:
                                    "data for creating new slider item. "
                                    "Each field is required(except id) "
                                    "if you are creating an element.")
-                            raise HttpError(403, msg)
+                            raise UnprocessableEntityExceptionError(message=msg)
                     create_item_schemas.append(schema)
             db_ids = slider.items.model.objects.values_list('id', flat=True)
             for item_id in item_ids:
@@ -136,7 +135,7 @@ class SliderService:
                            f"with id {item_id} "
                            f"doesn't belongs to "
                            f"{slider._meta.model.__name__}")
-                    raise HttpError(404, msg)
+                    raise NotFoundExceptionError(message=msg)
             self.bulk_delete_slider_items(item_ids=del_item_ids,
                                           slider=slider)
             self.bulk_update_slider_items(items_dict=update_items_dict,
@@ -146,7 +145,7 @@ class SliderService:
             if sliders_length >= 10:
                 msg = _('Максимальна кількість елементів '
                         'верхнього банеру, 10')
-                raise HttpError(409, msg)
+                raise TooMuchElementsExceptionError(message=msg)
             self.bulk_create_slider_items(item_schemas=create_item_schemas,
                                           slider=slider)
 
@@ -200,50 +199,6 @@ class SliderService:
             fields.remove('delete')
             slider.items.model.objects.bulk_update(slider_items, fields)
 
-    # def update_bottom_slider_items(self,
-    #                                schemas:
-    #                                List[BottomSliderItemUpdateSchema],
-    #                                slider: BottomSlider) -> None:
-    #     """
-    #     Update Bottom Slider.
-    #     """
-    #     if schemas:
-    #         for schema in schemas:
-    #             if schema.id:
-    #                 slider_item = (BottomSliderItem.objects
-    #                                .get_by_id(schema.id))
-    #                 self.item_matches_slider(slider, schema.id)
-    #                 if schema.delete:
-    #                     slider_item.delete()
-    #                     self.image_service.delete(slider_item.image)
-    #                 else:
-    #                     self.image_service.update(schema.image,
-    #                                               slider_item.image)
-    #                     expt_list = ['image', ]
-    #                     for attr, value in schema.dict().items():
-    #                         if attr not in expt_list and value is not None:
-    #                             setattr(slider_item, attr, value)
-    #                     slider_item.save()
-    #             elif not schema.delete:
-    #                 for key, value in schema.dict().items():
-    #                     if value is None and key != 'id':
-    #                         msg = ("You provided no correct "
-    #                                "data for creating new slider item. "
-    #                                "Each field is required(except id) "
-    #                                "if you are creating element.")
-    #                         raise HttpError(403, msg)
-    #                 if slider.items.count() >= 10:
-    #                     msg = _('Максимальна кількість елементів '
-    #                             'верхнього банеру, 10')
-    #                     raise HttpError(409, msg)
-    #                 image = self.image_service.create(schema.image)
-    #                 item = BottomSliderItem.objects.create(
-    #                     url=schema.url,
-    #                     image=image,
-    #                 )
-    #                 slider.items.add(item)
-    #                 slider.save()
-
     def bulk_delete_slider_items(self, item_ids: List[int],
                                  slider: TopSlider | BottomSlider) \
             -> None:
@@ -255,17 +210,6 @@ class SliderService:
         items.delete()
         self.image_service.bulk_delete(img_ids)
 
-    # @staticmethod
-    # def item_matches_slider(slider: TopSlider | BottomSlider,
-    #                         item_id: int) -> None:
-    #     """
-    #     Check that item match to given slider.
-    #     """
-    #     ids = slider.items.values_list('id', flat=True)
-    #     if item_id not in ids:
-    #         msg = "Given item_ id doesn't belongs to slider"
-    #         raise HttpError(404, msg)
-
     @staticmethod
     def get_etend_banner() \
             -> ETEndBBanner:
@@ -276,7 +220,7 @@ class SliderService:
             etend_banner = ETEndBBanner.objects.get(id=1)
         except ETEndBBanner.DoesNotExist:
             msg = "ETEndBanner doesn't exist. Backend have to add"
-            raise HttpError(404, msg)
+            raise NotFoundExceptionError(message=msg)
 
         return etend_banner
 

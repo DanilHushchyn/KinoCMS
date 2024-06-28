@@ -32,12 +32,10 @@ class CinemaService:
         Create cinema.
         """
         self.core_service.check_field_unique(
-            request=request,
             value=schema.name_uk,
             field_name='name_uk',
             model=Cinema)
         self.core_service.check_field_unique(
-            request=request,
             value=schema.name_ru,
             field_name='name_ru',
             model=Cinema)
@@ -78,12 +76,10 @@ class CinemaService:
         self.core_service.check_field_unique(value=schema.name_uk,
                                              field_name='name_uk',
                                              instance=cinema,
-                                             request=request,
                                              model=Cinema)
         self.core_service.check_field_unique(value=schema.name_ru,
                                              field_name='name_ru',
                                              instance=cinema,
-                                             request=request,
                                              model=Cinema)
         self.image_service.update(schema.banner, cinema.banner)
         self.image_service.update(schema.logo, cinema.logo)

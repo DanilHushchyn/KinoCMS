@@ -1,18 +1,14 @@
 import datetime
 from enum import Enum
 from typing import List
-
 import ninja_schema
-from ninja.errors import HttpError
 from pydantic.fields import Field
-
+from src.core.errors import UnprocessableEntityExceptionError, NotFoundExceptionError
 from src.movies.models import Movie, MovieParticipant, TECHS_CHOICES
 from ninja import ModelSchema
 from django.utils.translation import gettext as _
-
 from src.core.schemas.gallery import GalleryItemSchema
 from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
-from src.core.utils import validate_capitalized
 from django_countries.data import COUNTRIES
 
 GenresEnum = Enum(
@@ -50,16 +46,6 @@ class MovieInSchema(ninja_schema.ModelSchema):
     Pydantic schema for creating Movies to server side.
     """
 
-    @ninja_schema.model_validator('name_uk', 'name_ru',
-                                  'description_uk', 'description_ru',
-                                  'seo_title', 'seo_description')
-    def clean_capitalize(cls, value) -> int:
-        msg = _('Недійсне значення (не написане великими літерами). '
-                'З великих літер повинні починатися (name, '
-                'description, seo_title, seo_description)')
-        validate_capitalized(value, msg)
-        return value
-
     card_img: ImageInSchema
     seo_image: ImageInSchema
     gallery: List[ImageInSchema] = None
@@ -77,7 +63,7 @@ class MovieInSchema(ninja_schema.ModelSchema):
             msg = _(f'Expected min year is 1984 '
                     f'max year is {current_year() + 1} '
                     f'but got {year}')
-            raise HttpError(422, msg)
+            raise UnprocessableEntityExceptionError(message=msg)
         return year
 
     @ninja_schema.model_validator('genres')
@@ -89,7 +75,7 @@ class MovieInSchema(ninja_schema.ModelSchema):
             if genre not in keys:
                 msg = _(f'List should contain any of '
                         f'{keys}')
-                raise HttpError(422, msg)
+                raise UnprocessableEntityExceptionError(message=msg)
             result.append(genre.value)
         return result
 
@@ -102,7 +88,7 @@ class MovieInSchema(ninja_schema.ModelSchema):
             if tech not in keys:
                 msg = _(f'List should contain any of '
                         f'{keys}')
-                raise HttpError(422, msg)
+                raise UnprocessableEntityExceptionError(message=msg)
             result.append(tech.value)
         return list(result)
 
@@ -114,7 +100,7 @@ class MovieInSchema(ninja_schema.ModelSchema):
             if country not in COUNTRIES.keys():
                 msg = _(f'List should contain any of '
                         f'{list(COUNTRIES.keys())}')
-                raise HttpError(422, msg)
+                raise UnprocessableEntityExceptionError(message=msg)
             result.append(country.value)
         return result
 
@@ -127,7 +113,7 @@ class MovieInSchema(ninja_schema.ModelSchema):
             if participant not in participants_ids:
                 msg = _(f'Not Found: No MovieParticipant'
                         f'matches the given id - {participant}')
-                raise HttpError(404, msg)
+                raise NotFoundExceptionError(message=msg)
         return list(participants)
 
     class Config:

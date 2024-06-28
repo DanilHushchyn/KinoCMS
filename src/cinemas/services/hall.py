@@ -1,10 +1,9 @@
-from ninja.errors import HttpError
 from src.cinemas.models import Hall, Cinema
 from src.cinemas.schemas.hall import HallInSchema, HallUpdateSchema
 from django.utils.translation import gettext as _
 from src.cinemas.services.cinema import CinemaService
-from src.core.exceptions import FieldNotUniqueError
 from src.core.schemas.base import MessageOutSchema
+from src.core.errors import NotUniqueFieldExceptionError
 from src.core.services.gallery import GalleryService
 from src.core.services.images import ImageService
 from injector import inject
@@ -24,7 +23,8 @@ class HallService:
         self.image_service = image_service
         self.gallery_service = gallery_service
 
-    def create(self, schema: HallInSchema, cnm_slug: str) -> MessageOutSchema:
+    def create(self, schema: HallInSchema, cnm_slug: str) \
+            -> MessageOutSchema:
         """
         Create hall.
         """
@@ -85,10 +85,8 @@ class HallService:
                     f'*{number}* - цей номер вже зайнятий. '
                     f'Для кінотеатру {cinema.name}'
                     )
-            raise FieldNotUniqueError(detail={
-                        "detail": msg,
-                        "field": 'number',
-                    })
+            raise NotUniqueFieldExceptionError(message=msg,
+                                               field='number')
 
     @staticmethod
     def get_by_id(hall_id: int) -> Hall:
@@ -118,7 +116,8 @@ class HallService:
                          hall.banner_id, ]
         gallery = hall.gallery
         hall.delete()
-        gallery_imgs_ids = list(gallery.images.values_list('id', flat=True))
+        gallery_imgs_ids = list(gallery.images.values_list('id',
+                                                           flat=True))
         gallery.delete()
         imgs_ids_for_delete = hall_imgs_ids + gallery_imgs_ids
         self.image_service.bulk_delete(imgs_ids_for_delete)

@@ -4,6 +4,8 @@ from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 from django.db import models
 
+from src.core.errors import NotFoundExceptionError
+
 if TYPE_CHECKING:
     from src.cinemas.models import Cinema
 
@@ -31,5 +33,5 @@ class CinemaManager(models.Manager):
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів кінотеатрів '
                     'на заданному запиті.')
-            raise HttpError(404, msg)
+            raise NotFoundExceptionError(message=msg)
         return cinema

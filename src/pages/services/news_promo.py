@@ -2,6 +2,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 from ninja.errors import HttpError
 
+from src.core.errors import NotFoundExceptionError
 from src.pages.models import NewsPromo
 from src.pages.schemas.news_promo import (NewsPromoInSchema,
                                           NewsPromoUpdateSchema)
@@ -35,12 +36,10 @@ class NewsPromoService:
         """
         self.core_service.check_field_unique(
             value=schema.name_uk,
-            request=request,
             field_name='name_uk',
             model=NewsPromo)
         self.core_service.check_field_unique(
             value=schema.name_ru,
-            request=request,
             field_name='name_ru',
             model=NewsPromo)
         bodies = [schema.banner, schema.seo_image]
@@ -76,14 +75,12 @@ class NewsPromoService:
         news_promo = NewsPromo.objects.get_by_slug(np_slug=np_slug)
         self.core_service.check_field_unique(
             value=schema.name_uk,
-            request=request,
             instance=news_promo,
             field_name='name_uk',
             model=NewsPromo)
         self.core_service.check_field_unique(
             value=schema.name_ru,
             instance=news_promo,
-            request=request,
             field_name='name_ru',
             model=NewsPromo)
         self.image_service.update(schema.banner, news_promo.banner)
@@ -118,7 +115,7 @@ class NewsPromoService:
         if news_promo.active is False:
             msg = _('Не знайдено: немає збігів новин и акцій '
                     'на заданному запиті.')
-            raise HttpError(404, msg)
+            raise NotFoundExceptionError(message=msg)
         return news_promo
 
     @staticmethod

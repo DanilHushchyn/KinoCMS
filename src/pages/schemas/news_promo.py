@@ -1,30 +1,17 @@
-from typing import List, Any
+from typing import List
 import ninja_schema
 from pydantic.fields import Field
 from src.pages.models import NewsPromo
 from ninja import ModelSchema
-from ninja.errors import HttpError
-from django.utils.translation import gettext as _
 from src.core.schemas.gallery import GalleryItemSchema
-from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
-from src.core.utils import validate_capitalized, validate_max_length
-from pydantic import BaseModel, Json, ValidationError
+from src.core.schemas.images import (ImageOutSchema, ImageInSchema,
+                                     ImageUpdateSchema)
 
 
 class NewsPromoInSchema(ninja_schema.ModelSchema):
     """
     Pydantic schema for creating news and promos to server side.
     """
-
-    @ninja_schema.model_validator('name_uk', 'name_ru',
-                                  'description_uk', 'description_ru',
-                                  'seo_title', 'seo_description')
-    def clean_capitalize(cls, value) -> int:
-        msg = _('Недійсне значення (не написане великими літерами). '
-                'З великих літер повинні починатися (name, '
-                'description, seo_title, seo_description)')
-        validate_capitalized(value, msg)
-        return value
 
     banner: ImageInSchema
     seo_image: ImageInSchema
@@ -110,16 +97,6 @@ class NewsPromoUpdateSchema(ninja_schema.ModelSchema):
     banner: ImageUpdateSchema = None
     seo_image: ImageUpdateSchema = None
     gallery: List[GalleryItemSchema] = None
-
-    @ninja_schema.model_validator('name_uk', 'name_ru',
-                                  'description_uk', 'description_ru',
-                                  'seo_title', 'seo_description')
-    def clean_capitalize(cls, value) -> int:
-        msg = _('Недійсне значення (не написане великими літерами). '
-                'З великих літер повинні починатися (name, '
-                'description, seo_title, seo_description)')
-        validate_capitalized(value, msg)
-        return value
 
     class Config:
         model = NewsPromo

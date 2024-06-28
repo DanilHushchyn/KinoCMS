@@ -2,6 +2,8 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 from ninja.errors import HttpError
 
+from src.core.errors import NotFoundExceptionError
+from src.pages.errors import PageUnableToDeleteExceptionError
 from src.pages.models import Page
 from src.pages.schemas.page import (PageInSchema,
                                     PageUpdateSchema)
@@ -36,12 +38,10 @@ class PageService:
         """
         self.core_service.check_field_unique(
             value=schema.name_uk,
-            request=request,
             field_name='name_uk',
             model=Page)
         self.core_service.check_field_unique(
             value=schema.name_uk,
-            request=request,
             field_name='name_uk',
             model=Page)
         bodies = [schema.banner, schema.seo_image]
@@ -73,13 +73,11 @@ class PageService:
         page = Page.objects.get_by_slug(pg_slug=pg_slug)
         self.core_service.check_field_unique(
             value=schema.name_uk,
-            request=request,
             field_name='name_uk',
             instance=page,
             model=Page)
         self.core_service.check_field_unique(
             value=schema.name_ru,
-            request=request,
             field_name='name_ru',
             instance=page,
             model=Page)
@@ -113,7 +111,7 @@ class PageService:
         if page.active is False:
             msg = _('Не знайдено: немає збігів сторінок '
                     'на заданному запиті.')
-            raise HttpError(404, msg)
+            raise NotFoundExceptionError(message=msg)
         return page
 
     @staticmethod
@@ -142,7 +140,7 @@ class PageService:
                 .get_by_slug(pg_slug=pg_slug))
         if not page.can_delete:
             msg = _('Цю сторінку заборонено видаляти')
-            raise HttpError(409, msg)
+            raise PageUnableToDeleteExceptionError(message=msg)
         pg_imgs_ids = [page.seo_image_id,
                        page.banner_id, ]
         gallery = page.gallery

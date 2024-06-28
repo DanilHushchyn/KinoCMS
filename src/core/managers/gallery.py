@@ -1,6 +1,7 @@
-from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 from django.db import models
+
+from src.core.errors import NotFoundExceptionError
 
 
 # um1.User
@@ -23,5 +24,5 @@ class GalleryManager(models.Manager):
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів галерей '
                     'на заданному запиті.')
-            raise HttpError(403, msg)
+            raise NotFoundExceptionError(message=msg)
         return gallery

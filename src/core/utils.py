@@ -9,20 +9,16 @@ from ninja.errors import HttpError
 from django.db.models import QuerySet
 from ninja.security import HttpBearer
 from ninja_jwt.authentication import JWTBaseAuthentication
+from phonenumber_field.validators import validate_international_phonenumber
 from pydantic_core._pydantic_core import Url
+from phonenumber_field.validators import (
+    validate_international_phonenumber)
+from django.utils.translation import gettext as _
+
+from django.core.exceptions import ValidationError
+
+from src.core.errors import UnprocessableEntityExceptionError
 from src.users.models import User
-
-
-def validate_capitalized(value, msg):
-    if value[0] != value[0].capitalize():
-        raise HttpError(403, msg)
-
-
-def validate_max_length(available, current, field_name):
-    if current > available:
-        msg = (f'Max length expected for field {field_name} '
-               f'is {available} but got {current} ')
-        raise HttpError(403, msg)
 
 
 def get_timestamp_path(instance: object, filename) -> str:
@@ -75,3 +71,11 @@ class CustomJWTAuth(JWTBaseAuthentication, HttpBearer):
 
 
 primitives = (bool, str, int, float, Url)
+
+
+def check_phone_number(phone_number: str) -> None:
+    try:
+        validate_international_phonenumber(phone_number)
+    except ValidationError:
+        msg = _("Введено некоректний номер телефону.")
+        raise UnprocessableEntityExceptionError(message=msg)

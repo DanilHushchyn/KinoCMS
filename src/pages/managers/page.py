@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
-
-from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 from django.db import models
+
+from src.core.errors import NotFoundExceptionError
 
 if TYPE_CHECKING:
     from src.pages.models import Page
@@ -30,5 +30,5 @@ class PageManager(models.Manager):
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів сторінок '
                     'на заданному запиті.')
-            raise HttpError(404, msg)
+            raise NotFoundExceptionError(message=msg)
         return page

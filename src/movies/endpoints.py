@@ -1,16 +1,16 @@
-from typing import Any, Tuple
-
+from typing import Any
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.schemas.response import PaginatedResponseSchema
-from src.core.schemas.base import LangEnum, MessageOutSchema
+
+from src.core.errors import NotUniqueFieldExceptionError, \
+    InvalidTokenExceptionError
+from src.core.schemas.base import LangEnum, MessageOutSchema, errors_to_docs
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_post, http_patch, http_delete
 from ninja import Header
-from django.utils.translation import gettext as _
-
 from src.core.utils import CustomJWTAuth
 from src.movies.schemas import *
 from src.movies.service import MovieService
@@ -38,15 +38,11 @@ class MovieController(ControllerBase):
         response=PaginatedResponseSchema[List],
         openapi_extra={
             "operationId": "get_movie_legal_ages",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -72,15 +68,11 @@ class MovieController(ControllerBase):
         response=PaginatedResponseSchema[List],
         openapi_extra={
             "operationId": "get_movie_genres",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -106,15 +98,11 @@ class MovieController(ControllerBase):
         response=PaginatedResponseSchema[List],
         openapi_extra={
             "operationId": "get_techs",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -140,15 +128,11 @@ class MovieController(ControllerBase):
         response=PaginatedResponseSchema[List],
         openapi_extra={
             "operationId": "get_countries",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -173,15 +157,11 @@ class MovieController(ControllerBase):
         response=PaginatedResponseSchema[MovieParticipantOutSchema],
         openapi_extra={
             "operationId": "get_participants",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -207,15 +187,11 @@ class MovieController(ControllerBase):
         response=PaginatedResponseSchema[MovieCardOutSchema],
         openapi_extra={
             "operationId": "get_all_movie_cards",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -244,21 +220,20 @@ class MovieController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "create_movie",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                409: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                409: [
+                    NotUniqueFieldExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def create_movie(
@@ -277,11 +252,6 @@ class MovieController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
-            Причини: \n
-                1) Недійсне значення (не написане великими літерами).
-                   З великих літер повинні починатися (name, description,
-                   seo_title, seo_description) \n
           - **409**: Error: Conflict.
             Причини: \n
                 1) Поле name повинно бути унікальним. Ця назва вже зайнята
@@ -312,7 +282,7 @@ class MovieController(ControllerBase):
                  c) optional alt. If you don't specify it, I'll take the value from filename \n
              4. Be sure to specify the field delete=false \n
         """
-        result = self.movie_service.create(schema=body)
+        result = self.movie_service.create(schema=body, request=request)
         return result
 
     @http_patch(
@@ -322,24 +292,20 @@ class MovieController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "update_movie",
-            "responses": {
-                403: {
-                    "description": "Error: Forbidden",
-                },
-                404: {
-                    "description": "Error: Not Found",
-                },
-                409: {
-                    "description": "Error: Conflict",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                409: [
+                    NotUniqueFieldExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def update_movie(
@@ -359,11 +325,10 @@ class MovieController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **403**: Error: Forbidden. \n
+          - **404**: Error: Not Found. \n
             Причини: \n
-                1) Недійсне значення (не написане великими літерами).
-                   З великих літер повинні починатися (name, description,
-                   seo_title, seo_description) \n
+                1) Не знайдено: немає збігів фільмів
+                   на заданному запиті. \n
           - **409**: Error: Conflict. \n
             Причини: \n
                 1) Поле name повинно бути унікальним. Ця назва вже зайнята
@@ -394,7 +359,9 @@ class MovieController(ControllerBase):
                  c) optional alt. If you don't specify it, I'll take the value from filename \n
              4. Be sure to specify the field delete=false \n
         """
-        result = self.movie_service.update(mv_slug=mv_slug, schema=body)
+        result = self.movie_service.update(mv_slug=mv_slug,
+                                           schema=body,
+                                           request=request)
         return result
 
     @http_get(
@@ -402,18 +369,17 @@ class MovieController(ControllerBase):
         response=MovieOutSchema,
         openapi_extra={
             "operationId": "get_movie_by_slug",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                409: [
+                    NotUniqueFieldExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_movie_by_slug(
@@ -432,7 +398,7 @@ class MovieController(ControllerBase):
 
         Returns:
           - **200**: Success response with the data.
-          - **404**: Error: Forbidden. \n
+          - **404**: Error: Not Found. \n
             Причини: \n
                 1) Не знайдено: немає збігів фільмів
                    на заданному запиті. \n
@@ -448,18 +414,17 @@ class MovieController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "delete_movie_by_slug",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                401: [
+                    InvalidTokenExceptionError()
+                ],
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def delete_movie_by_slug(
@@ -512,15 +477,11 @@ class MovieClientController(ControllerBase):
         response=PaginatedResponseSchema[MovieCardOutSchema],
         openapi_extra={
             "operationId": "search_movies",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -549,15 +510,11 @@ class MovieClientController(ControllerBase):
         response=PaginatedResponseSchema[MovieSearchOutSchema],
         openapi_extra={
             "operationId": "search_movies",
-            "responses": {
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     @paginate()
@@ -586,18 +543,14 @@ class MovieClientController(ControllerBase):
         response=MovieClientOutSchema,
         openapi_extra={
             "operationId": "get_movie_by_slug",
-            "responses": {
-                404: {
-                    "description": "Error: Not Found",
-                },
-                422: {
-                    "description": "Error: Unprocessable Entity",
-                },
-                500: {
-                    "description": "Internal server error "
-                                   "if an unexpected error occurs.",
-                },
-            },
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError()
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
         },
     )
     def get_movie_by_slug(
