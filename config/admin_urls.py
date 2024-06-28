@@ -20,8 +20,7 @@ from imagekit.utils import get_cache
 from ninja_extra import NinjaExtraAPI, status
 from django.conf.urls.static import static
 from django.utils.translation import gettext as _
-from ninja.errors import AuthenticationError, ValidationError, HttpError
-from ninja_extra.exceptions import APIException
+from ninja.errors import ValidationError
 
 from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController

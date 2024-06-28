@@ -8,7 +8,6 @@ from ninja import ModelSchema
 from django.utils.translation import gettext as _
 from src.core.schemas.gallery import GalleryItemSchema
 from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
-from src.core.utils import validate_capitalized
 from pydantic import Json
 from django.core.exceptions import ValidationError
 

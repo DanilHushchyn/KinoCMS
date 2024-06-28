@@ -3,18 +3,12 @@ from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.schemas.response import PaginatedResponseSchema
-
 from src.booking.models import Seance
 from src.booking.schemas.seance import SeanceCardOutSchema
 from src.booking.services.seance import SeanceService
-from src.core.schemas.base import LangEnum, MessageOutSchema
-from ninja_extra.permissions import IsAdminUser
-from ninja_extra import http_get, http_post, http_patch, http_delete
+from src.core.schemas.base import LangEnum
+from ninja_extra import http_get
 from ninja import Header
-
-from src.core.utils import CustomJWTAuth
-from src.pages.models import Page
-from src.pages.services.page import PageService
 
 
 @api_controller("/seance", tags=["seances"])

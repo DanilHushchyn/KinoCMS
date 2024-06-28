@@ -2,10 +2,9 @@
 import json
 import os
 import random
-from datetime import timedelta, datetime
-from typing import List, Dict
+from datetime import timedelta
+from typing import Dict
 
-from django.contrib.auth import get_user_model
 from django.core.files import File
 from django.core.management.base import BaseCommand
 from faker import Faker
@@ -19,10 +18,6 @@ from src.pages.models import TopSlider, BottomSlider, TopSliderItem, BottomSlide
 from src.users.models import User
 from pytils.translit import slugify
 from django_countries.data import COUNTRIES
-from django.utils import timezone
-from django.utils.timezone import make_aware
-import pytz
-
 
 class Command(BaseCommand):
     _fake_ru = Faker("ru_RU")
@@ -296,25 +291,26 @@ class Command(BaseCommand):
 
     @classmethod
     def _create_seances(cls, movie: Movie):
-        import zoneinfo
-        seances = []
-        hall_ids = list(Hall.objects.values_list('id', flat=True))
+        if not Seance.objects.exists():
+            import zoneinfo
+            seances = []
+            hall_ids = list(Hall.objects.values_list('id', flat=True))
 
-        for i in range(1, 21):
-            start_date = movie.released
-            end_date = movie.released + timedelta(days=30)
-            tzinfo = zoneinfo.ZoneInfo('Europe/Kiev')
-            date = cls._fake_uk.date_time_between(start_date=start_date,
-                                                  end_date=end_date,
-                                                  tzinfo=tzinfo)
-            seance = Seance(
-                movie=movie,
-                price=random.choice([150, 100, 250, 500, 600, 350, 420]),
-                hall_id=random.choice(hall_ids),
-                date=date,
-            )
-            seances.append(seance)
-        Seance.objects.bulk_create(seances)
+            for i in range(1, 21):
+                start_date = movie.released
+                end_date = movie.released + timedelta(days=30)
+                tzinfo = zoneinfo.ZoneInfo('Europe/Kiev')
+                date = cls._fake_uk.date_time_between(start_date=start_date,
+                                                      end_date=end_date,
+                                                      tzinfo=tzinfo)
+                seance = Seance(
+                    movie=movie,
+                    price=random.choice([150, 100, 250, 500, 600, 350, 420]),
+                    hall_id=random.choice(hall_ids),
+                    date=date,
+                )
+                seances.append(seance)
+            Seance.objects.bulk_create(seances)
 
     @classmethod
     def _create_participants(cls) -> None:
