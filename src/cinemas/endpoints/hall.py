@@ -9,9 +9,13 @@ from src.cinemas.schemas.hall import (HallInSchema,
                                       HallUpdateSchema,
                                       HallOutSchema, HallClientOutSchema)
 from src.cinemas.services.hall import HallService
-from src.core.errors import NotFoundExceptionError, UnprocessableEntityExceptionError, NotUniqueFieldExceptionError, \
-    InvalidTokenExceptionError
-from src.core.schemas.base import LangEnum, MessageOutSchema, errors_to_docs
+from src.core.errors import (NotFoundExceptionError,
+                             UnprocessableEntityExceptionError,
+                             NotUniqueFieldExceptionError,
+                             InvalidTokenExceptionError)
+from src.core.models import Image
+from src.core.schemas.base import (LangEnum, MessageOutSchema,
+                                   errors_to_docs)
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_post, http_patch, http_delete
 from ninja import Header
@@ -44,7 +48,7 @@ class HallController(ControllerBase):
             "operationId": "get_all_hall_cards",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Hall)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -83,10 +87,10 @@ class HallController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Hall)
                 ],
                 409: [
-                    NotUniqueFieldExceptionError()
+                    NotUniqueFieldExceptionError(field='number')
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -157,10 +161,11 @@ class HallController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Hall),
+                    NotFoundExceptionError(cls_model=Image)
                 ],
                 409: [
-                    NotUniqueFieldExceptionError()
+                    NotUniqueFieldExceptionError(field='number')
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -232,7 +237,7 @@ class HallController(ControllerBase):
             "operationId": "get_hall_by_id",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Hall)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -279,7 +284,7 @@ class HallController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Hall)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -341,7 +346,7 @@ class HallClientController(ControllerBase):
             "operationId": "get_hall_by_id",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Hall)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()

@@ -1,4 +1,5 @@
 """Exceptions schema."""
+from django.db.models import Model
 
 from src.core.schemas.base import CustomAPIException
 
@@ -12,6 +13,12 @@ class NotUniqueFieldExceptionError(CustomAPIException):
     location = "body"
     status_code = 409
 
+    def __init__(self, field: str,
+                 message: str | None = None,
+                 code: str | None = None) -> None:
+        self.code = "_".join([field.upper(), self.code])
+        super().__init__(message=message, field=field, code=code)
+
 
 class NotFoundExceptionError(CustomAPIException):
     """Exception raised when row wasn't found in db."""
@@ -19,8 +26,14 @@ class NotFoundExceptionError(CustomAPIException):
     code = "NOT_FOUND"
     message = "Instance wasn't found."
     field = ""
-    location = ""
+    location = "db"
     status_code = 404
+
+    def __init__(self, cls_model: object, message: str | None = None,
+                 field: str | None = None,
+                 code: str | None = None) -> None:
+        self.code = "_".join([cls_model.__name__.upper(), self.code])
+        super().__init__(message=message, field=field, code=code)
 
 
 class UnprocessableEntityExceptionError(CustomAPIException):

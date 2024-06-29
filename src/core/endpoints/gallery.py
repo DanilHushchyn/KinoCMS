@@ -3,7 +3,8 @@ from typing import List
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 
-from src.core.errors import NotFoundExceptionError, UnprocessableEntityExceptionError
+from src.core.errors import (NotFoundExceptionError,
+                             UnprocessableEntityExceptionError)
 from src.core.models import Gallery
 from src.core.schemas.base import LangEnum, errors_to_docs
 from src.core.schemas.gallery import GalleryItemOutSchema
@@ -37,7 +38,7 @@ class GalleryController(ControllerBase):
 
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Gallery)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()

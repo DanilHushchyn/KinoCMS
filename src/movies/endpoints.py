@@ -4,10 +4,11 @@ from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.schemas.response import PaginatedResponseSchema
-
 from src.core.errors import NotUniqueFieldExceptionError, \
     InvalidTokenExceptionError
-from src.core.schemas.base import LangEnum, MessageOutSchema, errors_to_docs
+from src.core.models import Image
+from src.core.schemas.base import (LangEnum, MessageOutSchema,
+                                   errors_to_docs)
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_post, http_patch, http_delete
 from ninja import Header
@@ -225,10 +226,10 @@ class MovieController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Movie)
                 ],
                 409: [
-                    NotUniqueFieldExceptionError()
+                    NotUniqueFieldExceptionError(field='name')
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -297,10 +298,11 @@ class MovieController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Movie),
+                    NotFoundExceptionError(cls_model=Image)
                 ],
                 409: [
-                    NotUniqueFieldExceptionError()
+                    NotUniqueFieldExceptionError(field='name')
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -371,10 +373,7 @@ class MovieController(ControllerBase):
             "operationId": "get_movie_by_slug",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
-                ],
-                409: [
-                    NotUniqueFieldExceptionError()
+                    NotFoundExceptionError(cls_model=Movie)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -419,7 +418,7 @@ class MovieController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Movie)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -488,8 +487,6 @@ class MovieClientController(ControllerBase):
     def get_movie_today_cards(
             self,
             request: HttpRequest,
-            cnm_slug: str = None,
-            hall_id: int = None,
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
@@ -501,8 +498,7 @@ class MovieClientController(ControllerBase):
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
         """
-        result = self.movie_service.get_today_movies(cnm_slug=cnm_slug,
-                                                     hall_id=hall_id)
+        result = self.movie_service.get_today_movies()
         return result
 
     @http_get(
@@ -545,7 +541,7 @@ class MovieClientController(ControllerBase):
             "operationId": "get_movie_by_slug",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Movie)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()

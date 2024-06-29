@@ -23,7 +23,8 @@ class ImageManager(models.Manager):
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів картинок '
                     'на заданному запиті.')
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg,
+                                         cls_model=self.model)
         return image
 
     def check_of_ids(self, ids: List[int]) -> object:
@@ -37,5 +38,6 @@ class ImageManager(models.Manager):
             if i not in db_ids:
                 msg = _('Не знайдено: немає збігів картинок '
                         'на заданному запиті.')
-                raise NotFoundExceptionError(message=msg)
+                raise NotFoundExceptionError(message=msg,
+                                             cls_model=self.model)
         return True

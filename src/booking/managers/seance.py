@@ -1,8 +1,5 @@
-from datetime import datetime
 from typing import TYPE_CHECKING
-
 from django.db.models import QuerySet
-from django.utils.timezone import make_aware
 from django.utils import timezone
 from ninja.errors import HttpError
 from django.utils.translation import gettext as _
@@ -53,4 +50,22 @@ class SeanceManager(models.Manager):
         today = timezone.now()
         seances = (self.model.objects.prefetch_related('ticket_set')
                    .exclude(date__gte=today))
+        return seances
+
+    def get_today_seances(self,cnm_slug: str,
+                          hall_id: int) -> QuerySet['Seance']:
+        """
+        Get séances for today.
+        """
+        today = timezone.now()
+        seances = (self.model.objects.get_all()
+                   .filter(date__date=today.date()))
+        if cnm_slug:
+            from src.cinemas.models import Cinema
+            cinema = Cinema.objects.get_by_slug(cnm_slug)
+            seances = seances.filter(hall__cinema=cinema)
+        if hall_id:
+            from src.cinemas.models import Hall
+            hall = Hall.objects.get_by_id(hall_id)
+            seances = seances.filter(hall=hall)
         return seances

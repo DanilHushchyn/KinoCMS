@@ -3,12 +3,14 @@ from enum import Enum
 from typing import List
 import ninja_schema
 from pydantic.fields import Field
-from src.core.errors import UnprocessableEntityExceptionError, NotFoundExceptionError
+from src.core.errors import (UnprocessableEntityExceptionError,
+                             NotFoundExceptionError)
 from src.movies.models import Movie, MovieParticipant, TECHS_CHOICES
 from ninja import ModelSchema
 from django.utils.translation import gettext as _
 from src.core.schemas.gallery import GalleryItemSchema
-from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
+from src.core.schemas.images import (ImageOutSchema, ImageInSchema,
+                                     ImageUpdateSchema)
 from django_countries.data import COUNTRIES
 
 GenresEnum = Enum(
@@ -113,7 +115,7 @@ class MovieInSchema(ninja_schema.ModelSchema):
             if participant not in participants_ids:
                 msg = _(f'Not Found: No MovieParticipant'
                         f'matches the given id - {participant}')
-                raise NotFoundExceptionError(message=msg)
+                raise NotFoundExceptionError(message=msg, cls_model=MovieParticipant)
         return list(participants)
 
     class Config:

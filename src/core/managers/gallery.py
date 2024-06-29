@@ -24,5 +24,5 @@ class GalleryManager(models.Manager):
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів галерей '
                     'на заданному запиті.')
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=self.model)
         return gallery

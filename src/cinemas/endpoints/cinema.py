@@ -10,6 +10,7 @@ from src.cinemas.schemas.cinema import (CinemaInSchema,
                                         CinemaContactOutSchema,
                                         CinemaClientOutSchema)
 from src.cinemas.services.cinema import CinemaService
+from src.core.models import Image
 from src.core.schemas.base import (LangEnum, MessageOutSchema,
                                    errors_to_docs)
 from src.core.errors import (NotUniqueFieldExceptionError,
@@ -81,10 +82,10 @@ class CinemaController(ControllerBase):
             "operationId": "create_cinema",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Cinema)
                 ],
                 409: [
-                    NotUniqueFieldExceptionError()
+                    NotUniqueFieldExceptionError(field="name"),
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -151,10 +152,11 @@ class CinemaController(ControllerBase):
             "operationId": "update_cinema",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Cinema),
+                    NotFoundExceptionError(cls_model=Image)
                 ],
                 409: [
-                    NotUniqueFieldExceptionError()
+                    NotUniqueFieldExceptionError(field='name')
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -222,7 +224,7 @@ class CinemaController(ControllerBase):
             "operationId": "get_cinema_by_slug",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Cinema)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -266,7 +268,7 @@ class CinemaController(ControllerBase):
             "operationId": "delete_cinema_by_slug",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Cinema)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -358,7 +360,7 @@ class CinemaClientController(ControllerBase):
             "operationId": "get_cinema_by_slug",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Cinema)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()

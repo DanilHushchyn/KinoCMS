@@ -3,7 +3,8 @@ from pydantic.fields import Field
 from src.pages.models import Page
 from ninja import ModelSchema
 from src.core.schemas.gallery import GalleryItemSchema
-from src.core.schemas.images import ImageOutSchema, ImageInSchema, ImageUpdateSchema
+from src.core.schemas.images import (ImageOutSchema, ImageInSchema,
+                                     ImageUpdateSchema)
 from typing import List, Any
 from pydantic import Json
 

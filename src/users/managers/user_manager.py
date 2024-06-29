@@ -3,8 +3,8 @@ from django.contrib.auth.models import UserManager
 from django.utils.translation import gettext as _
 
 from typing import TYPE_CHECKING
-from src.authz.errors import EmailAlreadyExistsExceptionError
-from src.core.errors import NotFoundExceptionError, UnprocessableEntityExceptionError
+from src.core.errors import (NotFoundExceptionError,
+                             UnprocessableEntityExceptionError, NotUniqueFieldExceptionError)
 from src.core.schemas.base import MessageOutSchema
 from src.core.services.core import CoreService
 
@@ -92,7 +92,7 @@ class CustomUserManager(UserManager):
         except self.model.DoesNotExist:
             msg = _("Не знайдено: немає збігів користувачів"
                     " на заданному запиті.")
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=self.model)
         return user
 
     def delete_by_id(self, user_id: int) -> MessageOutSchema:
@@ -109,7 +109,7 @@ class CustomUserManager(UserManager):
         except self.model.DoesNotExist:
             msg = _("Не знайдено: немає збігів користувачів"
                     " на заданному запиті.")
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=self.model)
         msg = _("Користувач успішно видалений")
         return MessageOutSchema(detail=msg)
 
@@ -129,7 +129,7 @@ class CustomUserManager(UserManager):
         except self.model.DoesNotExist:
             msg = _("Не знайдено: немає збігів користувачів"
                     " на заданному запиті.")
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=self.model)
         if user_body.email:
             try:
                 CoreService.check_field_unique(value=user_body.email,
@@ -138,7 +138,8 @@ class CustomUserManager(UserManager):
                                                model=self.model)
             except Exception as exc:
                 msg = _("Ця електронна адреса вже використовується")
-                raise EmailAlreadyExistsExceptionError(msg)
+                raise NotUniqueFieldExceptionError(message=msg, field='email')
+
         for field, value in user_body.dict().items():
             if value is not None and field != 'password':
                 setattr(user, field, value)

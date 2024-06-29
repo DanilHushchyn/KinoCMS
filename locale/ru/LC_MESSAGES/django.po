@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-19 09:24+0300\n"
+"POT-Creation-Date: 2024-06-29 23:42+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,52 +20,35 @@ msgstr ""
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: config/admin_urls.py:58 config/kino_urls.py:37
+#: config/admin_urls.py:60 config/kino_urls.py:53
 msgid "Не авторизований"
 msgstr "Не авторизован"
 
-#: src/cinemas/endpoints/cinema.py:234 src/cinemas/services/cinema.py:99
+#: src/booking/managers/seance.py:30
+msgid "Не знайдено: немає збігів сеансів на заданному запиті."
+msgstr "Не найдено: нет совпадений сеансов по заданному запросу."
+
+#: src/cinemas/endpoints/cinema.py:218 src/cinemas/services/cinema.py:96
 msgid "Кінотеатр успішно оновлений"
 msgstr "Кинотеатр успешно обновлен"
 
-#: src/cinemas/endpoints/hall.py:234 src/cinemas/services/hall.py:70
+#: src/cinemas/endpoints/hall.py:231 src/cinemas/services/hall.py:70
 msgid "Зал успішно оновлений"
 msgstr "Зал успешно обновлен"
 
-#: src/cinemas/managers/cinema.py:32
+#: src/cinemas/managers/cinema.py:33
 msgid "Не знайдено: немає збігів кінотеатрів на заданному запиті."
 msgstr "Не найдено: нет совпадений кинотеатров по заданному запросу."
 
-#: src/cinemas/managers/hall.py:31
+#: src/cinemas/managers/hall.py:29
 msgid "Не знайдено: немає збігів залів на заданному запиті."
 msgstr "Не найдено: нет совпадений залов по заданному запросу."
 
-#: src/cinemas/schemas/cinema.py:25 src/movies/schemas.py:57
-#: src/pages/schemas/news_promo.py:23 src/pages/schemas/news_promo.py:82
-msgid ""
-"Недійсне значення (не написане великими літерами). З великих літер повинні "
-"починатися (name, description, seo_title, seo_description)"
-msgstr ""
-"Недействительное значение (не написано заглавными буквами). С заглавных букв "
-"должны начинаться (name, description, seo_title, seo_description)"
-
-#: src/cinemas/schemas/cinema.py:36 src/users/schemas.py:72
-msgid "Введено некоректний номер телефону."
-msgstr "Введен неправильный номер телефона."
-
-#: src/cinemas/schemas/hall.py:22
-msgid ""
-"Недійсне значення (не написане великими літерами). З великих літер повинні "
-"починатися (description, seo_title, seo_description)"
-msgstr ""
-"Недействительное значение (не написано заглавными буквами). С заглавных букв "
-"должны начинаться (description, seo_title, seo_description)"
-
-#: src/cinemas/services/cinema.py:69
+#: src/cinemas/services/cinema.py:68
 msgid "Кінотеатр успішно створений"
 msgstr "Кинотеатр успешно создан"
 
-#: src/cinemas/services/cinema.py:132
+#: src/cinemas/services/cinema.py:129
 msgid "Кінотеатр успішно видалений"
 msgstr "Кинотеатр успешно удалён"
 
@@ -76,76 +59,75 @@ msgstr "Зал успешно создан"
 #: src/cinemas/services/hall.py:83
 msgid ""
 "Це поле повинно бути унікальним по відношенню до конкретного кінотеатру. "
-msgstr ""
-"Это поле должно быть уникальным по отношению к конкретному кинотеатру."
+msgstr "Это поле должно быть уникальным по отношению к конкретному кинотеатру."
 
-#: src/cinemas/services/hall.py:125
+#: src/cinemas/services/hall.py:124
 msgid "Зал успішно видалений"
 msgstr "Зал успешно удалён"
 
-#: src/core/exceptions.py:10 src/core/services/core.py:38
-msgid "Поле повинно бути унікальним. "
-msgstr "Поле должно быть уникальным. "
-
-#: src/core/managers/gallery.py:24
+#: src/core/managers/gallery.py:25
 msgid "Не знайдено: немає збігів галерей на заданному запиті."
 msgstr "Не найдено: нет совпадений галерей по заданному запросу."
 
-#: src/core/managers/images.py:25 src/core/managers/images.py:39
+#: src/core/managers/images.py:24 src/core/managers/images.py:39
 msgid "Не знайдено: немає збігів картинок на заданному запиті."
 msgstr "Не найдено: нет совпадений галерей по заданному запросу."
 
-#: src/core/schemas/gallery.py:74 src/core/schemas/images.py:36
+#: src/core/schemas/gallery.py:69 src/core/schemas/images.py:35
 #: src/core/schemas/images.py:100
 #, python-brace-format
 msgid "Дозволено відправляти тільки {image_types}"
 msgstr "Разрешено отправлять только {image_types}"
 
-#: src/core/schemas/images.py:45 src/core/services/images.py:36
+#: src/core/schemas/images.py:46 src/core/services/images.py:35
 msgid "Невірний формат base64 був відправлений"
 msgstr "Неверный формат base64 был отправлен"
 
-#: src/core/services/images.py:39
+#: src/core/services/core.py:35
+msgid "Поле повинно бути унікальним. "
+msgstr "Поле должно быть уникальным. "
+
+#: src/core/services/images.py:38
 msgid "Файл пошкоджений"
 msgstr "Файл  повреждён"
 
-#: src/core/services/images.py:41 src/mailing/services/mailing.py:92
+#: src/core/services/images.py:41 src/mailing/services/mailing.py:84
 msgid "Максимально дозволений розмір файлу 1MB"
 msgstr "Максимально разрешенный размер файла 1MB"
 
-#: src/mailing/schemas.py:47 src/mailing/services/mailing.py:108
+#: src/core/utils.py:80 src/users/schemas.py:66
+msgid "Введено некоректний номер телефону."
+msgstr "Введен неправильный номер телефона."
+
+#: src/mailing/schemas.py:47 src/mailing/services/mailing.py:100
 msgid "Не знайдено: немає збігів шаблонів на заданному запиті"
 msgstr "Не найдено: нет совпадений шаблонов по заданному запросу."
 
-#: src/mailing/services/mailing.py:45
+#: src/mailing/services/mailing.py:39 src/mailing/services/mailing.py:105
 msgid "Треба зачекати поки закінчиться поточне розсилання"
 msgstr "Надо подождать пока закончится текущая рассылка"
 
-#: src/mailing/services/mailing.py:47
+#: src/mailing/services/mailing.py:41
 msgid "Розсилання почалося"
 msgstr "Рассылка началась"
 
-#: src/mailing/services/mailing.py:61
+#: src/mailing/services/mailing.py:55
 msgid "Розсилання успішно виконане"
 msgstr "Рассылка успешно завершена"
 
-#: src/mailing/services/mailing.py:70
+#: src/mailing/services/mailing.py:61
 msgid "На теперішній час розсилання не активне"
 msgstr "В настоящее время рассылка не активна"
 
-#: src/mailing/services/mailing.py:89
+#: src/mailing/services/mailing.py:81
 msgid "Дозволено відправляти тільки html"
 msgstr "Разрешено отправлять только html"
 
-#: src/mailing/services/mailing.py:114
-msgid "Не можна видаляти шаблони поки йде розсилання."
-msgstr "Нельзя удалять шаблоны пока идёт рассылка"
-
-#: src/mailing/services/mailing.py:117
+#: src/mailing/services/mailing.py:108
 msgid "Шаблон успішно видалений"
 msgstr "Шаблон успешно удален"
 
-#: src/movies/manager.py:31
+#: src/movies/manager.py:35
 msgid "Не знайдено: немає збігів фільмів на заданному запиті."
 msgstr "Не найдено: нет совпадений фильмов по заданному запросу."
 
@@ -181,31 +163,31 @@ msgstr "Мистика"
 msgid "Детектив"
 msgstr "Детектив"
 
-#: src/movies/schemas.py:77
+#: src/movies/schemas.py:65
 msgid "Expected min year is 1984 "
 msgstr ""
 
-#: src/movies/schemas.py:90 src/movies/schemas.py:103 src/movies/schemas.py:115
+#: src/movies/schemas.py:78 src/movies/schemas.py:91 src/movies/schemas.py:103
 msgid "List should contain any of "
 msgstr ""
 
-#: src/movies/schemas.py:128
+#: src/movies/schemas.py:116
 msgid "Not Found: No MovieParticipant"
 msgstr ""
 
-#: src/movies/service.py:61
+#: src/movies/service.py:67
 msgid "Фільм успішно створений"
 msgstr "Фильм успешно создан"
 
-#: src/movies/service.py:89
+#: src/movies/service.py:100
 msgid "Фільм успішно оновлений"
 msgstr "Фильм успешно обновлен"
 
-#: src/movies/service.py:166
+#: src/movies/service.py:190
 msgid "Фільм успішно видалений"
 msgstr "Фильм успешно удалён"
 
-#: src/pages/managers/bottom_slider_item.py:27
+#: src/pages/managers/bottom_slider_item.py:26
 msgid ""
 "Не знайдено: немає збігів елементів нижнього банеру на заданному запиті."
 msgstr ""
@@ -215,7 +197,7 @@ msgstr ""
 msgid "Не знайдено: немає збігів новин чи акцій на заданному запиті."
 msgstr "Не найдено: нет совпадений новостей или акций по заданному запросу."
 
-#: src/pages/managers/page.py:31
+#: src/pages/managers/page.py:31 src/pages/services/page.py:110
 msgid "Не знайдено: немає збігів сторінок на заданному запиті."
 msgstr "Не найдено: нет совпадений страниц по заданному запросу."
 
@@ -225,200 +207,189 @@ msgid ""
 msgstr ""
 "Не найдено: нет совпадений элементов верхнего баннера по заданному запросу."
 
-#: src/pages/schemas/banners_sliders.py:25
-msgid ""
-"Недійсне значення (не написане великими літерами). З великих літер повиннен "
-"починатися text"
-msgstr ""
-"Недействительное значение (не написано заглавными буквами). С заглавных букв "
-"должны начинаться text"
-
-#: src/pages/schemas/banners_sliders.py:171
+#: src/pages/schemas/banners_sliders.py:161
 msgid "Невірний формат кольору було введено"
 msgstr "Неверный формат цвета был отправлен"
 
-#: src/pages/schemas/page.py:22
-msgid ""
-"Недійсне значення (не написане великими літерами). З великих літер повинні "
-"починатися (name, seo_title, seo_description)"
-msgstr ""
-"Недействительное значение (не написано заглавными буквами). С заглавных букв "
-"должны начинаться (name, seo_title, seo_description)"
-
-#: src/pages/services/banners_sliders.py:54
+#: src/pages/services/banners_sliders.py:53
 msgid "Верхній слайдер успішно оновлений"
 msgstr "Верхний слайдер успешно обновлен"
 
-#: src/pages/services/banners_sliders.py:70
+#: src/pages/services/banners_sliders.py:69
 msgid "Нижній слайдер успішно оновлений"
 msgstr "Нижний слайдер успешно обновлен"
 
-#: src/pages/services/banners_sliders.py:147
+#: src/pages/services/banners_sliders.py:146
 msgid "Максимальна кількість елементів верхнього банеру, 10"
 msgstr "Максимальное количество элементов верхнего баннера, 10"
 
-#: src/pages/services/banners_sliders.py:296
+#: src/pages/services/banners_sliders.py:240
 msgid "Наскрізний банер успішно оновлений"
 msgstr "Сквозной баннер успешно обновлен"
 
-#: src/pages/services/news_promo.py:57
+#: src/pages/services/news_promo.py:64
 msgid "Акція успішно створена"
 msgstr "Акция успешно создана"
 
-#: src/pages/services/news_promo.py:58
+#: src/pages/services/news_promo.py:65
 msgid "Новина успішно створена"
 msgstr "Новость успешно создана"
 
-#: src/pages/services/news_promo.py:84
+#: src/pages/services/news_promo.py:96
 msgid "Акція успішно оновлена"
 msgstr "Фильм успешно обновлен"
 
-#: src/pages/services/news_promo.py:85
+#: src/pages/services/news_promo.py:97
 msgid "Новина успішно оновлена"
 msgstr "Новость успешно обновлена"
 
-#: src/pages/services/news_promo.py:122
+#: src/pages/services/news_promo.py:114
+msgid "Не знайдено: немає збігів новин и акцій на заданному запиті."
+msgstr "Не найдено: нет совпадений новостей и акций по заданному запросу."
+
+#: src/pages/services/news_promo.py:160
 msgid "Акція успішно видалена"
 msgstr "Акция успешно удалена"
 
-#: src/pages/services/news_promo.py:123
+#: src/pages/services/news_promo.py:161
 msgid "Новина успішно видалена"
 msgstr "Новость успешно удалена"
 
-#: src/pages/services/page.py:56
+#: src/pages/services/page.py:63
 msgid "Сторінка успішно створена"
 msgstr "Страница успешно создана"
 
-#: src/pages/services/page.py:81
+#: src/pages/services/page.py:93
 msgid "Сторінка успішно оновлена"
 msgstr "Страница успешно удалена"
 
-#: src/pages/services/page.py:107
+#: src/pages/services/page.py:140
 msgid "Цю сторінку заборонено видаляти"
 msgstr "Эту страницу запрещено удалять"
 
-#: src/pages/services/page.py:117
+#: src/pages/services/page.py:150
 msgid "Сторінка успішно видалена"
 msgstr "Страница успешно удалена"
 
-#: src/users/managers/user_manager.py:96 src/users/managers/user_manager.py:113
-#: src/users/managers/user_manager.py:133
+#: src/users/managers/user_manager.py:93 src/users/managers/user_manager.py:110
+#: src/users/managers/user_manager.py:130
 msgid "Не знайдено: немає збігів користувачів на заданному запиті."
 msgstr "Не найдено: нет совпадений пользователей по заданному запросу."
 
-#: src/users/managers/user_manager.py:115
+#: src/users/managers/user_manager.py:113
 msgid "Користувач успішно видалений"
 msgstr "Пользователь успешно удален"
 
-#: src/users/managers/user_manager.py:154
-msgid "Паролі не співпадають"
-msgstr "Пароли не совпадают"
-
-#: src/users/managers/user_manager.py:157
+#: src/users/managers/user_manager.py:140
+#: src/users/managers/user_manager.py:165
 msgid "Ця електронна адреса вже використовується"
 msgstr "Эта почта уже занята"
 
-#: src/users/models.py:33
+#: src/users/managers/user_manager.py:161
+msgid "Паролі не співпадають"
+msgstr "Пароли не совпадают"
+
+#: src/users/models.py:30
 msgid "Інше"
 msgstr "Другое"
 
-#: src/users/models.py:34
+#: src/users/models.py:31
 msgid "Київ"
 msgstr "Киев"
 
-#: src/users/models.py:35
+#: src/users/models.py:32
 msgid "Харків"
 msgstr "Харьков"
 
-#: src/users/models.py:36
+#: src/users/models.py:33
 msgid "Одеса"
 msgstr "Одесса"
 
-#: src/users/models.py:37
+#: src/users/models.py:34
 msgid "Дніпро"
 msgstr "Днепр"
 
-#: src/users/models.py:38
+#: src/users/models.py:35
 msgid "Донецьк"
 msgstr "Донецк"
 
-#: src/users/models.py:39
+#: src/users/models.py:36
 msgid "Запоріжжя"
 msgstr "Запорожье"
 
-#: src/users/models.py:40
+#: src/users/models.py:37
 msgid "Львів"
 msgstr "Львов"
 
-#: src/users/models.py:41
+#: src/users/models.py:38
 msgid "Кривий Ріг"
 msgstr "Кривой Рог"
 
-#: src/users/models.py:42
+#: src/users/models.py:39
 msgid "Миколаїв"
 msgstr "Николаев"
 
-#: src/users/models.py:43
+#: src/users/models.py:40
 msgid "Вінниця"
 msgstr "Винница"
 
-#: src/users/models.py:44
+#: src/users/models.py:41
 msgid "Луганськ"
 msgstr "Луганск"
 
-#: src/users/models.py:45
+#: src/users/models.py:42
 msgid "Сімферополь"
 msgstr "Симферополь"
 
-#: src/users/models.py:46
+#: src/users/models.py:43
 msgid "Херсон"
 msgstr "Херсон"
 
-#: src/users/models.py:47
+#: src/users/models.py:44
 msgid "Полтава"
 msgstr "Полтава"
 
-#: src/users/models.py:48
+#: src/users/models.py:45
 msgid "Чернігів"
 msgstr "Чернигов"
 
-#: src/users/models.py:49
+#: src/users/models.py:46
 msgid "Черкаси"
 msgstr "Черкасы"
 
-#: src/users/models.py:50
+#: src/users/models.py:47
 msgid "Житомир"
 msgstr "Житомир"
 
-#: src/users/models.py:51
+#: src/users/models.py:48
 msgid "Суми"
 msgstr "Сумы"
 
-#: src/users/models.py:52
+#: src/users/models.py:49
 msgid "Хмельницький"
 msgstr "Хмельницкий"
 
-#: src/users/models.py:53
+#: src/users/models.py:50
 msgid "Чернівці"
 msgstr "Черновцы"
 
-#: src/users/models.py:54
+#: src/users/models.py:51
 msgid "Рівне"
 msgstr "Ровно"
 
-#: src/users/models.py:55
+#: src/users/models.py:52
 msgid "Івано-Франківськ"
 msgstr "Івано-Франковск"
 
-#: src/users/models.py:56
+#: src/users/models.py:53
 msgid "Тернопіль"
 msgstr "Тернополь"
 
-#: src/users/models.py:57
+#: src/users/models.py:54
 msgid "Луцьк"
 msgstr "Луцк"
 
-#: src/users/schemas.py:82
+#: src/users/schemas.py:78
 msgid ""
 "Ім'я повинно починатися з великої літери(наступні маленькі), доступна "
 "кирилиця та латиниця, доступні спецсимволи('-)"
@@ -426,7 +397,7 @@ msgstr ""
 "Имя должно начинаться с заглавной буквы (следующие маленькие), доступная "
 "кириллица и латиница, доступные спецсимволы('-)"
 
-#: src/users/schemas.py:91
+#: src/users/schemas.py:87
 msgid ""
 "Прізвище повинно починатися з великої літери(наступні маленькі), доступна "
 "кирилиця та латиниця, доступні спецсимволи('-)"
@@ -434,7 +405,7 @@ msgstr ""
 "Фамилия должна начинаться с заглавной буквы (следующие маленькие), доступная "
 "кириллица и латиница, доступные спецсимволы('-)"
 
-#: src/users/schemas.py:114 src/users/schemas.py:151
+#: src/users/schemas.py:110 src/users/schemas.py:148
 msgid ""
 "Пароль повинен відповідати: * Хоча б одній великій літері, * Хоча б одній "
 "малій літері, * Хоча б одній цифрі, * Хоча б одному спеціальному символу з "
@@ -444,6 +415,37 @@ msgstr ""
 "маленькая буква, Хотя бы одна цифра,  Хотя бы один специальный символ из "
 "набора ?!@%^&- Минимальная длина 8 символов"
 
-#: src/users/services/user_service.py:62
+#: src/users/services/user_service.py:64
 msgid "Ви успішно зареєструвалися"
 msgstr "Вы успешно зарегистрировались"
+
+#~ msgid ""
+#~ "Недійсне значення (не написане великими літерами). З великих літер "
+#~ "повинні починатися (name, description, seo_title, seo_description)"
+#~ msgstr ""
+#~ "Недействительное значение (не написано заглавными буквами). С заглавных "
+#~ "букв должны начинаться (name, description, seo_title, seo_description)"
+
+#~ msgid ""
+#~ "Недійсне значення (не написане великими літерами). З великих літер "
+#~ "повинні починатися (description, seo_title, seo_description)"
+#~ msgstr ""
+#~ "Недействительное значение (не написано заглавными буквами). С заглавных "
+#~ "букв должны начинаться (description, seo_title, seo_description)"
+
+#~ msgid "Не можна видаляти шаблони поки йде розсилання."
+#~ msgstr "Нельзя удалять шаблоны пока идёт рассылка"
+
+#~ msgid ""
+#~ "Недійсне значення (не написане великими літерами). З великих літер "
+#~ "повиннен починатися text"
+#~ msgstr ""
+#~ "Недействительное значение (не написано заглавными буквами). С заглавных "
+#~ "букв должны начинаться text"
+
+#~ msgid ""
+#~ "Недійсне значення (не написане великими літерами). З великих літер "
+#~ "повинні починатися (name, seo_title, seo_description)"
+#~ msgstr ""
+#~ "Недействительное значение (не написано заглавными буквами). С заглавных "
+#~ "букв должны начинаться (name, seo_title, seo_description)"

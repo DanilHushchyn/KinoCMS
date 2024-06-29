@@ -30,5 +30,5 @@ class PageManager(models.Manager):
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів сторінок '
                     'на заданному запиті.')
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=self.model)
         return page

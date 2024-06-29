@@ -1,23 +1,25 @@
-from typing import Tuple, List
+from typing import List
 
 from django.http import HttpRequest
 from ninja_extra import http_post, http_get, http_patch
 from ninja_extra.controllers.base import ControllerBase, api_controller
-from ninja_extra.exceptions import AuthenticationFailed
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.permissions.common import AllowAny
 from ninja_extra.schemas.response import PaginatedResponseSchema
 from ninja_jwt.schema_control import SchemaControl
 from ninja_jwt.settings import api_settings
 
-from src.authz.errors import EmailAlreadyExistsExceptionError
 from src.authz.schemas import LoginSchema, LoginResponseSchema
-from src.core.errors import UnprocessableEntityExceptionError, InvalidTokenExceptionError, AuthenticationExceptionError
+from src.core.errors import (UnprocessableEntityExceptionError,
+                             InvalidTokenExceptionError,
+                             AuthenticationExceptionError, NotUniqueFieldExceptionError)
 from src.core.utils import CustomJWTAuth
 from src.users.models import User
-from src.users.schemas import UserOutSchema, UserUpdateSchema, UserRegisterSchema
+from src.users.schemas import (UserOutSchema, UserUpdateSchema,
+                               UserRegisterSchema)
 from src.users.services.user_service import UserService
-from src.core.schemas.base import LangEnum, MessageOutSchema, errors_to_docs
+from src.core.schemas.base import (LangEnum, MessageOutSchema,
+                                   errors_to_docs)
 from ninja import Header
 
 schema = SchemaControl(api_settings)
@@ -158,7 +160,7 @@ class CustomTokenObtainPairController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 409: [
-                    EmailAlreadyExistsExceptionError()
+                    NotUniqueFieldExceptionError(field='email')
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -285,7 +287,7 @@ class CustomTokenObtainPairController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 409: [
-                    EmailAlreadyExistsExceptionError()
+                    NotUniqueFieldExceptionError(field='email')
                 ],
                 422: [
                     UnprocessableEntityExceptionError()

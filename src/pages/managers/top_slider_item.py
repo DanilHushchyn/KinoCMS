@@ -27,5 +27,5 @@ class TopSliderItemManager(models.Manager):
             msg = _('Не знайдено: немає збігів елементів '
                     'верхнього банеру '
                     'на заданному запиті.')
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=self.model)
         return slider

@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 from django.utils.translation import gettext as _
 from django.db import models
 from src.core.errors import NotFoundExceptionError
+
 if TYPE_CHECKING:
     from src.cinemas.models import Hall
 
@@ -22,10 +23,10 @@ class HallManager(models.Manager):
         try:
             hall = (self.model.objects
                     .select_related('banner', 'seo_image',
-                                    'gallery',  'cinema')
+                                    'gallery', 'cinema')
                     .get(id=hall_id))
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів залів '
                     'на заданному запиті.')
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=self.model)
         return hall

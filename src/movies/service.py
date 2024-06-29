@@ -24,7 +24,8 @@ class MovieService:
         self.image_service = image_service
         self.gall_service = gall_service
 
-    def create(self, request: HttpRequest, schema: MovieInSchema) -> MessageOutSchema:
+    def create(self, request: HttpRequest, schema: MovieInSchema)\
+            -> MessageOutSchema:
         """
         Create Movie.
         """
@@ -116,14 +117,11 @@ class MovieService:
         return movies
 
     @staticmethod
-    def get_today_movies(cnm_slug: str, hall_id: int) -> QuerySet[Movie]:
+    def get_today_movies() -> QuerySet[Movie]:
         """
         Get movies queryset with séances for today;
-        :param cnm_slug for filtering séances by cinema
-        :param hall_id for filtering séances by hall
         """
-        movies = Movie.objects.get_today_movies(cnm_slug=cnm_slug,
-                                                hall_id=hall_id)
+        movies = Movie.objects.get_today_movies()
         return movies
 
     @staticmethod

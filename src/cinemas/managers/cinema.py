@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 
-from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 from django.db import models
 
@@ -33,5 +32,5 @@ class CinemaManager(models.Manager):
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів кінотеатрів '
                     'на заданному запиті.')
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=self.model)
         return cinema

@@ -1,22 +1,26 @@
-from typing import Any, Tuple, List
-
-from django.db.models import QuerySet
+from typing import List
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.schemas.response import PaginatedResponseSchema
 
-from src.core.errors import UnprocessableEntityExceptionError, NotUniqueFieldExceptionError, NotFoundExceptionError, \
-    InvalidTokenExceptionError
-from src.core.schemas.base import LangEnum, MessageOutSchema, errors_to_docs
+from src.core.errors import (UnprocessableEntityExceptionError,
+                             NotUniqueFieldExceptionError,
+                             NotFoundExceptionError,
+                             InvalidTokenExceptionError)
+from src.core.schemas.base import (LangEnum, MessageOutSchema,
+                                   errors_to_docs)
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_patch
 from ninja import Header
-
 from src.core.utils import CustomJWTAuth
-from src.pages.models import TopSlider, BottomSlider, ETEndBBanner
-from src.pages.schemas.banners_sliders import TopSliderUpdateSchema, TopSliderOutSchema, BottomSliderOutSchema, \
-    BottomSliderUpdateSchema, ETEndBBannerUpdateSchema, ETEndBBannerOutSchema
+from src.pages.models import TopSlider, BottomSlider, ETEndBBanner, BottomSliderItem, TopSliderItem
+from src.pages.schemas.banners_sliders import (TopSliderUpdateSchema,
+                                               TopSliderOutSchema,
+                                               BottomSliderOutSchema,
+                                               BottomSliderUpdateSchema,
+                                               ETEndBBannerUpdateSchema,
+                                               ETEndBBannerOutSchema)
 from src.pages.services.banners_sliders import SliderService
 
 
@@ -79,10 +83,8 @@ class SliderController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
-                ],
-                409: [
-                    NotUniqueFieldExceptionError()
+                    NotFoundExceptionError(cls_model=TopSlider),
+                    NotFoundExceptionError(cls_model=TopSliderItem)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -142,7 +144,7 @@ class SliderController(ControllerBase):
             "operationId": "get_top_slider",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=TopSlider),
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -178,10 +180,8 @@ class SliderController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
-                ],
-                409: [
-                    NotUniqueFieldExceptionError()
+                    NotFoundExceptionError(cls_model=BottomSlider),
+                    NotFoundExceptionError(cls_model=BottomSliderItem)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -239,7 +239,7 @@ class SliderController(ControllerBase):
             "operationId": "get_bottom_slider",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=BottomSlider)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -276,7 +276,7 @@ class SliderController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=ETEndBBanner)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -316,7 +316,7 @@ class SliderController(ControllerBase):
             "operationId": "get_etend_banner",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=ETEndBBanner)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -358,6 +358,7 @@ class SliderClientController(ControllerBase):
         :param slider_service: variable for managing sliders
         """
         self.slider_service = slider_service
+
     get_top_slider = SliderController.get_top_slider
     get_bottom_slider = SliderController.get_bottom_slider
     get_etend_banner = SliderController.get_etend_banner

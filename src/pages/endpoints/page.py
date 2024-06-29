@@ -6,6 +6,7 @@ from ninja_extra.schemas.response import PaginatedResponseSchema
 
 from src.core.errors import UnprocessableEntityExceptionError, InvalidTokenExceptionError, NotFoundExceptionError, \
     NotUniqueFieldExceptionError
+from src.core.models import Image
 from src.pages.errors import PageUnableToDeleteExceptionError
 from src.pages.schemas.page import (PageInSchema,
                                     PageCardOutSchema,
@@ -81,12 +82,12 @@ class PageController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "create_page",
-            "responses":errors_to_docs({
+            "responses": errors_to_docs({
                 401: [
                     InvalidTokenExceptionError()
                 ],
                 409: [
-                    NotUniqueFieldExceptionError()
+                    NotUniqueFieldExceptionError(field='name')
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -155,10 +156,11 @@ class PageController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Page),
+                    NotFoundExceptionError(cls_model=Image)
                 ],
                 409: [
-                    NotUniqueFieldExceptionError()
+                    NotUniqueFieldExceptionError(field='name')
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -232,7 +234,7 @@ class PageController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Page)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -277,7 +279,7 @@ class PageController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Page)
                 ],
                 406: [
                     PageUnableToDeleteExceptionError()
@@ -371,7 +373,7 @@ class PageClientController(ControllerBase):
             "operationId": "get_page_by_slug",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=Page)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()

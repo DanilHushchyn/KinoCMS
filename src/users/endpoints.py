@@ -6,8 +6,9 @@ from ninja_extra.pagination.decorator import paginate
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra.schemas.response import PaginatedResponseSchema
 
-from src.authz.errors import EmailAlreadyExistsExceptionError
-from src.core.errors import InvalidTokenExceptionError, UnprocessableEntityExceptionError
+from src.core.errors import (InvalidTokenExceptionError,
+                             UnprocessableEntityExceptionError,
+                             NotFoundExceptionError, NotUniqueFieldExceptionError)
 from src.core.schemas.base import (LangEnum, MessageOutSchema,
                                    DirectionEnum, errors_to_docs)
 from src.core.utils import CustomJWTAuth
@@ -48,10 +49,10 @@ class UsersAdminController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    InvalidTokenExceptionError()
+                    NotFoundExceptionError(cls_model=User)
                 ],
                 409: [
-                    EmailAlreadyExistsExceptionError()
+                    NotUniqueFieldExceptionError(field='email')
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -104,7 +105,7 @@ class UsersAdminController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    InvalidTokenExceptionError()
+                    NotFoundExceptionError(cls_model=User)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -150,7 +151,7 @@ class UsersAdminController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    InvalidTokenExceptionError()
+                    NotFoundExceptionError(cls_model=User)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()

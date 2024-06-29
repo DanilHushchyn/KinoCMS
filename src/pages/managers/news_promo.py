@@ -31,5 +31,5 @@ class NewsPromoManager(models.Manager):
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів новин чи акцій '
                     'на заданному запиті.')
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=self.model)
         return news_promo

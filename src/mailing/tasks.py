@@ -13,7 +13,7 @@ import loguru
 
 
 @shared_task()
-def make_mailing(user_ids: List | None,html_content: str) -> str:
+def make_mailing(user_ids: List | None, html_content: str) -> str:
     """
     Send letter to user and ask him to confirm registration
     In letter he will find link which redirects him to the site
@@ -28,7 +28,9 @@ def make_mailing(user_ids: List | None,html_content: str) -> str:
         users = User.objects.only('id', 'email').filter(id__in=user_ids)
 
     recipients = [user.email for user in users]
-
+    current_task.update_state(state='PROGRESS',
+                              meta={'current': 0,
+                                    'total': len(recipients)})
     for index, recipient in enumerate(recipients, start=1):
 
         email = EmailMultiAlternatives('KinoCMS', '',

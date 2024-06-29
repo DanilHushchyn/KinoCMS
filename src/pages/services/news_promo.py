@@ -1,7 +1,5 @@
 from django.db.models import QuerySet
 from django.http import HttpRequest
-from ninja.errors import HttpError
-
 from src.core.errors import NotFoundExceptionError
 from src.pages.models import NewsPromo
 from src.pages.schemas.news_promo import (NewsPromoInSchema,
@@ -115,7 +113,7 @@ class NewsPromoService:
         if news_promo.active is False:
             msg = _('Не знайдено: немає збігів новин и акцій '
                     'на заданному запиті.')
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=NewsPromo)
         return news_promo
 
     @staticmethod

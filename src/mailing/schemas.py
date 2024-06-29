@@ -46,7 +46,7 @@ class MailingInSchema(ninja_schema.Schema):
         except MailTemplate.DoesNotExist:
             msg = _('Не знайдено: немає збігів шаблонів '
                     'на заданному запиті')
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=MailTemplate)
         return temp_id
 
 

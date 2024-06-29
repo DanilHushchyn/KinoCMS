@@ -81,7 +81,7 @@ class SliderService:
                           .get(id=1))
         except TopSlider.DoesNotExist:
             msg = "TopSlider doesn't exist.Backend have to add"
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=TopSlider)
         return top_slider
 
     @staticmethod
@@ -96,7 +96,7 @@ class SliderService:
                              .get(id=1))
         except BottomSlider.DoesNotExist:
             msg = "BottomSlider doesn't exist.Backend have to add"
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=BottomSlider)
         return bottom_slider
 
     def update_slider_items(self,
@@ -135,7 +135,7 @@ class SliderService:
                            f"with id {item_id} "
                            f"doesn't belongs to "
                            f"{slider._meta.model.__name__}")
-                    raise NotFoundExceptionError(message=msg)
+                    raise NotFoundExceptionError(message=msg, cls_model=slider.items.model)
             self.bulk_delete_slider_items(item_ids=del_item_ids,
                                           slider=slider)
             self.bulk_update_slider_items(items_dict=update_items_dict,
@@ -220,7 +220,7 @@ class SliderService:
             etend_banner = ETEndBBanner.objects.get(id=1)
         except ETEndBBanner.DoesNotExist:
             msg = "ETEndBanner doesn't exist. Backend have to add"
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=ETEndBBanner)
 
         return etend_banner
 

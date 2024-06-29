@@ -1,7 +1,5 @@
 from django.db.models import QuerySet
 from django.http import HttpRequest
-from ninja.errors import HttpError
-
 from src.core.errors import NotFoundExceptionError
 from src.pages.errors import PageUnableToDeleteExceptionError
 from src.pages.models import Page
@@ -111,7 +109,7 @@ class PageService:
         if page.active is False:
             msg = _('Не знайдено: немає збігів сторінок '
                     'на заданному запиті.')
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=Page)
         return page
 
     @staticmethod

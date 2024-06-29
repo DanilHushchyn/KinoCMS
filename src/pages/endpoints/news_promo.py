@@ -6,6 +6,7 @@ from ninja_extra.schemas.response import PaginatedResponseSchema
 
 from src.core.errors import UnprocessableEntityExceptionError, InvalidTokenExceptionError, NotFoundExceptionError, \
     NotUniqueFieldExceptionError
+from src.core.models import Image
 from src.pages.models import NewsPromo
 from src.pages.schemas.news_promo import (NewsPromoInSchema,
                                           NewsPromoCardOutSchema,
@@ -83,10 +84,10 @@ class NewsPromoController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=NewsPromo)
                 ],
                 409: [
-                    NotUniqueFieldExceptionError()
+                    NotUniqueFieldExceptionError(field='name')
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -163,10 +164,11 @@ class NewsPromoController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=NewsPromo),
+                    NotFoundExceptionError(cls_model=Image)
                 ],
                 409: [
-                    NotUniqueFieldExceptionError()
+                    NotUniqueFieldExceptionError(field='name')
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -239,7 +241,7 @@ class NewsPromoController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=NewsPromo)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -284,7 +286,7 @@ class NewsPromoController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=NewsPromo)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -373,7 +375,7 @@ class NewsPromoClientController(ControllerBase):
             "operationId": "get_news_promo_by_slug",
             "responses": errors_to_docs({
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=NewsPromo)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()

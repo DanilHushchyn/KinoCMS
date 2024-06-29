@@ -53,7 +53,8 @@ app.conf.timezone = "Europe/Kiev"
 def clear_blacklisted_tokens():
     from ninja_jwt.token_blacklist.models import OutstandingToken
     from ninja_jwt.utils import aware_utcnow
-    OutstandingToken.objects.filter(expires_at__lte=aware_utcnow()).delete()
+    (OutstandingToken.objects.filter(expires_at__lte=aware_utcnow())
+     .delete())
 
 
 @app.task

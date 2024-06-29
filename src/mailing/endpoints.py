@@ -134,7 +134,7 @@ class MailingController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=MailTemplate)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()
@@ -181,7 +181,7 @@ class MailingController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError()
+                    NotFoundExceptionError(cls_model=MailTemplate)
                 ],
                 422: [
                     UnprocessableEntityExceptionError()

@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.http import HttpRequest, HttpResponse
-from django.urls import path, include
+from django.urls import path
 from ninja_extra import NinjaExtraAPI, status
 from django.conf.urls.static import static
 from django.utils.translation import gettext as _
@@ -47,18 +47,23 @@ kino_api.register_controllers(SeanceController)
 kino_api.register_controllers(SliderClientController)
 
 
+@kino_api.exception_handler(AuthenticationError)
 @kino_api.exception_handler(AuthenticationFailed)
-def authentication_failed_handler(request, exc):
+def authentication_handler(request, exc):
+    msg = _("Не авторизований")
+    if isinstance(exc, AuthenticationFailed):
+        msg = exc.detail['detail']
     return kino_api.create_response(
         request,
         data={
             "status": status.HTTP_401_UNAUTHORIZED,
             "error": AuthenticationExceptionError(
-                message=exc.detail['detail']
+                message=msg
             ).error_detail,
         },
         status=status.HTTP_401_UNAUTHORIZED,
     )
+
 
 
 @kino_api.exception_handler(InvalidToken)

@@ -55,12 +55,12 @@ class MailingService:
                 msg = _('Розсилання успішно виконане')
                 return 201, MessageOutSchema(detail=msg)
             data = task.result
-
             result = (data['current'] / data['total']) * 100
             return 200, TaskInfoOutSchema(progress=int(result))
         else:
             msg = _('На теперішній час розсилання не активне')
             raise MailingIsNotActiveExceptionError(message=msg)
+
 
     @staticmethod
     def get_templates() -> QuerySet:
@@ -99,7 +99,7 @@ class MailingService:
         except MailTemplate.DoesNotExist:
             msg = _('Не знайдено: немає збігів шаблонів '
                     'на заданному запиті')
-            raise NotFoundExceptionError(message=msg)
+            raise NotFoundExceptionError(message=msg, cls_model=MailTemplate)
         task_id = cache.get(f'mailing_task')
         if task_id:
             msg = _('Треба зачекати поки закінчиться поточне розсилання')

@@ -1,13 +1,10 @@
 from typing import List
-
-from ninja.errors import HttpError
-
 from src.core.errors import NotFoundExceptionError
 from src.core.models import Gallery, Image
-from src.core.schemas.gallery import GalleryInSchema, GalleryItemSchema
+from src.core.schemas.gallery import GalleryItemSchema
 from src.core.schemas.images import ImageInSchema
 from src.core.services.images import ImageService
-from injector import Binder, singleton, inject, provider
+from injector import inject
 
 
 class GalleryService:
@@ -25,7 +22,8 @@ class GalleryService:
         """
         gallery = Gallery.objects.create()
         if images:
-            list_of_images = self.image_service.bulk_create(schemas=images)
+            list_of_images = (self.image_service
+                              .bulk_create(schemas=images))
             gallery.images.set(list_of_images)
         return gallery
 
@@ -63,5 +61,6 @@ class GalleryService:
         """
         ids = gallery.images.values_list('id', flat=True)
         if img_id not in ids:
-            msg = "Given image id doesn't belongs to cinema's gallery"
-            raise NotFoundExceptionError(message=msg)
+            msg = (f"Given image id({img_id}) "
+                   f"doesn't belongs to cinema's gallery")
+            raise NotFoundExceptionError(message=msg, cls_model=Image)

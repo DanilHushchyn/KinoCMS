@@ -1,5 +1,4 @@
 from django.db import models
-
 from src.core.models import Seo
 from src.pages.managers.bottom_slider_item import BottomSliderItemManager
 from src.pages.managers.news_promo import NewsPromoManager
@@ -7,7 +6,6 @@ from src.pages.managers.page import PageManager
 from src.pages.managers.top_slider_item import TopSliderItemManager
 
 
-# Create your models here.
 class Page(Seo):
     name = models.CharField(max_length=60, unique=True, null=True)
     slug = models.SlugField(unique=True, null=True, db_index=True)
@@ -94,7 +92,8 @@ class BottomSlider(BaseSlider):
 class TopSliderItem(models.Model):
     url = models.URLField(null=True)
     text = models.CharField(max_length=40, null=True)
-    image = models.OneToOneField('core.Image', related_name='top_sl_img',
+    image = models.OneToOneField('core.Image',
+                                 related_name='top_sl_img',
                                  on_delete=models.DO_NOTHING,
                                  null=True)
     slider = models.ForeignKey(TopSlider, related_name='items',
@@ -110,7 +109,8 @@ class TopSliderItem(models.Model):
 
 class BottomSliderItem(models.Model):
     url = models.URLField(null=True)
-    image = models.OneToOneField('core.Image', related_name='bottom_sl_img',
+    image = models.OneToOneField('core.Image',
+                                 related_name='bottom_sl_img',
                                  on_delete=models.DO_NOTHING,
                                  null=True)
     slider = models.ForeignKey(BottomSlider, related_name='items',
