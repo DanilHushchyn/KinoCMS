@@ -55,7 +55,9 @@ class MailingService:
                 msg = _('Розсилання успішно виконане')
                 return 201, MessageOutSchema(detail=msg)
             data = task.result
-            result = (data['current'] / data['total']) * 100
+            current = data['current'] if data else 0
+            total = data['total'] if data else 100
+            result = (current / total) * 100
             return 200, TaskInfoOutSchema(progress=int(result))
         else:
             msg = _('На теперішній час розсилання не активне')
