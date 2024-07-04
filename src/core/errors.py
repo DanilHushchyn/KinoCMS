@@ -20,6 +20,21 @@ class NotUniqueFieldExceptionError(CustomAPIException):
         super().__init__(message=message, field=field, code=code)
 
 
+class TicketAlreadyBoughtExceptionError(CustomAPIException):
+    """Exception raised when field isn't unique in db."""
+
+    code = "TICKET_ALREADY_BOUGHT"
+    message = "..."
+    field = ""
+    location = "body"
+    status_code = 409
+
+    def __init__(self, field: str | None = None,
+                 message: str | None = None,
+                 code: str | None = None) -> None:
+        super().__init__(message=message, field=field, code=code)
+
+
 class NotFoundExceptionError(CustomAPIException):
     """Exception raised when row wasn't found in db."""
 
@@ -64,3 +79,28 @@ class InvalidTokenExceptionError(CustomAPIException):
     field = "API-KEY"
     location = "header"
     status_code = 401
+
+
+class BodyIsEmptyExceptionError(CustomAPIException):
+    """Exception raised when row wasn't found in db."""
+
+    code = "BODY_IS_EMPTY"
+    message = "Body is empty."
+    field = ""
+    location = "body"
+    status_code = 422
+
+    def __init__(self, message: str | None = None,
+                 field: str | None = None,
+                 code: str | None = None) -> None:
+        super().__init__(message=message, field=field, code=code)
+
+
+class SmthWWExceptionError(CustomAPIException):
+    """Exception raised when something went wrong."""
+
+    code = "SOMETHING_WENT_WRONG"
+    message = "Details of error."
+    field = ""
+    location = ""
+    status_code = 402

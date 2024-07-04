@@ -5,7 +5,8 @@ import ninja_schema
 from pydantic.fields import Field
 from src.core.errors import (UnprocessableEntityExceptionError,
                              NotFoundExceptionError)
-from src.movies.models import Movie, MovieParticipant, TECHS_CHOICES
+from src.movies.models import (Movie, MovieParticipant, TECHS_CHOICES,
+                               MovieParticipantRole)
 from ninja import ModelSchema
 from django.utils.translation import gettext as _
 from src.core.schemas.gallery import GalleryItemSchema
@@ -75,7 +76,7 @@ class MovieInSchema(ninja_schema.ModelSchema):
         keys = [str(key) for key, value in Movie.GENRES_CHOICES]
         for genre in genres:
             if genre not in keys:
-                msg = _(f'List should contain any of '
+                msg = _(f'Список має складатися з наступних значень '
                         f'{keys}')
                 raise UnprocessableEntityExceptionError(message=msg)
             result.append(genre.value)
@@ -156,6 +157,17 @@ class MovieCardOutSchema(ModelSchema):
                   'legal_age',
                   'card_img',
                   'released',
+                  'slug', ]
+
+
+class MovieScheduleFilterSchema(ModelSchema):
+    """
+    Pydantic schema for showing Movie card.
+    """
+
+    class Meta:
+        model = Movie
+        fields = ['name',
                   'slug', ]
 
 
@@ -252,8 +264,18 @@ class MovieParticipantClientOutSchema(ModelSchema):
 
     class Meta:
         model = MovieParticipant
-        fields = ['person',
-                  'role', ]
+        fields = ['person', ]
+
+
+class MovieRolesClientOutSchema(ModelSchema):
+    """
+    Pydantic schema for showing Participants of movie
+    """
+    persons: List[str]
+
+    class Meta:
+        model = MovieParticipantRole
+        fields = ['name', ]
 
 
 class MovieClientOutSchema(ModelSchema):
@@ -265,7 +287,9 @@ class MovieClientOutSchema(ModelSchema):
     genres_display: str
     countries_display: str
     techs_display: str
-    participants: List[MovieParticipantClientOutSchema]
+    mv_roles: List[MovieRolesClientOutSchema]
+
+    # participants: List[MovieParticipantClientOutSchema]
 
     @staticmethod
     def resolve_legal_age(obj: Movie) -> str:

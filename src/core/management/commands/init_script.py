@@ -218,7 +218,7 @@ class Command(BaseCommand):
                         tech=random.choice([key for key, _ in
                                             TECHS_CHOICES]),
                         seo_title=f'0{i}',
-                        schema=cls._create_hall_schema(),
+                        layout=cls._create_hall_schema(),
                         seo_description=description_uk[:150],
                         seo_image=cls._create_image('hall/banner'),
                         banner=cls._create_image('hall/banner'),
@@ -291,7 +291,7 @@ class Command(BaseCommand):
 
     @classmethod
     def _create_seances(cls, movie: Movie):
-        if not Seance.objects.exists():
+        if not movie.seance_set.exists():
             import zoneinfo
             seances = []
             hall_ids = list(Hall.objects.values_list('id', flat=True))

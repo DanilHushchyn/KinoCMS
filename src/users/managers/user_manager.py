@@ -4,7 +4,8 @@ from django.utils.translation import gettext as _
 
 from typing import TYPE_CHECKING
 from src.core.errors import (NotFoundExceptionError,
-                             UnprocessableEntityExceptionError, NotUniqueFieldExceptionError)
+                             UnprocessableEntityExceptionError,
+                             NotUniqueFieldExceptionError)
 from src.core.schemas.base import MessageOutSchema
 from src.core.services.core import CoreService
 

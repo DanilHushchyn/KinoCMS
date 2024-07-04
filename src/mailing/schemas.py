@@ -57,3 +57,4 @@ class TaskInfoOutSchema(ninja_schema.Schema):
     Purpose of this schema to get task info
     """
     progress: int
+

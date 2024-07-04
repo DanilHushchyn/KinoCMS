@@ -108,6 +108,16 @@ class HallClientOutSchema(ModelSchema):
                   ]
 
 
+class HallSchemaOutSchema(ModelSchema):
+    """
+    Pydantic schema for showing hall full data in the client site.
+    """
+
+    class Meta:
+        model = Hall
+        fields = ['layout']
+
+
 class HallUpdateSchema(HallInSchema):
     """
     Pydantic schema for updating hall.

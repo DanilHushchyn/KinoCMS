@@ -46,7 +46,7 @@ class Hall(Seo):
     banner = models.OneToOneField('core.Image', related_name='hall_bnr',
                                   on_delete=models.DO_NOTHING,
                                   null=True)
-    schema = models.JSONField()
+    layout = models.JSONField()
     date_created = models.DateTimeField(auto_now_add=True)
     cinema = models.ForeignKey('Cinema',
                                on_delete=models.CASCADE,

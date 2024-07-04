@@ -1,11 +1,18 @@
+from datetime import timedelta
 from typing import TYPE_CHECKING
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from django.utils import timezone
 from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 from django.db import models
+from django.template.defaultfilters import date as _date
+from django.utils import translation
+import pymorphy2
+
+from src.core.errors import NotFoundExceptionError
 
 if TYPE_CHECKING:
+    from src.booking.schemas.seance import SeanceFilterSchema
     from src.booking.models import Seance
 
 
@@ -24,12 +31,14 @@ class SeanceManager(models.Manager):
         """
         try:
             seance = (self.model.objects
-                      .prefetch_related('movie__card_img', 'hall')
+                      .prefetch_related('movie__card_img',
+                                        'hall__banner')
                       .get(id=seance_id))
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів сеансів '
                     'на заданному запиті.')
-            raise HttpError(404, msg)
+            raise NotFoundExceptionError(message=msg, cls_model=self.model)
+
         return seance
 
     def get_all(self) -> QuerySet['Seance']:
@@ -39,8 +48,57 @@ class SeanceManager(models.Manager):
         """
         today = timezone.now()
         seances = (self.model.objects
-                   .filter(date__gte=today))
+                   .filter(date__date__gte=today.date()))
         return seances
+
+    def get_filtered(self, filters: 'SeanceFilterSchema') -> list:
+        """
+        Get all séances in site.
+        :return: Séance model instance
+        """
+        today = timezone.now()
+        tomorrow = timezone.now() + timedelta(days=1)
+        seances = (self.model.objects
+                   .prefetch_related('movie',
+                                     'hall__cinema',
+                                     'ticket_set')
+                   .filter(date__date__gte=today.date()))
+        seances = seances.filter(hall__cinema__slug=filters.cnm_slug)
+        if filters.hall_ids:
+            seances = seances.filter(hall__id__in=filters.hall_ids)
+        if filters.mv_slugs:
+            seances = seances.filter(movie__slug__in=filters.mv_slugs)
+        if filters.techs:
+            seances = seances.filter(hall__tech__in=filters.techs)
+        if filters.date:
+            seances = seances.filter(date__date=filters.date)
+            dates = [filters.date]
+        else:
+            seances = seances.filter(Q(date__date=today.date()) |
+                                     Q(date__date=tomorrow.date()))
+            dates = [today.date(), tomorrow.date()]
+        # for seance in seances:
+        #     if str(seance.date.date()) not in dates:
+        #         dates.append(str(seance.date.date()))
+        result = []
+        for date in dates:
+            date_seances = []
+            for seance in seances:
+                if seance.date.date() == date:
+                    date_seances.append(seance)
+            date = _date(date, 'd F l')
+            date = date.split(' ')
+            current_lang = translation.get_language()
+            morph = pymorphy2.MorphAnalyzer(lang=current_lang)
+            parser = morph.parse(date[1])[0]
+            gent = parser.inflect({'gent'})
+            date[1] = gent.word + ','
+            result.append({
+                'date': ' '.join(date).upper(),
+                'seances': date_seances,
+
+            })
+        return result
 
     def get_all_expired(self) -> QuerySet['Seance']:
         """
@@ -49,10 +107,10 @@ class SeanceManager(models.Manager):
         """
         today = timezone.now()
         seances = (self.model.objects.prefetch_related('ticket_set')
-                   .exclude(date__gte=today))
+                   .exclude(date__date__gte=today.date()))
         return seances
 
-    def get_today_seances(self,cnm_slug: str,
+    def get_today_seances(self, cnm_slug: str,
                           hall_id: int) -> QuerySet['Seance']:
         """
         Get séances for today.

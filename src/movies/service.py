@@ -139,6 +139,14 @@ class MovieService:
         return movie
 
     @staticmethod
+    def get_schedule_filter() -> QuerySet[Movie]:
+        """
+        Get all movies for filter in schedule in the client site;
+        """
+        movies = Movie.objects.only('slug','name')
+        return movies
+
+    @staticmethod
     def get_legal_ages() -> List:
         """
         Get all legal age choices for movie.

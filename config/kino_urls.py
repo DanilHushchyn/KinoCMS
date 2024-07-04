@@ -15,11 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.http import HttpRequest, HttpResponse
-from django.urls import path
+from django.urls import path, include
 from ninja_extra import NinjaExtraAPI, status
 from django.conf.urls.static import static
 from django.utils.translation import gettext as _
-from ninja.errors import AuthenticationError, ValidationError
+from ninja.errors import AuthenticationError, ValidationError, HttpError
+from ninja_extra.exceptions import APIException
 from ninja_jwt.exceptions import InvalidToken, AuthenticationFailed
 
 from config.settings import settings
@@ -28,19 +29,23 @@ from src.booking.endpoints.seance import SeanceController
 from src.cinemas.endpoints.cinema import CinemaClientController
 from src.cinemas.endpoints.hall import HallClientController
 from src.core.endpoints.gallery import GalleryController
-from src.core.errors import AuthenticationExceptionError, InvalidTokenExceptionError
+from src.core.errors import (AuthenticationExceptionError,
+                             InvalidTokenExceptionError)
 from src.movies.endpoints import MovieClientController
 from src.pages.endpoints.page import PageClientController
 from src.pages.endpoints.news_promo import NewsPromoClientController
 from src.pages.endpoints.banners_sliders import SliderClientController
+from src.booking.endpoints.ticket import TicketController
 
-kino_api = NinjaExtraAPI(title='KinoCMS (client-site)', description='CLIENT API')
+kino_api = NinjaExtraAPI(title='KinoCMS (client-site)',
+                         description='CLIENT API')
 kino_api.register_controllers(CustomTokenObtainPairController)
 kino_api.register_controllers(GalleryController)
 kino_api.register_controllers(CinemaClientController)
 kino_api.register_controllers(HallClientController)
 kino_api.register_controllers(MovieClientController)
 kino_api.register_controllers(SeanceController)
+kino_api.register_controllers(TicketController)
 kino_api.register_controllers(PageClientController)
 kino_api.register_controllers(NewsPromoClientController)
 kino_api.register_controllers(SeanceController)
@@ -63,7 +68,6 @@ def authentication_handler(request, exc):
         },
         status=status.HTTP_401_UNAUTHORIZED,
     )
-
 
 
 @kino_api.exception_handler(InvalidToken)
@@ -94,7 +98,7 @@ def http_exceptions_handler(request: HttpRequest, exc: ValidationError) \
         error_list.append(
             {
                 "location": location,
-                "field": field_full.split('.')[1],
+                "field": field_full,
                 "message": message,
             }
         )
@@ -103,10 +107,33 @@ def http_exceptions_handler(request: HttpRequest, exc: ValidationError) \
         request,
         data={
             "status": status.HTTP_422_UNPROCESSABLE_ENTITY,
-            "error": {"code": "UNPROCESSABLE_ENTITY",
-                      "details": error_list},
+            "error": {
+                "code": "UNPROCESSABLE_ENTITY",
+                "details": error_list
+            },
         },
         status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+    )
+
+
+@kino_api.exception_handler(HttpError)
+def common_exception_handler(request, exc):
+    return kino_api.create_response(
+        request,
+        data={
+            "status": exc.status_code,
+            "error": {
+                "code": "COMMON_ERROR",
+                "details": [
+                    {
+                        "location": "",
+                        "field": "",
+                        "message": exc.message,
+                    }
+                ]
+            }
+        },
+        status=exc.status_code,
     )
 
 
@@ -114,8 +141,15 @@ urlpatterns = [
     path('api/', kino_api.urls),
 ]
 if settings.DEBUG:
+    settings.INSTALLED_APPS += ["requests_tracker"]
+    settings.MIDDLEWARE += \
+        ["requests_tracker.middleware.requests_tracker_middleware"]
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
     # urlpatterns += [
     #     path("__debug__/", include("debug_toolbar.urls")),
     # ]
+    urlpatterns += [path("__requests_tracker__/",
+                         include("requests_tracker.urls"))]
+    urlpatterns += static(settings.STATIC_URL,
+                          document_root=settings.STATIC_ROOT)

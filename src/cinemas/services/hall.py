@@ -97,6 +97,15 @@ class HallService:
 
         return hall
 
+    @staticmethod
+    def get_schema(hall_id: int) -> Hall:
+        """
+        Get hall schema by hall id.
+        """
+        hall = Hall.objects.get_schema(hall_id=hall_id)
+
+        return hall
+
     def get_all(self, cnm_slug: str) -> Hall:
         """
         Get all halls.

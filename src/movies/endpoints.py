@@ -469,6 +469,37 @@ class MovieClientController(ControllerBase):
         """
         self.movie_service = movie_service
 
+    @http_get(
+        "/schedule-filter/",
+        response=PaginatedResponseSchema[MovieScheduleFilterSchema],
+        openapi_extra={
+            "operationId": "get_movie_schedule_filter",
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
+        },
+    )
+    @paginate()
+    def get_movie_schedule_filter(
+            self,
+            request: HttpRequest,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default='uk'),
+    ) -> QuerySet[Movie]:
+        """
+        Get all movie cards.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.movie_service.get_schedule_filter()
+        return result
+    get_techs = MovieController.get_techs
+
     get_all_movie_cards = MovieController.get_all_movie_cards
 
     @http_get(

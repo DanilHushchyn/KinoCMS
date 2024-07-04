@@ -1,7 +1,6 @@
 from django.db.models import QuerySet
-
 from src.booking.models import Seance
-from django.utils import timezone
+from src.booking.schemas.seance import SeanceFilterSchema
 
 
 class SeanceService:
@@ -10,17 +9,11 @@ class SeanceService:
     """
 
     @staticmethod
-    def get_all() -> QuerySet[Seance]:
+    def get_filtered(filters: SeanceFilterSchema) -> list:
         """
         Get all séances.
         """
-        seances = Seance.objects.get_all()
-        today = timezone.now()
-        seances = seances.filter(date__date=today.date())
-        result = [{
-         "date": str(today),
-         "seances": seances,
-        }]
+        result = Seance.objects.get_filtered(filters=filters)
         return result
 
     @staticmethod
@@ -33,4 +26,14 @@ class SeanceService:
         """
         seances = Seance.objects.get_today_seances(cnm_slug=cnm_slug,
                                                    hall_id=hall_id)
+        return seances
+
+    @staticmethod
+    def get_by_id(seance_id: int) \
+            -> Seance:
+        """
+        Get séance by id;
+        :param seance_id for getting séance by id
+        """
+        seances = Seance.objects.get_by_id(seance_id=seance_id)
         return seances

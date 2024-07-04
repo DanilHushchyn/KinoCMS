@@ -22,7 +22,7 @@ from ninja import Header
 from src.core.utils import CustomJWTAuth
 
 
-@api_controller("/news_promo", tags=["news_promos"])
+@api_controller("/news-promo", tags=["news and promos"])
 class NewsPromoController(ControllerBase):
     """
     A controller class for managing news_promo in system.
@@ -320,7 +320,7 @@ class NewsPromoController(ControllerBase):
         return result
 
 
-@api_controller("/news_promo", tags=["news_promos"])
+@api_controller("/news-promo", tags=["news and promos"])
 class NewsPromoClientController(ControllerBase):
     """
     A controller class for managing news_promo in system.

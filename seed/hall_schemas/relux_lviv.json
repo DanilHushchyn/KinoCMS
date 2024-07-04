@@ -1,7 +1,6 @@
 {
     "seatsColor": "#600098",
-    "seatsCount": 26,
-
+    "seatsCount": 22,
     "rows": [
         {
             "number" : 1,
@@ -25,10 +24,10 @@
 
                 },
                 {
-                    "number" : 5
+
                 },
                 {
-                    "number" : 6
+
                 }
             ]
         },
@@ -57,12 +56,15 @@
 
                 },
                 {
-                    "number" : 5
+
                 },
                 {
-                    "number" : 6
+
                 }
             ]
+        },
+        {
+
         },
         {
             "number" : 3,

@@ -15,7 +15,7 @@ class HallManager(models.Manager):
 
     def get_by_id(self, hall_id: int) -> 'Hall':
         """
-        Get cinema with the given id.
+        Get hall with the given id.
         :param hall_id: id of hall
         :rtype: Hall
         :return: Hall model instance
@@ -24,6 +24,23 @@ class HallManager(models.Manager):
             hall = (self.model.objects
                     .select_related('banner', 'seo_image',
                                     'gallery', 'cinema')
+                    .get(id=hall_id))
+        except self.model.DoesNotExist:
+            msg = _('Не знайдено: немає збігів залів '
+                    'на заданному запиті.')
+            raise NotFoundExceptionError(message=msg, cls_model=self.model)
+        return hall
+
+    def get_schema(self, hall_id: int) -> 'Hall':
+        """
+        Get hall schema with the given hall id.
+        :param hall_id: id of hall
+        :rtype: Hall
+        :return: Hall model instance
+        """
+        try:
+            hall = (self.model.objects
+                    .only('layout')
                     .get(id=hall_id))
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів залів '

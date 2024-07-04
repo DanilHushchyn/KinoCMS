@@ -7,7 +7,7 @@ from src.cinemas.models import Hall
 from src.cinemas.schemas.hall import (HallInSchema,
                                       HallCardOutSchema,
                                       HallUpdateSchema,
-                                      HallOutSchema, HallClientOutSchema)
+                                      HallOutSchema, HallClientOutSchema, HallSchemaOutSchema)
 from src.cinemas.services.hall import HallService
 from src.core.errors import (NotFoundExceptionError,
                              UnprocessableEntityExceptionError,
@@ -340,8 +340,48 @@ class HallClientController(ControllerBase):
     get_all_hall_cards = HallController.get_all_hall_cards
 
     @http_get(
+        "/schema/{hall_id}/",
+        response=HallSchemaOutSchema,
+        openapi_extra={
+            "operationId": "get_hall_schema",
+            "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError(cls_model=Hall)
+                ],
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
+        },
+    )
+    def get_hall_schema(
+            self,
+            request: HttpRequest,
+            hall_id: int,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> Hall:
+        """
+        Get hall schema.
+
+        Please provide:
+          - **hall_id**  id of hall
+
+        Returns:
+          - **200**: Success response with the data.
+          - **404**: Error: Not Found. \n
+            Причини: \n
+                1) Не знайдено: немає збігів залів
+                   на заданному запиті. \n
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.hall_service.get_schema(hall_id=hall_id)
+        return result
+
+    @http_get(
         "/{hall_id}/",
-        response=HallClientOutSchema,
+        response=HallOutSchema,
         openapi_extra={
             "operationId": "get_hall_by_id",
             "responses": errors_to_docs({

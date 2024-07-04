@@ -20,7 +20,7 @@ from imagekit.utils import get_cache
 from ninja_extra import NinjaExtraAPI, status
 from django.conf.urls.static import static
 from django.utils.translation import gettext as _
-from ninja.errors import ValidationError, AuthenticationError
+from ninja.errors import ValidationError, AuthenticationError, HttpError
 
 from config.settings import settings
 from src.authz.endpoints import CustomTokenObtainPairController
@@ -41,7 +41,8 @@ from ninja_jwt.exceptions import InvalidToken, AuthenticationFailed
 cache.delete('mailing_task')
 cache = get_cache()
 cache.clear()
-admin_api = NinjaExtraAPI(title='KinoCMS (admin-panel)', description='ADMIN API')
+admin_api = NinjaExtraAPI(title='KinoCMS (admin-panel)',
+                          description='ADMIN API')
 admin_api.register_controllers(CustomTokenObtainPairController)
 admin_api.register_controllers(UsersAdminController)
 admin_api.register_controllers(MailingController)
@@ -116,16 +117,40 @@ def http_exceptions_handler(request: HttpRequest, exc: ValidationError) \
     )
 
 
+@admin_api.exception_handler(HttpError)
+def common_exception_handler(request, exc):
+    return admin_api.create_response(
+        request,
+        data={
+            "status": exc.status_code,
+            "error": {
+                "code": "COMMON_ERROR",
+                "details": [
+                    {
+                        "location": "",
+                        "field": "",
+                        "message": exc.message,
+                    }
+                ]
+            }
+        },
+        status=exc.status_code,
+    )
+
+
 urlpatterns = [
     path('api/', admin_api.urls)
 ]
 if settings.DEBUG:
     settings.INSTALLED_APPS += ["requests_tracker"]
-    settings.MIDDLEWARE += ["requests_tracker.middleware.requests_tracker_middleware"]
+    settings.MIDDLEWARE += \
+        ["requests_tracker.middleware.requests_tracker_middleware"]
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
     # urlpatterns += [
     #     path("__debug__/", include("debug_toolbar.urls")),
     # ]
-    urlpatterns += [path("__requests_tracker__/", include("requests_tracker.urls"))]
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += [path("__requests_tracker__/",
+                         include("requests_tracker.urls"))]
+    urlpatterns += static(settings.STATIC_URL,
+                          document_root=settings.STATIC_ROOT)

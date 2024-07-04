@@ -1,6 +1,7 @@
 from django.db import models
 
 from src.booking.managers.seance import SeanceManager
+from src.booking.managers.ticket import TicketManager
 
 
 # Create your models here.
@@ -22,8 +23,11 @@ class Ticket(models.Model):
     seance = models.ForeignKey('Seance', on_delete=models.CASCADE)
     row = models.PositiveIntegerField()
     seat = models.PositiveIntegerField()
+    date_created = models.DateTimeField(auto_now_add=True)
+    objects = TicketManager()
 
     class Meta:
+        unique_together = ('seance', 'row', 'seat')
         verbose_name = "Ticket"
         verbose_name_plural = "Tickets"
         db_table = 'tickets'

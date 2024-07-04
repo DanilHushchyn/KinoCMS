@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from django.db.models import QuerySet, Q
+from django.db.models import QuerySet, Q, Count, F
 from django.utils.translation import gettext as _
 from django.db import models
 from src.booking.models import Seance
@@ -29,12 +29,23 @@ class MovieManager(models.Manager):
             movie = (self.model.objects
                      .select_related('card_img',
                                      'seo_image', 'gallery')
-                     .prefetch_related('participants')
+                     .prefetch_related('participants__role')
+                     .prefetch_related('participants__person')
                      .get(slug=mv_slug))
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів фільмів '
                     'на заданному запиті.')
             raise NotFoundExceptionError(message=msg, cls_model=self.model)
+        from src.movies.models import MovieParticipantRole, MovieParticipantPerson
+
+        mv_roles = MovieParticipantRole.objects.filter(movieparticipant__movie=movie).distinct()
+        for mv_role in mv_roles:
+            persons_list = []
+            for participant in movie.participants.all():
+                if participant.role == mv_role:
+                    persons_list.append(participant.person.fullname)
+            mv_role.persons = persons_list
+        movie.mv_roles = mv_roles
         return movie
 
     def get_by_search_line(self, search_line: str) -> QuerySet['Movie']:
