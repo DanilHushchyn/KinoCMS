@@ -7,12 +7,12 @@ from ninja_extra.schemas.response import PaginatedResponseSchema
 from src.core.errors import UnprocessableEntityExceptionError, InvalidTokenExceptionError, NotFoundExceptionError, \
     NotUniqueFieldExceptionError
 from src.core.models import Image
-from src.pages.models import NewsPromo
+from src.pages.models import NewsPromo, Tag
 from src.pages.schemas.news_promo import (NewsPromoInSchema,
                                           NewsPromoCardOutSchema,
                                           NewsPromoUpdateSchema,
                                           NewsPromoOutSchema,
-                                          NewsPromoClientOutSchema)
+                                          NewsPromoClientOutSchema, TagOutSchema, NewsPromoCardClientOutSchema)
 from src.pages.services.news_promo import NewsPromoService
 from src.core.schemas.base import LangEnum, MessageOutSchema, errors_to_docs
 from ninja_extra.permissions import IsAdminUser
@@ -72,6 +72,38 @@ class NewsPromoController(ControllerBase):
         result = self.news_promo_service.get_all(promo)
         return result
 
+    @http_get(
+        "/all-tags/",
+        response=PaginatedResponseSchema[TagOutSchema],
+        permissions=[IsAdminUser()],
+        auth=CustomJWTAuth(),
+        openapi_extra={
+            "operationId": "get_all_tags",
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
+        },
+    )
+    @paginate()
+    def get_all_tags(
+            self,
+            request: HttpRequest,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> QuerySet[Tag]:
+        """
+        Get all tags.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.news_promo_service.get_all_tags()
+        return result
+
     @http_post(
         "/",
         response=MessageOutSchema,
@@ -84,7 +116,8 @@ class NewsPromoController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError(cls_model=NewsPromo)
+                    NotFoundExceptionError(cls_model=NewsPromo),
+                    NotFoundExceptionError(cls_model=Tag)
                 ],
                 409: [
                     NotUniqueFieldExceptionError(field='name')
@@ -120,6 +153,7 @@ class NewsPromoController(ControllerBase):
                 2) Максимальни довжина name 60 символів \n
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
+                5) Максимальна кількість тегів 5 \n
           - **500**: Internal server error if an unexpected error occurs.
 
 
@@ -165,7 +199,8 @@ class NewsPromoController(ControllerBase):
                 ],
                 404: [
                     NotFoundExceptionError(cls_model=NewsPromo),
-                    NotFoundExceptionError(cls_model=Image)
+                    NotFoundExceptionError(cls_model=Image),
+                    NotFoundExceptionError(cls_model=Tag, field='tags')
                 ],
                 409: [
                     NotUniqueFieldExceptionError(field='name')
@@ -202,6 +237,8 @@ class NewsPromoController(ControllerBase):
                 2) Максимальни довжина name 60 символів \n
                 3) Максимальни довжина seo_title 60 символів \n
                 4) Максимальни довжина seo_description 160 символів \n
+                5) Максимальна кількість тегів 5 \n
+
           - **500**: Internal server error if an unexpected error occurs.
 
 
@@ -339,7 +376,7 @@ class NewsPromoClientController(ControllerBase):
 
     @http_get(
         "/all-cards/",
-        response=PaginatedResponseSchema[NewsPromoCardOutSchema],
+        response=PaginatedResponseSchema[NewsPromoCardClientOutSchema],
         openapi_extra={
             "operationId": "get_all_news_promo_cards",
             "responses": errors_to_docs({

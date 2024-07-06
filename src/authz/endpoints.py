@@ -12,7 +12,8 @@ from ninja_jwt.settings import api_settings
 from src.authz.schemas import LoginSchema, LoginResponseSchema
 from src.core.errors import (UnprocessableEntityExceptionError,
                              InvalidTokenExceptionError,
-                             AuthenticationExceptionError, NotUniqueFieldExceptionError)
+                             AuthenticationExceptionError,
+                             NotUniqueFieldExceptionError)
 from src.core.utils import CustomJWTAuth
 from src.users.models import User
 from src.users.schemas import (UserOutSchema, UserUpdateSchema,
@@ -281,7 +282,6 @@ class CustomTokenObtainPairController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "update_my_profile",
-
             "responses": errors_to_docs({
                 401: [
                     InvalidTokenExceptionError()

@@ -4,10 +4,11 @@ from django.utils.translation import gettext as _
 from ninja import File
 from ninja.files import UploadedFile
 from django.core.cache import cache
-
-from src.core.errors import UnprocessableEntityExceptionError, NotFoundExceptionError
+from src.core.errors import (UnprocessableEntityExceptionError,
+                             NotFoundExceptionError)
 from src.core.schemas.base import MessageOutSchema
-from src.mailing.errors import MailingIsActiveExceptionError, MailingIsNotActiveExceptionError
+from src.mailing.errors import (MailingIsActiveExceptionError,
+                                MailingIsNotActiveExceptionError)
 from src.mailing.models import MailTemplate
 from src.mailing.schemas import MailingInSchema, TaskInfoOutSchema
 from src.mailing.tasks import make_mailing
@@ -58,7 +59,8 @@ class MailingService:
             current = data['current'] if data else 0
             total = data['total'] if data else 100
             result = (current / total) * 100
-            return 200, TaskInfoOutSchema(progress=int(result))
+            return 200, TaskInfoOutSchema(progress=int(result),
+                                          letters_count=int(total))
         else:
             msg = _('На теперішній час розсилання не активне')
             raise MailingIsNotActiveExceptionError(message=msg)

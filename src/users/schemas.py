@@ -16,6 +16,10 @@ from pydantic.types import SecretStr
 from src.core.errors import UnprocessableEntityExceptionError
 from src.users.models import User
 from django.utils.translation import gettext as _
+from pydantic import field_validator
+from django.utils.translation import gettext as _
+from dateutil.parser import parse
+from django.utils import timezone
 
 
 class UserFieldsEnum(enum.Enum):
@@ -36,6 +40,19 @@ class UserInBaseSchema(ninja_schema.ModelSchema):
     Purpose of this schema to get user's
     personal data for system purposes
     """
+    birthday: str
+
+    @field_validator('birthday')
+    @classmethod
+    def clean_birthday(cls, v: str) -> str:
+        try:
+            result = parse(v, dayfirst=True).date()
+        except ValueError as exc:
+            msg = _(f'Невірний формат дати було надано: {v}. '
+                    f'Правильний формат: 01.12.2012')
+            raise UnprocessableEntityExceptionError(message=msg)
+
+        return result
 
     class Config:
         model = User
@@ -136,7 +153,7 @@ class UserUpdateSchema(UserInBaseSchema):
     Purpose of this schema to get user's
     personal data for updating
     """
-
+    birthday: str = None
     password: SecretStr = None
 
     @staticmethod
@@ -190,7 +207,7 @@ class UserOutSchema(ModelSchema):
         return dj
 
     @staticmethod
-    def resolve_birthday(obj: User):
+    def resolve_birthday(obj: User) -> str:
         birth = obj.birthday.strftime("%d.%m.%Y")
         return birth
 

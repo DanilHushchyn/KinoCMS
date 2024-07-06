@@ -9,7 +9,7 @@ from src.core.errors import (NotFoundExceptionError,
                              UnprocessableEntityExceptionError,
                              SmthWWExceptionError)
 from src.core.schemas.base import MessageOutSchema
-
+from django.utils import timezone
 if TYPE_CHECKING:
     from src.booking.models import Ticket, Seance
 
@@ -48,8 +48,9 @@ class TicketManager(models.Manager):
         from src.booking.models import Seance
 
         try:
+            today = timezone.now()
             seance = (Seance.objects.prefetch_related('hall')
-                      .get(id=payload.seance_id))
+                      .get(id=payload.seance_id, date__gte=today))
         except Seance.DoesNotExist:
             msg = _('Не знайдено: немає збігів сеансів '
                     'на заданному запиті.')

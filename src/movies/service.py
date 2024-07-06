@@ -24,7 +24,7 @@ class MovieService:
         self.image_service = image_service
         self.gall_service = gall_service
 
-    def create(self, request: HttpRequest, schema: MovieInSchema)\
+    def create(self, request: HttpRequest, schema: MovieInSchema) \
             -> MessageOutSchema:
         """
         Create Movie.
@@ -62,7 +62,8 @@ class MovieService:
             seo_description=schema.seo_description,
             seo_image=seo_image,
         )
-        movie.participants.set(schema.participants)
+        if schema.participants is not None:
+            movie.participants.set(schema.participants)
         movie.save()
         return MessageOutSchema(detail=_('Фільм успішно створений'))
 
@@ -95,11 +96,11 @@ class MovieService:
 
         if schema.participants is not None:
             movie.participants.set(schema.participants)
+
         movie.slug = slugify(movie.name_uk)
         movie.save()
         return MessageOutSchema(detail=_('Фільм успішно оновлений'))
 
-    #
     @staticmethod
     def get_by_slug(mv_slug: str) -> Movie:
         """
@@ -143,7 +144,7 @@ class MovieService:
         """
         Get all movies for filter in schedule in the client site;
         """
-        movies = Movie.objects.only('slug','name')
+        movies = Movie.objects.only('slug', 'name')
         return movies
 
     @staticmethod
@@ -177,7 +178,9 @@ class MovieService:
         """
         Get all participants for movie.
         """
-        participants = MovieParticipant.objects.all()
+        participants = (MovieParticipant.objects
+                        .prefetch_related('role', 'person')
+                        .all())
         return participants
 
     def delete_by_slug(self, mv_slug: str) -> MessageOutSchema:

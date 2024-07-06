@@ -8,9 +8,10 @@ from src.booking.models import Seance
 from src.booking.schemas.seance import (SeanceCardOutSchema,
                                         SeanceOutSchema,
                                         SeanceFilterSchema,
-                                        ScheduleOutSchema)
+                                        ScheduleOutSchema, SeanceShortSchema)
 from src.booking.services.seance import SeanceService
-from src.core.errors import UnprocessableEntityExceptionError
+from src.cinemas.models import Cinema
+from src.core.errors import UnprocessableEntityExceptionError, NotFoundExceptionError
 from src.core.schemas.base import LangEnum, errors_to_docs
 from ninja_extra import http_get
 from ninja import Header, Query
@@ -65,7 +66,7 @@ class SeanceController(ControllerBase):
 
     @http_get(
         "/today-cards/",
-        response=PaginatedResponseSchema[SeanceCardOutSchema],
+        response=PaginatedResponseSchema[SeanceShortSchema],
         openapi_extra={
             "operationId": "get_today_seances",
             "responses": errors_to_docs({
@@ -102,6 +103,9 @@ class SeanceController(ControllerBase):
         openapi_extra={
             "operationId": "get_seance_by_id",
             "responses": errors_to_docs({
+                404: [
+                    NotFoundExceptionError(cls_model=Seance)
+                ],
                 422: [
                     UnprocessableEntityExceptionError()
                 ],

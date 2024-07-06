@@ -1,6 +1,6 @@
 from modeltranslation.translator import TranslationOptions, register
 
-from src.pages.models import TopSliderItem, NewsPromo, Page
+from src.pages.models import TopSliderItem, NewsPromo, Page, Tag
 
 
 @register(TopSliderItem)
@@ -18,4 +18,10 @@ class NewsPromoTranslationOptions(TranslationOptions):
 @register(Page)
 class PageTranslationOptions(TranslationOptions):
     fields = ("name", "content")
+    required_languages = ("uk", "ru")
+
+
+@register(Tag)
+class TagTranslationOptions(TranslationOptions):
+    fields = ("name",)
     required_languages = ("uk", "ru")

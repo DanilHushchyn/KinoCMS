@@ -6,6 +6,16 @@ from django_countries.fields import CountryField
 from src.movies.utils import MultiSelectField
 
 
+class Tech(models.Model):
+    name = models.CharField(max_length=60)
+    color = models.CharField(max_length=60)
+
+    class Meta:
+        verbose_name = "Tech"
+        verbose_name_plural = "Techs"
+        db_table = 'techs'
+
+
 class MovieGenre(models.Model):
     name = models.CharField(max_length=60)
 
@@ -91,7 +101,7 @@ class Movie(Seo):
     ]
     duration = models.DurationField()
     released = models.DateField()
-    participants = models.ManyToManyField('MovieParticipant')
+    participants = models.ManyToManyField('MovieParticipant', )
 
     techs = MultiSelectField(choices=TECHS_CHOICES,
                              min_choices=1,

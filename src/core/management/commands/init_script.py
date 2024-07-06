@@ -14,10 +14,12 @@ from src.booking.models import Seance
 from src.cinemas.models import Cinema, Hall
 from src.core.models import Image, Gallery
 from src.movies.models import Movie, TECHS_CHOICES, MovieParticipantRole, MovieParticipantPerson, MovieParticipant
-from src.pages.models import TopSlider, BottomSlider, TopSliderItem, BottomSliderItem, ETEndBBanner, NewsPromo, Page
+from src.pages.models import TopSlider, BottomSlider, TopSliderItem, BottomSliderItem, ETEndBBanner, NewsPromo, Page, \
+    Tag
 from src.users.models import User
 from pytils.translit import slugify
 from django_countries.data import COUNTRIES
+
 
 class Command(BaseCommand):
     _fake_ru = Faker("ru_RU")
@@ -35,6 +37,7 @@ class Command(BaseCommand):
         self._create_participants()
         self._create_movies()
         self._create_sliders()
+        self._create_tags()
         self._create_news_promos()
         self._create_pages()
 
@@ -228,6 +231,24 @@ class Command(BaseCommand):
             Hall.objects.bulk_create(halls)
 
     @classmethod
+    def _create_tags(cls):
+        if not Tag.objects.exists():
+            tags = []
+            for i in range(1, 50):
+                name_uk = f'тег-0{i}'
+                name_ru = f'тег-0{i}'
+                color = random.choice(["494c8f", "faf0d7", "fadfd7",
+                                       "c7c1f5", "f97420", "fbb00c",
+                                       "2aae80", "ffa9d2", "fb380c"])
+                tag = Tag(
+                    name_uk=name_uk,
+                    name_ru=name_ru,
+                    color=color,
+                )
+                tags.append(tag)
+            Tag.objects.bulk_create(tags)
+
+    @classmethod
     def _create_news_promos(cls):
         if not NewsPromo.objects.exists():
             news_promos = []
@@ -260,7 +281,13 @@ class Command(BaseCommand):
                     gallery=cls._create_gallery('news_promo'),
                 )
                 news_promos.append(news_promo)
-            NewsPromo.objects.bulk_create(news_promos)
+            news_promos = NewsPromo.objects.bulk_create(news_promos)
+            tag_ids = list(Tag.objects
+                           .values_list('id', flat=True))
+            for news_promo in news_promos:
+                news_promo_tags = random.sample(tag_ids, 3)
+                news_promo.tags.set(news_promo_tags)
+                news_promo.save()
 
     @classmethod
     def _create_pages(cls):
@@ -364,7 +391,7 @@ class Command(BaseCommand):
             for i in range(1, 41):
                 name_uk = f'Фільм-0{i}'
                 name_ru = f'Фильм-0{i}'
-                slug = slugify(name_uk)
+                slug = slugify(f"movie-0{i}")
                 description_uk = (cls._fake_uk.text(max_nb_chars=2500)
                                   .capitalize())
                 description_ru = (cls._fake_ru.text(max_nb_chars=2500)
@@ -402,8 +429,8 @@ class Command(BaseCommand):
             movies = Movie.objects.bulk_create(movies)
             participant_ids = list(MovieParticipant.objects
                                    .values_list('id', flat=True))
-            movie_participants = random.sample(participant_ids, 3)
             for movie in movies:
+                movie_participants = random.sample(participant_ids, 3)
                 movie.participants.set(movie_participants)
                 movie.save()
                 cls._create_seances(movie)

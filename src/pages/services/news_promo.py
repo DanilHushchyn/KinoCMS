@@ -1,7 +1,7 @@
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from src.core.errors import NotFoundExceptionError
-from src.pages.models import NewsPromo
+from src.pages.models import NewsPromo, Tag
 from src.pages.schemas.news_promo import (NewsPromoInSchema,
                                           NewsPromoUpdateSchema)
 from django.utils.translation import gettext as _
@@ -28,7 +28,8 @@ class NewsPromoService:
         self.gallery_service = gallery_service
         self.core_service = core_service
 
-    def create(self, request: HttpRequest, schema: NewsPromoInSchema) -> MessageOutSchema:
+    def create(self, request: HttpRequest, schema: NewsPromoInSchema) \
+            -> MessageOutSchema:
         """
         Create news_promo.
         """
@@ -60,6 +61,9 @@ class NewsPromoService:
             seo_description=schema.seo_description,
             seo_image=seo_image,
         )
+        if schema.tags is not None:
+            news_promo.tags.set(schema.tags)
+        news_promo.save()
         if news_promo.promo:
             return MessageOutSchema(detail=_('Акція успішно створена'))
         return MessageOutSchema(detail=_('Новина успішно створена'))
@@ -86,11 +90,14 @@ class NewsPromoService:
 
         self.gallery_service.update(schemas=schema.gallery,
                                     gallery=news_promo.gallery)
-        expt_list = ['banner', 'seo_image', 'gallery']
+        expt_list = ['banner', 'seo_image', 'gallery', 'tags']
         for attr, value in schema.dict().items():
             if attr not in expt_list and value is not None:
                 setattr(news_promo, attr, value)
         news_promo.slug = slugify(news_promo.name_uk)
+        if schema.tags is not None:
+            news_promo.tags.set(schema.tags)
+
         news_promo.save()
         if news_promo.promo:
             return MessageOutSchema(detail=_('Акція успішно оновлена'))
@@ -128,16 +135,29 @@ class NewsPromoService:
         return news_promo
 
     @staticmethod
+    def get_all_tags() -> QuerySet[Tag]:
+        """
+        Get all tags.
+        """
+
+        tags = Tag.objects.all()
+        return tags
+
+    @staticmethod
     def get_all_active(promo: bool) -> QuerySet[NewsPromo]:
         """
         Get all news_promos.
         """
         if promo:
-            news_promo = NewsPromo.objects.filter(promo=True,
-                                                  active=True)
+            news_promo = (NewsPromo.objects
+                          .prefetch_related('tags', 'banner')
+                          .filter(promo=True,
+                                  active=True))
         else:
-            news_promo = NewsPromo.objects.filter(promo=False,
-                                                  active=True)
+            news_promo = (NewsPromo.objects
+                          .prefetch_related('tags', 'banner')
+                          .filter(promo=False,
+                                  active=True))
 
         return news_promo
 
@@ -152,7 +172,8 @@ class NewsPromoService:
                        news_promo.banner_id, ]
         gallery = news_promo.gallery
         news_promo.delete()
-        gallery_imgs_ids = list(gallery.images.values_list('id', flat=True))
+        gallery_imgs_ids = list(gallery.images.values_list('id',
+                                                           flat=True))
         gallery.delete()
         imgs_ids_for_delete = np_imgs_ids + gallery_imgs_ids
         self.image_service.bulk_delete(imgs_ids_for_delete)

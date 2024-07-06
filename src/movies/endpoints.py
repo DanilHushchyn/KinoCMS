@@ -226,7 +226,9 @@ class MovieController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError(cls_model=Movie)
+                    NotFoundExceptionError(cls_model=Movie),
+                    NotFoundExceptionError(cls_model=MovieParticipant),
+
                 ],
                 409: [
                     NotUniqueFieldExceptionError(field='name')
@@ -299,7 +301,8 @@ class MovieController(ControllerBase):
                 ],
                 404: [
                     NotFoundExceptionError(cls_model=Movie),
-                    NotFoundExceptionError(cls_model=Image)
+                    NotFoundExceptionError(cls_model=Image),
+                    NotFoundExceptionError(cls_model=MovieParticipant),
                 ],
                 409: [
                     NotUniqueFieldExceptionError(field='name')

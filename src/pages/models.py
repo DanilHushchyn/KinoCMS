@@ -28,6 +28,17 @@ class Page(Seo):
         db_table = 'pages'
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=60, unique=True, null=True)
+    color = models.CharField(null=True, max_length=40)
+
+    class Meta:
+        ordering = ['id',]
+        verbose_name = 'Tag'
+        verbose_name_plural = 'Tags'
+        db_table = 'tags'
+
+
 class NewsPromo(Seo):
     name = models.CharField(max_length=60, unique=True, null=True)
     slug = models.SlugField(unique=True, null=True, db_index=True)
@@ -35,6 +46,7 @@ class NewsPromo(Seo):
     banner = models.OneToOneField('core.Image',
                                   on_delete=models.DO_NOTHING,
                                   null=True, related_name='np_bnr')
+    tags = models.ManyToManyField(Tag, related_name='tags')
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     active = models.BooleanField()
     promo = models.BooleanField()

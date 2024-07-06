@@ -2,7 +2,6 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 from django.db.models import QuerySet, Q
 from django.utils import timezone
-from ninja.errors import HttpError
 from django.utils.translation import gettext as _
 from django.db import models
 from django.template.defaultfilters import date as _date
@@ -29,11 +28,14 @@ class SeanceManager(models.Manager):
         :param seance_id: if of séance
         :return: Séance model instance
         """
+
         try:
+            today = timezone.now()
             seance = (self.model.objects
                       .prefetch_related('movie__card_img',
                                         'hall__banner')
-                      .get(id=seance_id))
+                      .get(id=seance_id, date__gte=today))
+
         except self.model.DoesNotExist:
             msg = _('Не знайдено: немає збігів сеансів '
                     'на заданному запиті.')
@@ -116,7 +118,7 @@ class SeanceManager(models.Manager):
         Get séances for today.
         """
         today = timezone.now()
-        seances = (self.model.objects.get_all()
+        seances = (self.model.objects.filter(date__gte=today)
                    .filter(date__date=today.date()))
         if cnm_slug:
             from src.cinemas.models import Cinema

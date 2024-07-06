@@ -1,13 +1,14 @@
 from typing import List
-
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from ninja_extra.controllers.base import api_controller, ControllerBase
 from src.booking.models import Ticket, Seance
 from src.booking.schemas.ticket import BuyTicketSchema, TicketSchema
 from src.booking.services.ticket import TicketService
-from src.core.errors import UnprocessableEntityExceptionError, NotFoundExceptionError, \
-    TicketAlreadyBoughtExceptionError, SmthWWExceptionError
+from src.core.errors import (UnprocessableEntityExceptionError,
+                             NotFoundExceptionError,
+                             TicketAlreadyBoughtExceptionError,
+                             SmthWWExceptionError)
 from src.core.schemas.base import (LangEnum, errors_to_docs,
                                    MessageOutSchema)
 from ninja_extra import http_post, http_get
@@ -69,6 +70,7 @@ class TicketController(ControllerBase):
     @http_get(
         "/recently-bought/",
         response=List[TicketSchema],
+        summary="Get recent tickets (Long polling)",
         openapi_extra={
             "operationId": "get_recently_tickets",
             "responses": errors_to_docs({

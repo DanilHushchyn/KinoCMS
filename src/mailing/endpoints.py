@@ -219,6 +219,8 @@ class MailingController(ControllerBase):
     @http_get(
         "/status/",
         response={200: TaskInfoOutSchema, 201: MessageOutSchema},
+        summary="Get status of mailing (Long polling)",
+
         openapi_extra={
             "operationId": "status_mailing",
             "responses": errors_to_docs({

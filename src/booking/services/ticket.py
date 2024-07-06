@@ -2,8 +2,7 @@ from datetime import timedelta
 
 from django.db.models import QuerySet
 
-from src.booking.models import Seance, Ticket
-from src.booking.schemas.seance import SeanceFilterSchema
+from src.booking.models import Ticket
 from django.utils import timezone
 from src.booking.schemas.ticket import BuyTicketSchema
 from src.core.schemas.base import MessageOutSchema

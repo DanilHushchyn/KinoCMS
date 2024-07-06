@@ -13,6 +13,10 @@ from src.core.schemas.gallery import GalleryItemSchema
 from src.core.schemas.images import (ImageOutSchema, ImageInSchema,
                                      ImageUpdateSchema)
 from django_countries.data import COUNTRIES
+from pydantic import field_validator
+from django.utils import timezone
+
+from dateutil.parser import parse
 
 GenresEnum = Enum(
     "GenresEnum",
@@ -59,6 +63,24 @@ class MovieInSchema(ninja_schema.ModelSchema):
     name_ru: str = Field(max_length=60)
     description_uk: str = Field(max_length=2000)
     description_ru: str = Field(max_length=2000)
+    released: str
+
+    @field_validator('released')
+    @classmethod
+    def clean_released(cls, v: str) -> str:
+        try:
+            result = parse(v, dayfirst=True).date()
+        except ValueError as exc:
+            msg = _(f'Невірний формат дати було надано: {v}. '
+                    f'Правильний формат: 01.12.2012')
+            raise UnprocessableEntityExceptionError(message=msg, field='released')
+        today = timezone.now().date()
+        if result >= today:
+            return result
+        else:
+            msg = _(f'Дата повинна починатися '
+                    f'від сьогодні і пізніше.')
+            raise UnprocessableEntityExceptionError(message=msg, field='released')
 
     @ninja_schema.model_validator('year')
     def clean_year(cls, year) -> int:
@@ -108,16 +130,18 @@ class MovieInSchema(ninja_schema.ModelSchema):
         return result
 
     @ninja_schema.model_validator('participants')
-    def clean_participants(cls, participants) -> List[int]:
-        participants = set(participants)
-        participants_ids = (MovieParticipant.objects
-                            .values_list('id', flat=True))
-        for participant in participants:
-            if participant not in participants_ids:
-                msg = _(f'Not Found: No MovieParticipant'
-                        f'matches the given id - {participant}')
-                raise NotFoundExceptionError(message=msg, cls_model=MovieParticipant)
-        return list(participants)
+    def clean_participants(cls, participant_ids: List[int]) -> List[int]:
+        participants_db = list(MovieParticipant.objects
+                               .filter(id__in=participant_ids)
+                               .values_list('id', flat=True))
+        if len(participant_ids) != len(participants_db):
+            diff = list(set(participant_ids) ^ set(participants_db))
+            msg = _(f'У заданому переліку участників є '
+                    f'ids {diff} які не присутні у базі')
+            raise NotFoundExceptionError(message=msg,
+                                         cls_model=MovieParticipant,
+                                         field='participants')
+        return participant_ids
 
     class Config:
         model = Movie
@@ -289,8 +313,6 @@ class MovieClientOutSchema(ModelSchema):
     techs_display: str
     mv_roles: List[MovieRolesClientOutSchema]
 
-    # participants: List[MovieParticipantClientOutSchema]
-
     @staticmethod
     def resolve_legal_age(obj: Movie) -> str:
         legal_age_display = dict(Movie.AGE_CHOICES)[obj.legal_age]
@@ -322,14 +344,13 @@ class MovieClientOutSchema(ModelSchema):
                   'year',
                   'budget',
                   'released',
-                  'participants',
                   'seo_title',
                   'seo_image',
                   'seo_description',
                   ]
 
 
-class MovieUpdateSchema(MovieInSchema):
+class MovieUpdateSchema(ninja_schema.ModelSchema):
     """
     Pydantic schema for updating Movie.
     """
@@ -339,9 +360,57 @@ class MovieUpdateSchema(MovieInSchema):
     gallery: List[GalleryItemSchema] = None
     countries: List[CountryEnum] = None
     genres: List[GenresEnum] = None
-    techs: List[TechsEnum] = None
 
-    class Config(MovieInSchema.Config):
+    @ninja_schema.model_validator('year')
+    def clean_year(cls, year) -> int:
+        if year < 1984 or year > current_year() + 1:
+            msg = _(f'Expected min year is 1984 '
+                    f'max year is {current_year() + 1} '
+                    f'but got {year}')
+            raise UnprocessableEntityExceptionError(message=msg)
+        return year
+
+    @ninja_schema.model_validator('genres')
+    def clean_genres(cls, genres) -> List[str]:
+        genres = set(genres)
+        result = []
+        keys = [str(key) for key, value in Movie.GENRES_CHOICES]
+        for genre in genres:
+            if genre not in keys:
+                msg = _(f'Список має складатися з наступних значень '
+                        f'{keys}')
+                raise UnprocessableEntityExceptionError(message=msg)
+            result.append(genre.value)
+        return result
+
+    @ninja_schema.model_validator('countries')
+    def clean_countries(cls, countries) -> List[str]:
+        countries = set(countries)
+        result = []
+        for country in countries:
+            if country not in COUNTRIES.keys():
+                msg = _(f'List should contain any of '
+                        f'{list(COUNTRIES.keys())}')
+                raise UnprocessableEntityExceptionError(message=msg)
+            result.append(country.value)
+        return result
+
+    @ninja_schema.model_validator('participants')
+    def clean_participants(cls, participant_ids: List[int]) -> List[int]:
+        participants_db = list(MovieParticipant.objects
+                               .filter(id__in=participant_ids)
+                               .values_list('id', flat=True))
+        if len(participant_ids) != len(participants_db):
+            diff = list(set(participant_ids) ^ set(participants_db))
+            msg = _(f'У заданому переліку участників є '
+                    f'ids {diff} які не присутні у базі')
+            raise NotFoundExceptionError(message=msg,
+                                         cls_model=MovieParticipant,
+                                         field='participants')
+        return participant_ids
+
+    class Config:
+        model = Movie
         include = [
             'name_uk',
             'name_ru',
@@ -352,7 +421,6 @@ class MovieUpdateSchema(MovieInSchema):
             'budget',
             'year',
             'trailer_link',
-            'released',
             'participants',
             'genres',
             'gallery',

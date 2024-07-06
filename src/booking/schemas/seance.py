@@ -58,6 +58,24 @@ class SeanceCardOutSchema(ModelSchema):
             'id', ]
 
 
+class SeanceShortSchema(ModelSchema):
+    """
+    Pydantic schema for showing séance card.
+    """
+    title: str
+
+    @staticmethod
+    def resolve_title(obj: Seance) -> str:
+
+        title = _(f"Сеанс - {obj.date.strftime('%H:%M')}")
+        return title
+
+    class Meta:
+        model = Seance
+        fields = [
+            'id', ]
+
+
 class SeanceOutSchema(ModelSchema):
     """
     Pydantic schema for showing séance card.
@@ -73,6 +91,9 @@ class SeanceOutSchema(ModelSchema):
         seats_count = obj.hall.layout['seatsCount']
         tickets_count = obj.ticket_set.count()
         if seats_count == tickets_count:
+            return False
+        today = timezone.now()
+        if today > obj.date:
             return False
         return True
 
