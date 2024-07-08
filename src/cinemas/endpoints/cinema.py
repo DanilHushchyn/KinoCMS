@@ -8,7 +8,7 @@ from src.cinemas.schemas.cinema import (CinemaInSchema,
                                         CinemaUpdateSchema,
                                         CinemaOutSchema,
                                         CinemaContactOutSchema,
-                                        CinemaClientOutSchema)
+                                        CinemaClientOutSchema, PaginatedContactsResponseSchema)
 from src.cinemas.services.cinema import CinemaService
 from src.core.models import Image
 from src.core.schemas.base import (LangEnum, MessageOutSchema,
@@ -325,7 +325,7 @@ class CinemaClientController(ControllerBase):
 
     @http_get(
         "/all-contacts/",
-        response=PaginatedResponseSchema[CinemaContactOutSchema],
+        response=PaginatedContactsResponseSchema[CinemaContactOutSchema],
         openapi_extra={
             "operationId": "get_all_cinema_contacts",
             "responses": errors_to_docs({

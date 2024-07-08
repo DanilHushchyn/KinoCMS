@@ -10,6 +10,7 @@ from src.core.errors import (NotFoundExceptionError,
                              SmthWWExceptionError)
 from src.core.schemas.base import MessageOutSchema
 from django.utils import timezone
+
 if TYPE_CHECKING:
     from src.booking.models import Ticket, Seance
 
@@ -65,10 +66,11 @@ class TicketManager(models.Manager):
                                 seat['number'] == ticket.seat):
                             found = True
             if found is False:
-                msg = _(f'Дані про розташування '
-                        f'квитка (ряд: {ticket.row}, '
-                        f'місце: {ticket.seat}) '
-                        f'на схемі неправельні.')
+                msg = (_('Дані про розташування '
+                         'квитка (ряд: {row}, '
+                         'місце: {seat}) '
+                         'на схемі неправельні.')
+                       .format(row=ticket.row, seat=ticket.seat))
                 raise UnprocessableEntityExceptionError(message=msg)
             item = self.model(seance_id=payload.seance_id,
                               row=ticket.row,

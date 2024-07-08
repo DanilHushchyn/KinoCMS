@@ -4,8 +4,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 from src.cinemas.managers.cinema import CinemaManager
 from src.cinemas.managers.hall import HallManager
 from src.core.models import Seo
-from src.movies.models import TECHS_CHOICES
-from src.movies.utils import MultiSelectField
 
 
 # Create your models here.
@@ -51,12 +49,12 @@ class Hall(Seo):
     cinema = models.ForeignKey('Cinema',
                                on_delete=models.CASCADE,
                                null=True)
+    tech = models.ForeignKey('movies.Tech',
+                             on_delete=models.CASCADE,
+                             null=True)
     gallery = models.OneToOneField('core.Gallery',
                                    on_delete=models.DO_NOTHING,
                                    null=True)
-
-    tech = models.CharField(choices=TECHS_CHOICES,
-                            max_length=25)
     objects = HallManager()
 
     class Meta:

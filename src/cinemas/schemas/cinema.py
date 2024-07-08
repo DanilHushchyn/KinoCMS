@@ -1,6 +1,9 @@
 from typing import List, Any
 import ninja_schema
+from ninja_extra.schemas.response import PaginatedResponseSchema
 from pydantic.fields import Field
+
+from config.settings.settings import GOOGLE_MAPS_API_KEY
 from src.cinemas.models import Cinema
 from ninja import ModelSchema
 from src.core.schemas.gallery import GalleryItemSchema
@@ -8,6 +11,8 @@ from src.core.schemas.images import (ImageOutSchema, ImageInSchema,
                                      ImageUpdateSchema)
 from pydantic import Json
 from src.core.utils import check_phone_number
+from src.movies.models import Tech
+from src.movies.schemas import TechOutSchema
 
 
 class CinemaInSchema(ninja_schema.ModelSchema):
@@ -87,6 +92,16 @@ class CinemaClientOutSchema(ModelSchema):
     banner: ImageOutSchema
     logo: ImageOutSchema
     seo_image: ImageOutSchema
+    techs: List[TechOutSchema]
+
+    @staticmethod
+    def resolve_techs(obj: Cinema) -> List[Tech]:
+        obj.hall_set.select_related('tech').all()
+        techs = []
+        for hall in obj.hall_set.select_related('tech').all():
+            techs.append(hall.tech)
+        techs = list(set(techs))
+        return techs
 
     @staticmethod
     def resolve_phone_1(obj: Cinema):
@@ -127,6 +142,13 @@ class CinemaContactOutSchema(ModelSchema):
                   'email', 'banner', 'logo',
                   'phone_1', 'phone_2',
                   'coordinate']
+
+
+class PaginatedContactsResponseSchema(PaginatedResponseSchema):
+    """
+    Pydantic schema for paginating cinema contacts.
+    """
+    google_maps_api_key: str = GOOGLE_MAPS_API_KEY
 
 
 class CinemaUpdateSchema(CinemaInSchema):

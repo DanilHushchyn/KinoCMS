@@ -1,5 +1,4 @@
 from typing import List
-
 from src.booking.models import Seance
 from ninja import ModelSchema, FilterSchema, Schema
 from pydantic import field_validator
@@ -8,10 +7,7 @@ from dateutil.parser import parse
 from src.core.errors import UnprocessableEntityExceptionError
 from src.core.models import Image
 from src.core.schemas.images import ImageOutSchema
-from src.movies.models import TECHS_CHOICES
-from src.movies.schemas import TechsEnum
 from django.utils import timezone
-
 from django.template.defaultfilters import date as _date
 from django.utils import translation
 import pymorphy2
@@ -48,13 +44,16 @@ class SeanceCardOutSchema(ModelSchema):
         gent = parser.inflect({'gent'})
         date[1] = gent.word
         date = ' '.join(date).upper()
-        summary = _(f"{date}, {obj.date.strftime('%H:%M')}, ЗАЛ №{obj.hall.number}")
+        summary = (_("{date}, {time}, ЗАЛ №{hall_number}")
+                   .format(date=date, time=obj.date.strftime('%H:%M'),
+                           hall_number=obj.hall.number))
         return summary
 
     class Meta:
         model = Seance
         fields = [
             'price',
+            'hall',
             'id', ]
 
 
@@ -66,8 +65,8 @@ class SeanceShortSchema(ModelSchema):
 
     @staticmethod
     def resolve_title(obj: Seance) -> str:
-
-        title = _(f"Сеанс - {obj.date.strftime('%H:%M')}")
+        title = (_("Сеанс - {time}")
+                 .format(time=obj.date.strftime('%H:%M')))
         return title
 
     class Meta:
@@ -131,8 +130,8 @@ class SeanceFilterSchema(FilterSchema):
     cnm_slug: str
     hall_ids: List[int] = None
     mv_slugs: List[str] = None
+    tech_ids: List[int] = None
     date: str = None
-    techs: List[TechsEnum] = None
 
     @field_validator('date')
     @classmethod
@@ -140,26 +139,14 @@ class SeanceFilterSchema(FilterSchema):
         try:
             result = parse(v, dayfirst=True).date()
         except ValueError as exc:
-            msg = _(f'Невірний формат дати було надано: {v}.'
-                    f'Правильний формат: 01.12.2012')
+            msg = (_('Невірний формат дати було надано: {v}.'
+                     'Правильний формат: 01.12.2012')
+                   .format(v=v))
             raise UnprocessableEntityExceptionError(message=msg)
         today = timezone.now().date()
         if result >= today:
             return result
         else:
-            msg = _(f'Дата повинна починатися '
-                    f'від сьогодні і пізніше.')
+            msg = _('Дата повинна починатися '
+                    'від сьогодні і пізніше.')
             raise UnprocessableEntityExceptionError(message=msg)
-
-    @field_validator('techs')
-    def clean_techs(cls, techs) -> List[str]:
-        techs = set(techs)
-        result = []
-        keys = [str(key) for key, value in TECHS_CHOICES]
-        for tech in techs:
-            if tech not in keys:
-                msg = _(f'Список має складатися з наступних значень '
-                        f'{keys}')
-                raise UnprocessableEntityExceptionError(message=msg)
-            result.append(tech.value)
-        return list(result)

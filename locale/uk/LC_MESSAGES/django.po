@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-29 23:42+0300\n"
+"POT-Creation-Date: 2024-07-09 00:45+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,19 +21,66 @@ msgstr ""
 "100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
 "(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: config/admin_urls.py:60 config/kino_urls.py:53
+#: config/admin_urls.py:61 config/kino_urls.py:58
 msgid "Не авторизований"
 msgstr ""
 
-#: src/booking/managers/seance.py:30
+#: src/booking/managers/seance.py:40 src/booking/managers/ticket.py:38
+#: src/booking/managers/ticket.py:56
 msgid "Не знайдено: немає збігів сеансів на заданному запиті."
+msgstr ""
+
+#: src/booking/managers/ticket.py:69
+#, python-brace-format
+msgid ""
+"Дані про розташування квитка (ряд: {row}, місце: {seat}) на схемі "
+"неправельні."
+msgstr ""
+
+#: src/booking/managers/ticket.py:80
+msgid "Квитки для покупки не обрані, має бути мінімум 1."
+msgstr ""
+
+#: src/booking/managers/ticket.py:87
+msgid "У вказаному переліку квитків є ті які вже кимось придбані"
+msgstr ""
+
+#: src/booking/managers/ticket.py:90
+msgid "Цей квиток вже придбаний кимось"
+msgstr ""
+
+#: src/booking/managers/ticket.py:96
+msgid "Операція з оплатою нажаль не пройшла, спробуйте ще раз."
+msgstr ""
+
+#: src/booking/managers/ticket.py:99
+msgid "Покупка пройшла успішно"
+msgstr ""
+
+#: src/booking/schemas/seance.py:47
+#, python-brace-format
+msgid "{date}, {time}, ЗАЛ №{hall_number}"
+msgstr ""
+
+#: src/booking/schemas/seance.py:68
+#, python-brace-format
+msgid "Сеанс - {time}"
+msgstr ""
+
+#: src/booking/schemas/seance.py:142
+#, python-brace-format
+msgid "Невірний формат дати було надано: {v}.Правильний формат: 01.12.2012"
+msgstr ""
+
+#: src/booking/schemas/seance.py:150 src/movies/schemas.py:87
+msgid "Дата повинна починатися від сьогодні і пізніше."
 msgstr ""
 
 #: src/cinemas/endpoints/cinema.py:218 src/cinemas/services/cinema.py:96
 msgid "Кінотеатр успішно оновлений"
 msgstr ""
 
-#: src/cinemas/endpoints/hall.py:231 src/cinemas/services/hall.py:70
+#: src/cinemas/endpoints/hall.py:234 src/cinemas/services/hall.py:72
 msgid "Зал успішно оновлений"
 msgstr ""
 
@@ -41,8 +88,13 @@ msgstr ""
 msgid "Не знайдено: немає збігів кінотеатрів на заданному запиті."
 msgstr ""
 
-#: src/cinemas/managers/hall.py:29
+#: src/cinemas/managers/hall.py:29 src/cinemas/managers/hall.py:46
 msgid "Не знайдено: немає збігів залів на заданному запиті."
+msgstr ""
+
+#: src/cinemas/schemas/hall.py:32
+#, python-brace-format
+msgid "У заданому переліку технологій є id {tech_id} які не присутні у базі"
 msgstr ""
 
 #: src/cinemas/services/cinema.py:68
@@ -53,16 +105,18 @@ msgstr ""
 msgid "Кінотеатр успішно видалений"
 msgstr ""
 
-#: src/cinemas/services/hall.py:49
+#: src/cinemas/services/hall.py:51
 msgid "Зал успішно створений"
 msgstr ""
 
-#: src/cinemas/services/hall.py:83
+#: src/cinemas/services/hall.py:85
+#, python-brace-format
 msgid ""
 "Це поле повинно бути унікальним по відношенню до конкретного кінотеатру. "
+"*{number}* - цей номер вже зайнятий. Для кінотеатру {cinema_name}"
 msgstr ""
 
-#: src/cinemas/services/hall.py:124
+#: src/cinemas/services/hall.py:136
 msgid "Зал успішно видалений"
 msgstr ""
 
@@ -74,117 +128,142 @@ msgstr ""
 msgid "Не знайдено: немає збігів картинок на заданному запиті."
 msgstr ""
 
-#: src/core/schemas/gallery.py:69 src/core/schemas/images.py:35
-#: src/core/schemas/images.py:100
+#: src/core/schemas/gallery.py:62 src/core/schemas/images.py:26
+#: src/core/schemas/images.py:92
+#, python-brace-format
+msgid ""
+"Поле filename не підходить, filename має відповідати наступному регулярному "
+"виразу {pattern}"
+msgstr ""
+
+#: src/core/schemas/gallery.py:69 src/core/schemas/images.py:33
+#: src/core/schemas/images.py:99
 #, python-brace-format
 msgid "Дозволено відправляти тільки {image_types}"
 msgstr ""
 
-#: src/core/schemas/images.py:46 src/core/services/images.py:35
+#: src/core/schemas/images.py:45 src/core/services/images.py:35
 msgid "Невірний формат base64 був відправлений"
 msgstr ""
 
 #: src/core/services/core.py:35
-msgid "Поле повинно бути унікальним. "
+#, python-brace-format
+msgid "Поле повинно бути унікальним. *{value}* - Ця назва вже зайнята"
 msgstr ""
 
 #: src/core/services/images.py:38
 msgid "Файл пошкоджений"
 msgstr ""
 
-#: src/core/services/images.py:41 src/mailing/services/mailing.py:84
+#: src/core/services/images.py:41 src/mailing/services/mailing.py:88
 msgid "Максимально дозволений розмір файлу 1MB"
 msgstr ""
 
-#: src/core/utils.py:80 src/users/schemas.py:66
+#: src/core/utils.py:80 src/users/schemas.py:81
 msgid "Введено некоректний номер телефону."
 msgstr ""
 
-#: src/mailing/schemas.py:47 src/mailing/services/mailing.py:100
+#: src/mailing/schemas.py:47 src/mailing/services/mailing.py:104
 msgid "Не знайдено: немає збігів шаблонів на заданному запиті"
 msgstr ""
 
-#: src/mailing/services/mailing.py:39 src/mailing/services/mailing.py:105
+#: src/mailing/services/mailing.py:40 src/mailing/services/mailing.py:109
 msgid "Треба зачекати поки закінчиться поточне розсилання"
 msgstr ""
 
-#: src/mailing/services/mailing.py:41
+#: src/mailing/services/mailing.py:42
 msgid "Розсилання почалося"
 msgstr ""
 
-#: src/mailing/services/mailing.py:55
+#: src/mailing/services/mailing.py:56
 msgid "Розсилання успішно виконане"
 msgstr ""
 
-#: src/mailing/services/mailing.py:61
+#: src/mailing/services/mailing.py:65
 msgid "На теперішній час розсилання не активне"
 msgstr ""
 
-#: src/mailing/services/mailing.py:81
+#: src/mailing/services/mailing.py:85
 msgid "Дозволено відправляти тільки html"
 msgstr ""
 
-#: src/mailing/services/mailing.py:108
+#: src/mailing/services/mailing.py:112
 msgid "Шаблон успішно видалений"
 msgstr ""
 
-#: src/movies/manager.py:35
+#: src/movies/manager.py:37
 msgid "Не знайдено: немає збігів фільмів на заданному запиті."
 msgstr ""
 
-#: src/movies/models.py:83
+#: src/movies/models.py:94
 msgid "Комедія"
 msgstr ""
 
-#: src/movies/models.py:84
+#: src/movies/models.py:95
 msgid "Фантастика"
 msgstr ""
 
-#: src/movies/models.py:85
+#: src/movies/models.py:96
 msgid "Жахи"
 msgstr ""
 
-#: src/movies/models.py:86
+#: src/movies/models.py:97
 msgid "Бойовик"
 msgstr ""
 
-#: src/movies/models.py:87
+#: src/movies/models.py:98
 msgid "Мелодрами"
 msgstr ""
 
-#: src/movies/models.py:88
+#: src/movies/models.py:99
 msgid "Трилер"
 msgstr ""
 
-#: src/movies/models.py:89
+#: src/movies/models.py:100
 msgid "Містика"
 msgstr ""
 
-#: src/movies/models.py:90
+#: src/movies/models.py:101
 msgid "Детектив"
 msgstr ""
 
-#: src/movies/schemas.py:65
-msgid "Expected min year is 1984 "
+#: src/movies/schemas.py:80 src/users/schemas.py:49
+#, python-brace-format
+msgid "Невірний формат дати було надано: {v}. Правильний формат: 01.12.2012"
 msgstr ""
 
-#: src/movies/schemas.py:78 src/movies/schemas.py:91 src/movies/schemas.py:103
-msgid "List should contain any of "
+#: src/movies/schemas.py:94 src/movies/schemas.py:370
+#, python-brace-format
+msgid ""
+"Очікуваний мінімальний рік становить {min}, максимальний рік {max} but got "
+"{current}"
 msgstr ""
 
-#: src/movies/schemas.py:116
-msgid "Not Found: No MovieParticipant"
+#: src/movies/schemas.py:109 src/movies/schemas.py:121
+#: src/movies/schemas.py:385 src/movies/schemas.py:397
+#, python-brace-format
+msgid "Список має складатися з наступних значень {keys}"
 msgstr ""
 
-#: src/movies/service.py:67
+#: src/movies/schemas.py:134 src/movies/schemas.py:410
+#, python-brace-format
+msgid "У заданому переліку участників є ids {diff} які не присутні у базі"
+msgstr ""
+
+#: src/movies/schemas.py:149
+#, python-brace-format
+msgid "У заданому переліку технологій є ids {diff} які не присутні у базі"
+msgstr ""
+
+#: src/movies/service.py:70
 msgid "Фільм успішно створений"
 msgstr ""
 
-#: src/movies/service.py:100
+#: src/movies/service.py:104
 msgid "Фільм успішно оновлений"
 msgstr ""
 
-#: src/movies/service.py:190
+#: src/movies/service.py:222
 msgid "Фільм успішно видалений"
 msgstr ""
 
@@ -210,6 +289,15 @@ msgstr ""
 msgid "Невірний формат кольору було введено"
 msgstr ""
 
+#: src/pages/schemas/news_promo.py:30 src/pages/schemas/news_promo.py:139
+msgid "Максимальна кількість тегів 5"
+msgstr ""
+
+#: src/pages/schemas/news_promo.py:37 src/pages/schemas/news_promo.py:146
+#, python-brace-format
+msgid "У заданому переліку тегів є ids {diff} які не присутні у базі"
+msgstr ""
+
 #: src/pages/services/banners_sliders.py:53
 msgid "Верхній слайдер успішно оновлений"
 msgstr ""
@@ -218,39 +306,51 @@ msgstr ""
 msgid "Нижній слайдер успішно оновлений"
 msgstr ""
 
-#: src/pages/services/banners_sliders.py:146
+#: src/pages/services/banners_sliders.py:83
+msgid "TopSlider не існує. Бекенд повиннен додати"
+msgstr ""
+
+#: src/pages/services/banners_sliders.py:98
+msgid "BottomSlider не існує. Бекенд повиннен додати"
+msgstr ""
+
+#: src/pages/services/banners_sliders.py:151
 msgid "Максимальна кількість елементів верхнього банеру, 10"
 msgstr ""
 
-#: src/pages/services/banners_sliders.py:240
+#: src/pages/services/banners_sliders.py:227
+msgid "ETEndBanner не існує. Бекенд повиннен додати"
+msgstr ""
+
+#: src/pages/services/banners_sliders.py:245
 msgid "Наскрізний банер успішно оновлений"
 msgstr ""
 
-#: src/pages/services/news_promo.py:64
+#: src/pages/services/news_promo.py:68
 msgid "Акція успішно створена"
 msgstr ""
 
-#: src/pages/services/news_promo.py:65
+#: src/pages/services/news_promo.py:69
 msgid "Новина успішно створена"
 msgstr ""
 
-#: src/pages/services/news_promo.py:96
+#: src/pages/services/news_promo.py:103
 msgid "Акція успішно оновлена"
 msgstr ""
 
-#: src/pages/services/news_promo.py:97
+#: src/pages/services/news_promo.py:104
 msgid "Новина успішно оновлена"
 msgstr ""
 
-#: src/pages/services/news_promo.py:114
+#: src/pages/services/news_promo.py:121
 msgid "Не знайдено: немає збігів новин и акцій на заданному запиті."
 msgstr ""
 
-#: src/pages/services/news_promo.py:160
+#: src/pages/services/news_promo.py:181
 msgid "Акція успішно видалена"
 msgstr ""
 
-#: src/pages/services/news_promo.py:161
+#: src/pages/services/news_promo.py:182
 msgid "Новина успішно видалена"
 msgstr ""
 
@@ -270,21 +370,21 @@ msgstr ""
 msgid "Сторінка успішно видалена"
 msgstr ""
 
-#: src/users/managers/user_manager.py:93 src/users/managers/user_manager.py:110
-#: src/users/managers/user_manager.py:130
+#: src/users/managers/user_manager.py:94 src/users/managers/user_manager.py:111
+#: src/users/managers/user_manager.py:131
 msgid "Не знайдено: немає збігів користувачів на заданному запиті."
 msgstr ""
 
-#: src/users/managers/user_manager.py:113
+#: src/users/managers/user_manager.py:114
 msgid "Користувач успішно видалений"
 msgstr ""
 
-#: src/users/managers/user_manager.py:140
-#: src/users/managers/user_manager.py:165
+#: src/users/managers/user_manager.py:141
+#: src/users/managers/user_manager.py:166
 msgid "Ця електронна адреса вже використовується"
 msgstr ""
 
-#: src/users/managers/user_manager.py:161
+#: src/users/managers/user_manager.py:162
 msgid "Паролі не співпадають"
 msgstr ""
 
@@ -388,19 +488,19 @@ msgstr ""
 msgid "Луцьк"
 msgstr ""
 
-#: src/users/schemas.py:78
+#: src/users/schemas.py:93
 msgid ""
 "Ім'я повинно починатися з великої літери(наступні маленькі), доступна "
 "кирилиця та латиниця, доступні спецсимволи('-)"
 msgstr ""
 
-#: src/users/schemas.py:87
+#: src/users/schemas.py:102
 msgid ""
 "Прізвище повинно починатися з великої літери(наступні маленькі), доступна "
 "кирилиця та латиниця, доступні спецсимволи('-)"
 msgstr ""
 
-#: src/users/schemas.py:110 src/users/schemas.py:148
+#: src/users/schemas.py:125 src/users/schemas.py:163
 msgid ""
 "Пароль повинен відповідати: * Хоча б одній великій літері, * Хоча б одній "
 "малій літері, * Хоча б одній цифрі, * Хоча б одному спеціальному символу з "

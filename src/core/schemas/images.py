@@ -1,10 +1,8 @@
 import binascii
 import re
 from base64 import b64decode
-
 from ninja import ModelSchema
 import ninja_schema
-from ninja.errors import HttpError
 from pydantic.functional_validators import field_validator
 from django.utils.translation import gettext as _
 from config.settings.settings import ABSOLUTE_URL
@@ -25,14 +23,15 @@ class ImageInSchema(ninja_schema.ModelSchema):
                        'svg', 'webp', ]
         pattern = r'^[a-zA-Z0-9_-]{1,255}\.[a-zA-Z0-9]+$'
         if re.match(pattern, filename) is None:
-            msg = f"Field filename is not valid " \
-                  f"filename have to correspond " \
-                  f"to next regular expression " \
-                  f"{pattern}"
+            msg = _("Поле filename не підходить, "
+                    "filename має відповідати "
+                    "наступному регулярному виразу "
+                    "{pattern}").format(pattern=pattern)
             raise UnprocessableEntityExceptionError(msg, field="filename")
         name, extension = filename.split('.')
         if extension not in image_types:
-            msg = _(f'Дозволено відправляти тільки {image_types}')
+            msg = (_('Дозволено відправляти тільки {image_types}')
+                   .format(image_types=image_types))
             raise UnprocessableEntityExceptionError(msg, field="filename")
 
         return filename
@@ -90,14 +89,15 @@ class ImageUpdateSchema(ImageInSchema):
                        'svg', 'webp', ]
         pattern = r'^[a-zA-Z0-9_-]{1,255}\.[a-zA-Z0-9]+$'
         if re.match(pattern, filename) is None:
-            msg = f"Field filename is not valid " \
-                  f"filename have to correspond " \
-                  f"to next regular expression " \
-                  f"{pattern}"
+            msg = _("Поле filename не підходить, "
+                    "filename має відповідати "
+                    "наступному регулярному виразу "
+                    "{pattern}").format(pattern=pattern)
             raise UnprocessableEntityExceptionError(msg, field="filename")
         name, extension = filename.split('.')
         if extension not in image_types:
-            msg = _(f'Дозволено відправляти тільки {image_types}')
+            msg = (_('Дозволено відправляти тільки {image_types}')
+                   .format(image_types=image_types))
             raise UnprocessableEntityExceptionError(msg, field="filename")
         return filename
 

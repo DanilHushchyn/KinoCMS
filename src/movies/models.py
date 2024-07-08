@@ -11,6 +11,7 @@ class Tech(models.Model):
     color = models.CharField(max_length=60)
 
     class Meta:
+        ordering = ['id',]
         verbose_name = "Tech"
         verbose_name_plural = "Techs"
         db_table = 'techs'
@@ -43,13 +44,13 @@ class MovieParticipantRole(models.Model):
         db_table = 'movie_participant_roles'
 
 
-TECHS_CHOICES = [
-    ['3d', "3D"],
-    ['2d', "2D"],
-    ['imax', "IMAX"],
-    ['4dx', "4DX"],
-    ['5d', "5D"],
-]
+# TECHS_CHOICES = [
+#     ['3d', "3D"],
+#     ['2d', "2D"],
+#     ['imax', "IMAX"],
+#     ['4dx', "4DX"],
+#     ['5d', "5D"],
+# ]
 
 
 class MovieParticipant(models.Model):
@@ -102,10 +103,11 @@ class Movie(Seo):
     duration = models.DurationField()
     released = models.DateField()
     participants = models.ManyToManyField('MovieParticipant', )
+    techs = models.ManyToManyField('Tech', )
 
-    techs = MultiSelectField(choices=TECHS_CHOICES,
-                             min_choices=1,
-                             max_length=255, null=True)
+    # techs = MultiSelectField(choices=TECHS_CHOICES,
+    #                          min_choices=1,
+    #                          max_length=255, null=True)
 
     genres = MultiSelectField(choices=GENRES_CHOICES,
                               min_choices=1,

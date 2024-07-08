@@ -15,11 +15,9 @@ from ninja import ModelSchema
 from pydantic.types import SecretStr
 from src.core.errors import UnprocessableEntityExceptionError
 from src.users.models import User
-from django.utils.translation import gettext as _
 from pydantic import field_validator
 from django.utils.translation import gettext as _
 from dateutil.parser import parse
-from django.utils import timezone
 
 
 class UserFieldsEnum(enum.Enum):
@@ -48,8 +46,8 @@ class UserInBaseSchema(ninja_schema.ModelSchema):
         try:
             result = parse(v, dayfirst=True).date()
         except ValueError as exc:
-            msg = _(f'Невірний формат дати було надано: {v}. '
-                    f'Правильний формат: 01.12.2012')
+            msg = _('Невірний формат дати було надано: {v}. '
+                    'Правильний формат: 01.12.2012').format(v=v)
             raise UnprocessableEntityExceptionError(message=msg)
 
         return result

@@ -5,10 +5,10 @@ from ninja_extra.controllers.base import api_controller, ControllerBase
 from ninja_extra.pagination.decorator import paginate
 from ninja_extra.permissions import IsAdminUser
 from ninja_extra.schemas.response import PaginatedResponseSchema
-
 from src.core.errors import (InvalidTokenExceptionError,
                              UnprocessableEntityExceptionError,
-                             NotFoundExceptionError, NotUniqueFieldExceptionError)
+                             NotFoundExceptionError,
+                             NotUniqueFieldExceptionError)
 from src.core.schemas.base import (LangEnum, MessageOutSchema,
                                    DirectionEnum, errors_to_docs)
 from src.core.utils import CustomJWTAuth

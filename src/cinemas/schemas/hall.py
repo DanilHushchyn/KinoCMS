@@ -1,13 +1,15 @@
 from typing import List
 import ninja_schema
 from pydantic.fields import Field
-
+from django.utils.translation import gettext as _
 from src.cinemas.models import Hall
 from ninja import ModelSchema
+from src.core.errors import NotFoundExceptionError
 from src.core.schemas.gallery import GalleryItemSchema
 from src.core.schemas.images import (ImageOutSchema, ImageInSchema,
                                      ImageUpdateSchema)
-from src.movies.models import TECHS_CHOICES
+from src.movies.models import Tech
+from src.movies.schemas import TechOutSchema
 
 
 class HallInSchema(ninja_schema.ModelSchema):
@@ -21,6 +23,19 @@ class HallInSchema(ninja_schema.ModelSchema):
 
     description_uk: str = Field(max_length=2000)
     description_ru: str = Field(max_length=2000)
+
+    @ninja_schema.model_validator('tech')
+    def clean_tech(cls, tech_id: int) -> Tech:
+        try:
+            tech = Tech.objects.get(id=tech_id)
+        except Tech.DoesNotExist:
+            msg = (_('У заданому переліку технологій є '
+                     'id {tech_id} які не присутні у базі')
+                   .format(tech_id=tech_id))
+            raise NotFoundExceptionError(message=msg,
+                                         cls_model=Tech,
+                                         field='tech')
+        return tech
 
     class Config:
         model = Hall
@@ -56,16 +71,7 @@ class HallOutSchema(ModelSchema):
     """
     banner: ImageOutSchema
     seo_image: ImageOutSchema
-    tech_display: str
-
-    @staticmethod
-    def resolve_tech_display(obj: Hall) -> str:
-        tech_display = dict(TECHS_CHOICES)[obj.tech]
-        return tech_display
-
-    @staticmethod
-    def resolve_tech(obj: Hall) -> str:
-        return obj.tech
+    tech: TechOutSchema
 
     class Meta:
         model = Hall
@@ -88,12 +94,7 @@ class HallClientOutSchema(ModelSchema):
     """
     banner: ImageOutSchema
     seo_image: ImageOutSchema
-    tech_display: str
-
-    @staticmethod
-    def resolve_tech_display(obj: Hall) -> str:
-        tech_display = dict(TECHS_CHOICES)[obj.tech]
-        return tech_display
+    tech: TechOutSchema
 
     class Meta:
         model = Hall
@@ -118,7 +119,7 @@ class HallSchemaOutSchema(ModelSchema):
         fields = ['layout']
 
 
-class HallUpdateSchema(HallInSchema):
+class HallUpdateSchema(ninja_schema.ModelSchema):
     """
     Pydantic schema for updating hall.
     """
@@ -126,7 +127,8 @@ class HallUpdateSchema(HallInSchema):
     seo_image: ImageUpdateSchema = None
     gallery: List[GalleryItemSchema] = None
 
-    class Config(HallInSchema.Config):
+    class Config:
+        model = Hall
         include = [
             'number',
             'description_uk',

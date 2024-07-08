@@ -1,8 +1,8 @@
 from typing import List
 import ninja_schema
 from pydantic.fields import Field
-
-from src.core.errors import UnprocessableEntityExceptionError, NotFoundExceptionError
+from src.core.errors import (UnprocessableEntityExceptionError,
+                             NotFoundExceptionError)
 from src.pages.models import NewsPromo, Tag
 from ninja import ModelSchema
 from src.core.schemas.gallery import GalleryItemSchema
@@ -27,15 +27,16 @@ class NewsPromoInSchema(ninja_schema.ModelSchema):
     @ninja_schema.model_validator('tags')
     def clean_tags(cls, tag_ids: List[int]) -> List[int]:
         if len(tag_ids) > 5:
-            msg = _(f'Максимальна кількість тегів 5')
+            msg = _('Максимальна кількість тегів 5')
             raise UnprocessableEntityExceptionError(message=msg)
         tags_db = list(Tag.objects
                        .filter(id__in=tag_ids)
                        .values_list('id', flat=True))
         if len(tag_ids) != len(tags_db):
             diff = list(set(tag_ids) ^ set(tags_db))
-            msg = _(f'У заданому переліку тегів є '
-                    f'ids {diff} які не присутні у базі')
+            msg = (_('У заданому переліку тегів є '
+                     'ids {diff} які не присутні у базі')
+                   .format(diff=diff))
             raise NotFoundExceptionError(message=msg,
                                          cls_model=Tag,
                                          field='tags')
@@ -135,15 +136,16 @@ class NewsPromoUpdateSchema(ninja_schema.ModelSchema):
     @ninja_schema.model_validator('tags')
     def clean_tags(cls, tag_ids: List[int]) -> List[int]:
         if len(tag_ids) > 5:
-            msg = _(f'Максимальна кількість тегів 5')
+            msg = _('Максимальна кількість тегів 5')
             raise UnprocessableEntityExceptionError(message=msg)
         tags_db = list(Tag.objects
                        .filter(id__in=tag_ids)
                        .values_list('id', flat=True))
         if len(tag_ids) != len(tags_db):
             diff = list(set(tag_ids) ^ set(tags_db))
-            msg = _(f'У заданому переліку тегів є '
-                    f'ids {diff} які не присутні у базі')
+            msg = (_('У заданому переліку тегів є '
+                     'ids {diff} які не присутні у базі')
+                   .format(diff=diff))
             raise NotFoundExceptionError(message=msg,
                                          cls_model=Tag,
                                          field='tags')

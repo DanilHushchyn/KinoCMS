@@ -87,7 +87,7 @@ CACHES = {
     }
 }
 IMAGEKIT_DEFAULT_IMAGE_CACHE_BACKEND = 'django_redis.client.DefaultClient'
-
+GOOGLE_MAPS_API_KEY = env('GOOGLE_MAPS_API_KEY')
 SITE_ID = 1
 NINJA_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),

@@ -22,6 +22,7 @@ from ninja import Header
 from django.utils.translation import gettext as _
 
 from src.core.utils import CustomJWTAuth
+from src.movies.models import Tech
 
 
 @api_controller("/hall", tags=["halls"])
@@ -87,7 +88,9 @@ class HallController(ControllerBase):
                     InvalidTokenExceptionError()
                 ],
                 404: [
-                    NotFoundExceptionError(cls_model=Hall)
+                    NotFoundExceptionError(cls_model=Hall),
+                    NotFoundExceptionError(cls_model=Tech,
+                                           field='tech')
                 ],
                 409: [
                     NotUniqueFieldExceptionError(field='number')

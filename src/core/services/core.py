@@ -14,10 +14,10 @@ class CoreService:
 
     @staticmethod
     def check_field_unique(
-                           field_name: str,
-                           value: str,
-                           model: Type[Model],
-                           instance: Model = None) \
+            field_name: str,
+            value: str,
+            model: Type[Model],
+            instance: Model = None) \
             -> None:
         """
         Check field for unique in model;
@@ -32,6 +32,7 @@ class CoreService:
             if instances and instance:
                 instances = instances.exclude(id=instance.id)
             if instances.count():
-                msg = _(f'Поле повинно бути унікальним. '
-                        f'*{value}* - Ця назва вже зайнята')
+                msg = (_('Поле повинно бути унікальним. '
+                         '*{value}* - Ця назва вже зайнята')
+                       .format(value=value))
                 raise NotUniqueFieldExceptionError(message=msg, field=field_name)

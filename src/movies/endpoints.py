@@ -13,6 +13,7 @@ from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_post, http_patch, http_delete
 from ninja import Header
 from src.core.utils import CustomJWTAuth
+from src.movies.models import Tech
 from src.movies.schemas import *
 from src.movies.service import MovieService
 
@@ -96,7 +97,7 @@ class MovieController(ControllerBase):
 
     @http_get(
         "/techs/",
-        response=PaginatedResponseSchema[List],
+        response=PaginatedResponseSchema[TechOutSchema],
         openapi_extra={
             "operationId": "get_techs",
             "responses": errors_to_docs({
@@ -113,7 +114,7 @@ class MovieController(ControllerBase):
             accept_lang: LangEnum =
             Header(alias="Accept-Language",
                    default="uk"),
-    ) -> List:
+    ) -> QuerySet[Tech]:
         """
         Get techs for input.
 
@@ -184,6 +185,35 @@ class MovieController(ControllerBase):
         return result
 
     @http_get(
+        "/participants-grouped/",
+        response=List[MovieParticipantRoleOutSchema],
+        openapi_extra={
+            "operationId": "get_participants_grouped",
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
+        },
+    )
+    def get_participants_grouped(
+            self,
+            request: HttpRequest,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> QuerySet:
+        """
+        Get participants for input.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.movie_service.get_participants_grouped()
+        return result
+
+    @http_get(
         "/all-cards/",
         response=PaginatedResponseSchema[MovieCardOutSchema],
         openapi_extra={
@@ -227,8 +257,10 @@ class MovieController(ControllerBase):
                 ],
                 404: [
                     NotFoundExceptionError(cls_model=Movie),
-                    NotFoundExceptionError(cls_model=MovieParticipant),
-
+                    NotFoundExceptionError(cls_model=MovieParticipant,
+                                           field='participants'),
+                    NotFoundExceptionError(cls_model=Tech,
+                                           field='techs')
                 ],
                 409: [
                     NotUniqueFieldExceptionError(field='name')
@@ -302,7 +334,8 @@ class MovieController(ControllerBase):
                 404: [
                     NotFoundExceptionError(cls_model=Movie),
                     NotFoundExceptionError(cls_model=Image),
-                    NotFoundExceptionError(cls_model=MovieParticipant),
+                    NotFoundExceptionError(cls_model=MovieParticipant,
+                                           field='participants'),
                 ],
                 409: [
                     NotUniqueFieldExceptionError(field='name')
@@ -501,15 +534,47 @@ class MovieClientController(ControllerBase):
         """
         result = self.movie_service.get_schedule_filter()
         return result
+
     get_techs = MovieController.get_techs
 
     get_all_movie_cards = MovieController.get_all_movie_cards
 
     @http_get(
+        "/search/",
+        response=PaginatedResponseSchema[MovieSearchOutSchema],
+        openapi_extra={
+            "operationId": "search_movies",
+            "responses": errors_to_docs({
+                422: [
+                    UnprocessableEntityExceptionError()
+                ],
+            }),
+        },
+    )
+    @paginate()
+    def search_movies(
+            self,
+            request: HttpRequest,
+            search_line: str,
+            accept_lang: LangEnum =
+            Header(alias="Accept-Language",
+                   default="uk"),
+    ) -> QuerySet[Movie]:
+        """
+        Search movies by search line.
+
+        Returns:
+          - **200**: Success response with the data.
+          - **500**: Internal server error if an unexpected error occurs.
+        """
+        result = self.movie_service.search(search_line)
+        return result
+
+    @http_get(
         "/seances-today-cards/",
         response=PaginatedResponseSchema[MovieCardOutSchema],
         openapi_extra={
-            "operationId": "search_movies",
+            "operationId": "get_movie_today_cards",
             "responses": errors_to_docs({
                 422: [
                     UnprocessableEntityExceptionError()
@@ -533,37 +598,6 @@ class MovieClientController(ControllerBase):
           - **500**: Internal server error if an unexpected error occurs.
         """
         result = self.movie_service.get_today_movies()
-        return result
-
-    @http_get(
-        "/search/",
-        response=PaginatedResponseSchema[MovieSearchOutSchema],
-        openapi_extra={
-            "operationId": "search_movies",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
-        },
-    )
-    @paginate()
-    def search_movies(
-            self,
-            request: HttpRequest,
-            search_line: str = None,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
-    ) -> QuerySet[Movie]:
-        """
-        Search movies by search line.
-
-        Returns:
-          - **200**: Success response with the data.
-          - **500**: Internal server error if an unexpected error occurs.
-        """
-        result = self.movie_service.search(search_line)
         return result
 
     get_movie_by_slug = MovieController.get_movie_by_slug

@@ -70,8 +70,8 @@ class SeanceManager(models.Manager):
             seances = seances.filter(hall__id__in=filters.hall_ids)
         if filters.mv_slugs:
             seances = seances.filter(movie__slug__in=filters.mv_slugs)
-        if filters.techs:
-            seances = seances.filter(hall__tech__in=filters.techs)
+        if filters.tech_ids:
+            seances = seances.filter(hall__tech__in=filters.tech_ids)
         if filters.date:
             seances = seances.filter(date__date=filters.date)
             dates = [filters.date]
@@ -79,9 +79,6 @@ class SeanceManager(models.Manager):
             seances = seances.filter(Q(date__date=today.date()) |
                                      Q(date__date=tomorrow.date()))
             dates = [today.date(), tomorrow.date()]
-        # for seance in seances:
-        #     if str(seance.date.date()) not in dates:
-        #         dates.append(str(seance.date.date()))
         result = []
         for date in dates:
             date_seances = []

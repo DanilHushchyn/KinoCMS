@@ -80,7 +80,7 @@ class SliderService:
                           .prefetch_related('items__image')
                           .get(id=1))
         except TopSlider.DoesNotExist:
-            msg = "TopSlider doesn't exist.Backend have to add"
+            msg = _("TopSlider не існує. Бекенд повиннен додати")
             raise NotFoundExceptionError(message=msg, cls_model=TopSlider)
         return top_slider
 
@@ -95,7 +95,7 @@ class SliderService:
                              .prefetch_related('items__image')
                              .get(id=1))
         except BottomSlider.DoesNotExist:
-            msg = "BottomSlider doesn't exist.Backend have to add"
+            msg = _("BottomSlider не існує. Бекенд повиннен додати")
             raise NotFoundExceptionError(message=msg, cls_model=BottomSlider)
         return bottom_slider
 
@@ -121,21 +121,26 @@ class SliderService:
                 elif not schema.delete:
                     for key, value in schema.dict().items():
                         if value is None and key != 'id':
-                            msg = ("You provided no correct "
-                                   "data for creating new slider item. "
-                                   "Each field is required(except id) "
-                                   "if you are creating an element.")
+                            msg = ("Ви не надали правильних "
+                                   "даних для створення нового елемента слайдера. "
+                                   "Якщо ви створюєте новий елемент, "
+                                   "кожне поле є обов'язковим (крім id).")
                             raise UnprocessableEntityExceptionError(message=msg)
                     create_item_schemas.append(schema)
             db_ids = slider.items.model.objects.values_list('id', flat=True)
             for item_id in item_ids:
                 if item_id not in db_ids:
-                    msg = (f"Given "
-                           f"{slider.items.model.__name__} "
-                           f"with id {item_id} "
-                           f"doesn't belongs to "
-                           f"{slider._meta.model.__name__}")
-                    raise NotFoundExceptionError(message=msg, cls_model=slider.items.model)
+                    slider_item_model_name = slider.items.model.__name__
+                    slider_model_name = slider._meta.model.__name__
+                    msg = (("Наданий {slider_imn} з id {item_id} "
+                            "не належить до {slider_mn}")
+                           .format(slider_imn=slider_item_model_name,
+                                   slider_mn=slider_model_name,
+                                   item_id=item_id)
+                           )
+                    cls_model = slider.items.model
+                    raise NotFoundExceptionError(message=msg,
+                                                 cls_model=cls_model)
             self.bulk_delete_slider_items(item_ids=del_item_ids,
                                           slider=slider)
             self.bulk_update_slider_items(items_dict=update_items_dict,
@@ -219,7 +224,7 @@ class SliderService:
         try:
             etend_banner = ETEndBBanner.objects.get(id=1)
         except ETEndBBanner.DoesNotExist:
-            msg = "ETEndBanner doesn't exist. Backend have to add"
+            msg = _("ETEndBanner не існує. Бекенд повиннен додати")
             raise NotFoundExceptionError(message=msg, cls_model=ETEndBBanner)
 
         return etend_banner

@@ -4,18 +4,19 @@ import os
 import random
 from datetime import timedelta
 from typing import Dict
-
 from django.core.files import File
 from django.core.management.base import BaseCommand
 from faker import Faker
 from faker.providers import date_time, phone_number
-
 from src.booking.models import Seance
 from src.cinemas.models import Cinema, Hall
 from src.core.models import Image, Gallery
-from src.movies.models import Movie, TECHS_CHOICES, MovieParticipantRole, MovieParticipantPerson, MovieParticipant
-from src.pages.models import TopSlider, BottomSlider, TopSliderItem, BottomSliderItem, ETEndBBanner, NewsPromo, Page, \
-    Tag
+from src.movies.models import (Movie, MovieParticipantRole,
+                               MovieParticipantPerson, MovieParticipant,
+                               Tech)
+from src.pages.models import (TopSlider, BottomSlider,
+                              TopSliderItem, BottomSliderItem,
+                              ETEndBBanner, NewsPromo, Page, Tag)
 from src.users.models import User
 from pytils.translit import slugify
 from django_countries.data import COUNTRIES
@@ -32,6 +33,7 @@ class Command(BaseCommand):
     def handle(self, null=None, *args, **options):
         self._create_superuser()
         self._create_users()
+        self._create_techs()
         self._create_cinemas()
         self._create_halls()
         self._create_participants()
@@ -60,6 +62,19 @@ class Command(BaseCommand):
             )
             user.set_password("Sword123*")
             user.save()
+
+    @classmethod
+    def _create_techs(cls):
+        if not Tech.objects.exists():
+            techs = [
+                Tech(name='Cinetech', color="#AD0076"),
+                Tech(name='Cinetech+', color="#DF1B66"),
+                Tech(name='IMAX', color="#0F9539"),
+                Tech(name='4DX', color="#514BBE"),
+                Tech(name="RE'LUX", color="#4751FF"),
+                Tech(name='IMAX with Laser', color="#FF1F1F"),
+            ]
+            Tech.objects.bulk_create(techs)
 
     @classmethod
     def _create_users(cls):
@@ -192,7 +207,7 @@ class Command(BaseCommand):
             Cinema.objects.bulk_create(cinemas)
 
     @classmethod
-    def _create_hall_schema(cls) -> Dict:
+    def create_hall_schema(cls) -> Dict:
         random_schema = random.choice(os.listdir(
             os.path.join("seed", 'hall_schemas')))
         schema = open(os.path.join("seed", 'hall_schemas', random_schema), "rb")
@@ -210,18 +225,18 @@ class Command(BaseCommand):
             halls = []
             cinemas = Cinema.objects.all()
             for cinema in cinemas:
-                for i in range(1, 6):
+                for i in range(1, 4):
                     description_uk = cls._fake_uk.text(max_nb_chars=2500)
                     description_ru = cls._fake_ru.text(max_nb_chars=2500)
+                    techs = list(Tech.objects.values_list('id', flat=True))
                     hall = Hall(
                         number=f'0{i}',
                         description_uk=description_uk,
                         description_ru=description_ru,
                         cinema=cinema,
-                        tech=random.choice([key for key, _ in
-                                            TECHS_CHOICES]),
+                        tech_id=random.choice(techs),
                         seo_title=f'0{i}',
-                        layout=cls._create_hall_schema(),
+                        layout=cls.create_hall_schema(),
                         seo_description=description_uk[:150],
                         seo_image=cls._create_image('hall/banner'),
                         banner=cls._create_image('hall/banner'),
@@ -414,7 +429,6 @@ class Command(BaseCommand):
                     budget=i * 1_000_0000,
                     duration="01:30",
                     countries=random.sample(list(COUNTRIES.keys()), 4),
-                    techs=random.sample([key for key, _ in TECHS_CHOICES], 2),
                     genres=random.sample([key for key, _ in Movie.GENRES_CHOICES], 2),
                     legal_age=random.choice([key for key, _ in Movie.AGE_CHOICES]),
                     released=released,
@@ -429,8 +443,12 @@ class Command(BaseCommand):
             movies = Movie.objects.bulk_create(movies)
             participant_ids = list(MovieParticipant.objects
                                    .values_list('id', flat=True))
+            tech_ids = list(Tech.objects.values_list('id', flat=True))
+
             for movie in movies:
                 movie_participants = random.sample(participant_ids, 3)
                 movie.participants.set(movie_participants)
+                movie_techs = random.sample(tech_ids, 2)
+                movie.techs.set(movie_techs)
                 movie.save()
                 cls._create_seances(movie)

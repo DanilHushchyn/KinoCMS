@@ -61,6 +61,7 @@ class GalleryService:
         """
         ids = gallery.images.values_list('id', flat=True)
         if img_id not in ids:
-            msg = (f"Given image id({img_id}) "
-                   f"doesn't belongs to cinema's gallery")
+            msg = (("Дане зображення id({img_id}) "
+                   "не належить до галереї кінотеатру")
+                   .format(img_id=img_id))
             raise NotFoundExceptionError(message=msg, cls_model=Image)

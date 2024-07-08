@@ -5,8 +5,8 @@ import ninja_schema
 from pydantic.fields import Field
 from src.core.errors import (UnprocessableEntityExceptionError,
                              NotFoundExceptionError)
-from src.movies.models import (Movie, MovieParticipant, TECHS_CHOICES,
-                               MovieParticipantRole)
+from src.movies.models import (Movie, MovieParticipant,
+                               MovieParticipantRole, Tech)
 from ninja import ModelSchema
 from django.utils.translation import gettext as _
 from src.core.schemas.gallery import GalleryItemSchema
@@ -28,11 +28,6 @@ CountryEnum = Enum(
     [(str(value), str(key)) for key, value in list(COUNTRIES.items())],
     type=str,
 )
-TechsEnum = Enum(
-    "TechsEnum",
-    [(value, key) for key, value in TECHS_CHOICES],
-    type=str,
-)
 
 
 class ReleaseEnum(Enum):
@@ -48,6 +43,18 @@ def current_year():
     return datetime.date.today().year
 
 
+class TechOutSchema(ModelSchema):
+    """
+    Pydantic schema for showing Movie techs.
+    """
+
+    class Meta:
+        model = Tech
+        fields = ['name',
+                  'color',
+                  'id', ]
+
+
 class MovieInSchema(ninja_schema.ModelSchema):
     """
     Pydantic schema for creating Movies to server side.
@@ -58,7 +65,6 @@ class MovieInSchema(ninja_schema.ModelSchema):
     gallery: List[ImageInSchema] = None
     countries: List[CountryEnum]
     genres: List[GenresEnum]
-    techs: List[TechsEnum]
     name_uk: str = Field(max_length=60)
     name_ru: str = Field(max_length=60)
     description_uk: str = Field(max_length=2000)
@@ -71,23 +77,25 @@ class MovieInSchema(ninja_schema.ModelSchema):
         try:
             result = parse(v, dayfirst=True).date()
         except ValueError as exc:
-            msg = _(f'Невірний формат дати було надано: {v}. '
-                    f'Правильний формат: 01.12.2012')
+            msg = _('Невірний формат дати було надано: {v}. '
+                    'Правильний формат: 01.12.2012').format(v=v)
             raise UnprocessableEntityExceptionError(message=msg, field='released')
         today = timezone.now().date()
         if result >= today:
             return result
         else:
-            msg = _(f'Дата повинна починатися '
-                    f'від сьогодні і пізніше.')
+            msg = _('Дата повинна починатися '
+                    'від сьогодні і пізніше.')
             raise UnprocessableEntityExceptionError(message=msg, field='released')
 
     @ninja_schema.model_validator('year')
     def clean_year(cls, year) -> int:
         if year < 1984 or year > current_year() + 1:
-            msg = _(f'Expected min year is 1984 '
-                    f'max year is {current_year() + 1} '
-                    f'but got {year}')
+            msg = (_('Очікуваний мінімальний рік становить {min}, '
+                     'максимальний рік {max} '
+                     'but got {current}')
+                   .format(min=1984, max=current_year() + 1,
+                           current=year))
             raise UnprocessableEntityExceptionError(message=msg)
         return year
 
@@ -98,24 +106,11 @@ class MovieInSchema(ninja_schema.ModelSchema):
         keys = [str(key) for key, value in Movie.GENRES_CHOICES]
         for genre in genres:
             if genre not in keys:
-                msg = _(f'Список має складатися з наступних значень '
-                        f'{keys}')
+                msg = (_('Список має складатися з наступних значень {keys}')
+                       .format(keys=keys))
                 raise UnprocessableEntityExceptionError(message=msg)
             result.append(genre.value)
         return result
-
-    @ninja_schema.model_validator('techs')
-    def clean_techs(cls, techs) -> List[str]:
-        techs = set(techs)
-        result = []
-        keys = [str(key) for key, value in TECHS_CHOICES]
-        for tech in techs:
-            if tech not in keys:
-                msg = _(f'List should contain any of '
-                        f'{keys}')
-                raise UnprocessableEntityExceptionError(message=msg)
-            result.append(tech.value)
-        return list(result)
 
     @ninja_schema.model_validator('countries')
     def clean_countries(cls, countries) -> List[str]:
@@ -123,8 +118,8 @@ class MovieInSchema(ninja_schema.ModelSchema):
         result = []
         for country in countries:
             if country not in COUNTRIES.keys():
-                msg = _(f'List should contain any of '
-                        f'{list(COUNTRIES.keys())}')
+                msg = (_('Список має складатися з наступних значень {keys}')
+                       .format(keys=list(COUNTRIES.keys())))
                 raise UnprocessableEntityExceptionError(message=msg)
             result.append(country.value)
         return result
@@ -136,12 +131,28 @@ class MovieInSchema(ninja_schema.ModelSchema):
                                .values_list('id', flat=True))
         if len(participant_ids) != len(participants_db):
             diff = list(set(participant_ids) ^ set(participants_db))
-            msg = _(f'У заданому переліку участників є '
-                    f'ids {diff} які не присутні у базі')
+            msg = (_('У заданому переліку участників є '
+                     'ids {diff} які не присутні у базі')
+                   .format(diff=diff))
             raise NotFoundExceptionError(message=msg,
                                          cls_model=MovieParticipant,
                                          field='participants')
         return participant_ids
+
+    @ninja_schema.model_validator('techs')
+    def clean_techs(cls, tech_ids: List[int]) -> List[int]:
+        techs_db = list(Tech.objects
+                        .filter(id__in=tech_ids)
+                        .values_list('id', flat=True))
+        if len(tech_ids) != len(techs_db):
+            diff = list(set(tech_ids) ^ set(techs_db))
+            msg = (_('У заданому переліку технологій є '
+                     'ids {diff} які не присутні у базі')
+                   .format(diff=diff))
+            raise NotFoundExceptionError(message=msg,
+                                         cls_model=Tech,
+                                         field='techs')
+        return tech_ids
 
     class Config:
         model = Movie
@@ -156,8 +167,8 @@ class MovieInSchema(ninja_schema.ModelSchema):
             'duration',
             'genres',
             'participants',
-            'released',
             'countries',
+            'techs',
             'trailer_link',
             'legal_age',
             'card_img',
@@ -174,6 +185,13 @@ class MovieCardOutSchema(ModelSchema):
     Pydantic schema for showing Movie card.
     """
     card_img: ImageOutSchema
+    techs: List[TechOutSchema]
+    released: str
+
+    @staticmethod
+    def resolve_released(obj: Movie) -> str:
+        released = obj.released.strftime("%d.%m.%Y")
+        return released
 
     class Meta:
         model = Movie
@@ -201,12 +219,15 @@ class MovieOutSchema(ModelSchema):
     """
     card_img: ImageOutSchema
     seo_image: ImageOutSchema
-    genres_display: str
     genres: List[str]
-    techs: List[str]
+    techs: List[TechOutSchema]
     countries: List[str]
-    countries_display: str
-    techs_display: str
+    released: str
+
+    @staticmethod
+    def resolve_released(obj: Movie) -> str:
+        released = obj.released.strftime("%d.%m.%Y")
+        return released
 
     @staticmethod
     def resolve_genres(obj: Movie) -> List[str]:
@@ -221,31 +242,11 @@ class MovieOutSchema(ModelSchema):
         return legal_age_display
 
     @staticmethod
-    def resolve_techs(obj: Movie) -> List[str]:
-        result = []
-        for tech in obj.techs:
-            result.append(tech)
-        return result
-
-    @staticmethod
-    def resolve_genres_display(obj: Movie) -> str:
-        return str(obj.genres)
-
-    @staticmethod
-    def resolve_techs_display(obj: Movie) -> str:
-        return str(obj.techs)
-
-    @staticmethod
     def resolve_countries(obj: Movie) -> List[str]:
         result = []
         for country in obj.countries:
             result.append(country.code)
         return result
-
-    @staticmethod
-    def resolve_countries_display(obj: Movie) -> str:
-        result = [country.name for country in obj.countries]
-        return ', '.join(result)
 
     class Meta:
         model = Movie
@@ -310,8 +311,14 @@ class MovieClientOutSchema(ModelSchema):
     seo_image: ImageOutSchema
     genres_display: str
     countries_display: str
-    techs_display: str
+    techs: List[TechOutSchema]
     mv_roles: List[MovieRolesClientOutSchema]
+    released: str
+
+    @staticmethod
+    def resolve_released(obj: Movie) -> str:
+        released = obj.released.strftime("%d.%m.%Y")
+        return released
 
     @staticmethod
     def resolve_legal_age(obj: Movie) -> str:
@@ -321,10 +328,6 @@ class MovieClientOutSchema(ModelSchema):
     @staticmethod
     def resolve_genres_display(obj: Movie) -> str:
         return str(obj.genres)
-
-    @staticmethod
-    def resolve_techs_display(obj: Movie) -> str:
-        return str(obj.techs)
 
     @staticmethod
     def resolve_countries_display(obj: Movie) -> str:
@@ -364,9 +367,11 @@ class MovieUpdateSchema(ninja_schema.ModelSchema):
     @ninja_schema.model_validator('year')
     def clean_year(cls, year) -> int:
         if year < 1984 or year > current_year() + 1:
-            msg = _(f'Expected min year is 1984 '
-                    f'max year is {current_year() + 1} '
-                    f'but got {year}')
+            msg = (_('Очікуваний мінімальний рік становить {min}, '
+                     'максимальний рік {max} '
+                     'але отримано {current}')
+                   .format(min=1984, max=current_year() + 1,
+                           current=year))
             raise UnprocessableEntityExceptionError(message=msg)
         return year
 
@@ -377,8 +382,8 @@ class MovieUpdateSchema(ninja_schema.ModelSchema):
         keys = [str(key) for key, value in Movie.GENRES_CHOICES]
         for genre in genres:
             if genre not in keys:
-                msg = _(f'Список має складатися з наступних значень '
-                        f'{keys}')
+                msg = (_('Список має складатися з наступних значень {keys}')
+                       .format(keys=keys))
                 raise UnprocessableEntityExceptionError(message=msg)
             result.append(genre.value)
         return result
@@ -389,8 +394,8 @@ class MovieUpdateSchema(ninja_schema.ModelSchema):
         result = []
         for country in countries:
             if country not in COUNTRIES.keys():
-                msg = _(f'List should contain any of '
-                        f'{list(COUNTRIES.keys())}')
+                msg = (_('Список має складатися з наступних значень '
+                         '{keys}').format(keys=list(COUNTRIES.keys())))
                 raise UnprocessableEntityExceptionError(message=msg)
             result.append(country.value)
         return result
@@ -402,8 +407,9 @@ class MovieUpdateSchema(ninja_schema.ModelSchema):
                                .values_list('id', flat=True))
         if len(participant_ids) != len(participants_db):
             diff = list(set(participant_ids) ^ set(participants_db))
-            msg = _(f'У заданому переліку участників є '
-                    f'ids {diff} які не присутні у базі')
+            msg = (_('У заданому переліку участників є '
+                     'ids {diff} які не присутні у базі')
+                   .format(diff=diff))
             raise NotFoundExceptionError(message=msg,
                                          cls_model=MovieParticipant,
                                          field='participants')
@@ -447,6 +453,39 @@ class MovieParticipantOutSchema(ModelSchema):
         model = MovieParticipant
         fields = [
             'id',
+        ]
+
+
+class MovieParticipantSelectOutSchema(ModelSchema):
+    """
+    Pydantic schema for getting
+    all movie participants in system.
+    """
+    name: str
+
+    @staticmethod
+    def resolve_name(obj: MovieParticipant) -> str:
+        return obj.person.fullname
+
+    class Meta:
+        model = MovieParticipant
+        fields = [
+            'id',
+        ]
+
+
+class MovieParticipantRoleOutSchema(ModelSchema):
+    """
+    Pydantic schema for getting
+    all movie participants in system grouped by role.
+    """
+
+    persons: List[MovieParticipantSelectOutSchema]
+
+    class Meta:
+        model = MovieParticipantRole
+        fields = [
+            'name',
         ]
 
 

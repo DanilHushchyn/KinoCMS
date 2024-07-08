@@ -2,6 +2,7 @@ from src.cinemas.models import Hall, Cinema
 from src.cinemas.schemas.hall import HallInSchema, HallUpdateSchema
 from django.utils.translation import gettext as _
 from src.cinemas.services.cinema import CinemaService
+from src.core.management.commands.init_script import Command
 from src.core.schemas.base import MessageOutSchema
 from src.core.errors import NotUniqueFieldExceptionError
 from src.core.services.gallery import GalleryService
@@ -39,8 +40,9 @@ class HallService:
             description_uk=schema.description_uk,
             description_ru=schema.description_ru,
             banner=banner,
-            tech=schema.tech.value,
+            tech=schema.tech,
             cinema=cinema,
+            layout=Command.create_hall_schema(),
             gallery=gallery,
             seo_title=schema.seo_title,
             seo_description=schema.seo_description,
@@ -82,9 +84,10 @@ class HallService:
         if halls.count():
             msg = _('Це поле повинно бути унікальним '
                     'по відношенню до конкретного кінотеатру. '
-                    f'*{number}* - цей номер вже зайнятий. '
-                    f'Для кінотеатру {cinema.name}'
-                    )
+                    '*{number}* - цей номер вже зайнятий. '
+                    'Для кінотеатру {cinema_name}'
+                    ).format(number=number, cinema_name=cinema.name)
+
             raise NotUniqueFieldExceptionError(message=msg,
                                                field='number')
 

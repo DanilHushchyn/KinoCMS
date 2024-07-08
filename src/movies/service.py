@@ -8,6 +8,7 @@ from src.core.services.images import ImageService
 from src.movies.schemas import *
 from django.utils.translation import gettext as _
 from pytils.translit import slugify
+from src.movies.models import MovieParticipantRole, Tech
 
 
 class MovieService:
@@ -57,13 +58,14 @@ class MovieService:
             released=schema.released,
             countries=schema.countries,
             genres=schema.genres,
-            techs=schema.techs,
             seo_title=schema.seo_title,
             seo_description=schema.seo_description,
             seo_image=seo_image,
         )
         if schema.participants is not None:
             movie.participants.set(schema.participants)
+        if schema.techs is not None:
+            movie.techs.set(schema.techs)
         movie.save()
         return MessageOutSchema(detail=_('Фільм успішно створений'))
 
@@ -166,15 +168,15 @@ class MovieService:
         return genres
 
     @staticmethod
-    def get_techs() -> List:
+    def get_techs() -> QuerySet[Tech]:
         """
         Get all techs for movie.
         """
-        genres = TECHS_CHOICES
-        return genres
+        techs = Tech.objects.all()
+        return techs
 
     @staticmethod
-    def get_participants() -> QuerySet:
+    def get_participants() -> QuerySet[MovieParticipant]:
         """
         Get all participants for movie.
         """
@@ -182,6 +184,25 @@ class MovieService:
                         .prefetch_related('role', 'person')
                         .all())
         return participants
+
+    @staticmethod
+    def get_participants_grouped() -> QuerySet[MovieParticipantRole]:
+        """
+        Get all participants for movie grouped by profession.
+        """
+        participants = (MovieParticipant.objects
+                        .prefetch_related('role', 'person')
+                        .all())
+
+        mv_roles = MovieParticipantRole.objects.all()
+        for mv_role in mv_roles:
+            persons_list = []
+            for participant in participants:
+                if participant.role == mv_role:
+                    persons_list.append(participant)
+            mv_role.persons = persons_list
+        # mv_roles.mv_persons = mv_roles
+        return mv_roles
 
     def delete_by_slug(self, mv_slug: str) -> MessageOutSchema:
         """

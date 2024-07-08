@@ -30,6 +30,7 @@ class MovieManager(models.Manager):
                      .select_related('card_img',
                                      'seo_image', 'gallery')
                      .prefetch_related('participants__role')
+                     .prefetch_related('techs')
                      .prefetch_related('participants__person')
                      .get(slug=mv_slug))
         except self.model.DoesNotExist:
@@ -66,5 +67,6 @@ class MovieManager(models.Manager):
         today = timezone.now()
         seances = Seance.objects.get_all().filter(date__date=today.date())
         movie_ids = list(set(seances.values_list('movie_id', flat=True)))
-        movies = self.model.objects.filter(id__in=movie_ids)
+        movies = (self.model.objects.prefetch_related('techs', 'card_img')
+                  .filter(id__in=movie_ids))
         return movies
