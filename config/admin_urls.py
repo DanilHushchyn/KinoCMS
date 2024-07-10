@@ -15,7 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render
 from django.urls import path, include
+from django.views.generic import View
 from imagekit.utils import get_cache
 from ninja_extra import NinjaExtraAPI, status
 from django.conf.urls.static import static
@@ -27,6 +29,7 @@ from src.authz.endpoints import CustomTokenObtainPairController
 from src.cinemas.endpoints.cinema import CinemaController
 from src.cinemas.endpoints.hall import HallController
 from src.core.endpoints.gallery import GalleryController
+from src.core.endpoints.statistic import StatisticController
 from src.core.errors import (AuthenticationExceptionError,
                              InvalidTokenExceptionError)
 from src.mailing.endpoints import MailingController
@@ -43,6 +46,7 @@ cache = get_cache()
 cache.clear()
 admin_api = NinjaExtraAPI(title='KinoCMS (admin-panel)',
                           description='ADMIN API')
+admin_api.register_controllers(StatisticController)
 admin_api.register_controllers(CustomTokenObtainPairController)
 admin_api.register_controllers(UsersAdminController)
 admin_api.register_controllers(MailingController)
@@ -101,7 +105,7 @@ def http_exceptions_handler(request: HttpRequest, exc: ValidationError) \
         error_list.append(
             {
                 "location": location,
-                "field": field_full.split('.')[1],
+                "field": field_full,
                 "message": message,
             }
         )
@@ -138,8 +142,16 @@ def common_exception_handler(request, exc):
     )
 
 
+class StatisticView(View):
+    template_name = 'index.html'
+
+    def get(self, request):
+        return render(request, '../templates/statistic/base.html', context={})
+
+
 urlpatterns = [
-    path('api/', admin_api.urls)
+    path('api/', admin_api.urls),
+    # path('statistic/', StatisticView.as_view())
 ]
 if settings.DEBUG:
     settings.INSTALLED_APPS += ["requests_tracker"]

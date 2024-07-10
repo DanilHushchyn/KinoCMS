@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import copy
 import json
 import os
 import random
@@ -8,7 +9,7 @@ from django.core.files import File
 from django.core.management.base import BaseCommand
 from faker import Faker
 from faker.providers import date_time, phone_number
-from src.booking.models import Seance
+from src.booking.models import Seance, Ticket
 from src.cinemas.models import Cinema, Hall
 from src.core.models import Image, Gallery
 from src.movies.models import (Movie, MovieParticipantRole,
@@ -332,27 +333,56 @@ class Command(BaseCommand):
             Page.objects.bulk_create(pages)
 
     @classmethod
+    def _create_schedule(cls, start_date, end_date, movie, price, hall_id):
+        import zoneinfo
+        tzinfo = zoneinfo.ZoneInfo('Europe/Kiev')
+        seances = []
+        for i in range(1, 31):
+            date = cls._fake_uk.date_time_between(start_date=start_date,
+                                                  end_date=end_date,
+                                                  tzinfo=tzinfo)
+            seance = Seance(
+                movie=movie,
+                price=price,
+                hall_id=hall_id,
+                date=date,
+            )
+            seances.append(seance)
+        Seance.objects.bulk_create(seances)
+
+    @classmethod
     def _create_seances(cls, movie: Movie):
         if not movie.seance_set.exists():
             import zoneinfo
-            seances = []
             hall_ids = list(Hall.objects.values_list('id', flat=True))
-
-            for i in range(1, 21):
+            for hall_id in hall_ids:
+                price = random.choice([150, 100, 250, 500, 280,
+                                       180, 600, 350, 420])
                 start_date = movie.released
                 end_date = movie.released + timedelta(days=30)
-                tzinfo = zoneinfo.ZoneInfo('Europe/Kiev')
-                date = cls._fake_uk.date_time_between(start_date=start_date,
-                                                      end_date=end_date,
-                                                      tzinfo=tzinfo)
-                seance = Seance(
-                    movie=movie,
-                    price=random.choice([150, 100, 250, 500, 600, 350, 420]),
-                    hall_id=random.choice(hall_ids),
-                    date=date,
-                )
-                seances.append(seance)
-            Seance.objects.bulk_create(seances)
+                cls._create_schedule(start_date=start_date,
+                                     end_date=end_date,
+                                     movie=movie,
+                                     hall_id=hall_id,
+                                     price=price)
+
+                start_date = movie.released + timedelta(days=30)
+                end_date = movie.released + timedelta(days=60)
+                cls._create_schedule(start_date=start_date,
+                                     end_date=end_date,
+                                     movie=movie,
+                                     hall_id=hall_id,
+                                     price=price)
+
+                start_date = movie.released + timedelta(days=60)
+                end_date = movie.released + timedelta(days=90)
+                cls._create_schedule(start_date=start_date,
+                                     end_date=end_date,
+                                     movie=movie,
+                                     hall_id=hall_id,
+                                     price=price)
+
+
 
     @classmethod
     def _create_participants(cls) -> None:
@@ -413,21 +443,24 @@ class Command(BaseCommand):
                                   .capitalize())
                 if i % 2 == 0:
                     released = (cls._fake_uk
-                                .date_this_year(before_today=True,
-                                                after_today=False))
+                                .date_this_month(before_today=True,
+                                                 after_today=False))
                 else:
                     released = (cls._fake_uk
-                                .date_this_year(before_today=False,
-                                                after_today=True))
+                                .date_this_month(before_today=False,
+                                                 after_today=True))
+                hour = random.choice(["01", "02", "03"])
+                minutes = random.choice(["15", "25", "30", "00", "40"])
+                year = random.choice([2024, 2020, 2015, 2017, 2012, 2018, 2019])
                 movie = Movie(
                     name_uk=name_uk,
                     name_ru=name_ru,
                     slug=slug,
                     description_uk=description_uk,
                     description_ru=description_ru,
-                    year=2024,
+                    year=year,
                     budget=i * 1_000_0000,
-                    duration="01:30",
+                    duration=f"{hour}:{minutes}",
                     countries=random.sample(list(COUNTRIES.keys()), 4),
                     genres=random.sample([key for key, _ in Movie.GENRES_CHOICES], 2),
                     legal_age=random.choice([key for key, _ in Movie.AGE_CHOICES]),
@@ -452,3 +485,41 @@ class Command(BaseCommand):
                 movie.techs.set(movie_techs)
                 movie.save()
                 cls._create_seances(movie)
+
+    # @classmethod
+    # def _create_tickets(cls):
+    #     if not Ticket.objects.exists():
+    #         movies = Movie.objects.prefetch_related('seance_set').all()
+    #         for movie in movies:
+    #             seances = movie.seance_set.all()
+    #             # num_seances = random.randrange(1, len(seance_ids), 1)
+    #             # print(num_seances, len(seance_ids[:num_seances]), movie.id)
+    #
+    #             for seance in seances:
+    #                 if random.choice([True, False, False]):
+    #                     rows = seance.hall.layout['rows']
+    #                     rows = copy.deepcopy(rows)
+    #                     for i, row in enumerate(rows):
+    #                         if 'number' not in row:
+    #                             if rows[i]:
+    #                                 del rows[i]
+    #                     rows_len = len(rows)
+    #                     row = random.randrange(1, rows_len, 1)
+    #                     for item in seance.hall.layout['rows']
+    #                     seats = seance.hall.layout['rows'][row]['seats']
+    #                     seats = copy.deepcopy(seats)
+    #                     for i, seat in enumerate(seats):
+    #                         if 'number' not in seat:
+    #                             if seats[i]:
+    #                                 del seats[i]
+    #                     seats_len = len(seance.hall.layout['rows'][row]['seats'])
+    #
+    #                     seat = random.randrange(1, seats_len, 1)
+    #                     print(row, seat)
+    #                     # for row in seance.hall.layout['rows']:
+    #                     #     if 'number' in row and row['number'] == ticket.row:
+    #                     #         for seat in row['seats']:
+    #                     #             if ('number' in seat and
+    #                     #                     seat['number'] == ticket.seat):
+    #                     #                 found = True
+    #                     # if found is False:

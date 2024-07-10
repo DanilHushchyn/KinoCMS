@@ -13,7 +13,6 @@ from ninja_extra.permissions import IsAdminUser
 from ninja_extra import http_get, http_post, http_patch, http_delete
 from ninja import Header
 from src.core.utils import CustomJWTAuth
-from src.movies.models import Tech
 from src.movies.schemas import *
 from src.movies.service import MovieService
 

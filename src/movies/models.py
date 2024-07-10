@@ -104,11 +104,6 @@ class Movie(Seo):
     released = models.DateField()
     participants = models.ManyToManyField('MovieParticipant', )
     techs = models.ManyToManyField('Tech', )
-
-    # techs = MultiSelectField(choices=TECHS_CHOICES,
-    #                          min_choices=1,
-    #                          max_length=255, null=True)
-
     genres = MultiSelectField(choices=GENRES_CHOICES,
                               min_choices=1,
                               max_length=255, null=True)

@@ -1,6 +1,8 @@
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from injector import inject
+
+from src.core.management.commands.init_script import Command
 from src.core.schemas.base import MessageOutSchema
 from src.core.services.core import CoreService
 from src.core.services.gallery import GalleryService
@@ -67,6 +69,7 @@ class MovieService:
         if schema.techs is not None:
             movie.techs.set(schema.techs)
         movie.save()
+        Command._create_seances(movie)
         return MessageOutSchema(detail=_('Фільм успішно створений'))
 
     def update(self, request: HttpRequest, mv_slug: str,

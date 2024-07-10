@@ -5,6 +5,7 @@ from ninja_extra.controllers.base import api_controller, ControllerBase
 
 from src.core.errors import (NotFoundExceptionError,
                              UnprocessableEntityExceptionError)
+from src.core.management.commands.init_script import Command
 from src.core.models import Gallery
 from src.core.schemas.base import LangEnum, errors_to_docs
 from src.core.schemas.gallery import GalleryItemOutSchema

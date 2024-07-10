@@ -32,8 +32,8 @@ class SeanceManager(models.Manager):
         try:
             today = timezone.now()
             seance = (self.model.objects
-                      .prefetch_related('movie__card_img',
-                                        'hall__banner')
+                      .select_related('movie__card_img',
+                                      'hall__banner')
                       .get(id=seance_id, date__gte=today))
 
         except self.model.DoesNotExist:
