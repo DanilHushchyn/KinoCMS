@@ -203,6 +203,7 @@ DATABASES = {
     "default": {
         "ENGINE": env("DB_ENGINE"),
         "NAME": env("DB_NAME"),
+        "NAME_TEST": env("DB_NAME_TEST"),
         "USER": env("DB_USER"),
         "PASSWORD": env("DB_PASSWORD"),
         "HOST": env("DB_HOST"),

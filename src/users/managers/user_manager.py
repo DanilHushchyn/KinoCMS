@@ -8,6 +8,7 @@ from src.core.errors import (NotFoundExceptionError,
                              NotUniqueFieldExceptionError)
 from src.core.schemas.base import MessageOutSchema
 from src.core.services.core import CoreService
+from src.users.errors import EmailAlreadyExistsExceptionError
 
 if TYPE_CHECKING:
     from src.users.schemas import UserRegisterSchema, UserUpdateSchema
@@ -164,7 +165,7 @@ class CustomUserManager(UserManager):
 
         if self.model.objects.filter(email=user_body.email).exists():
             msg = _("Ця електронна адреса вже використовується")
-            raise EmailAlreadyExistsExceptionError(msg)
+            raise NotUniqueFieldExceptionError(message=msg, field='email')
 
         self.model.objects.create(
             first_name=user_body.first_name,

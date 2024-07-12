@@ -72,3 +72,9 @@ run1:
 run2:
 	$(MANAGE) runserver --settings config.settings.kino_cms 7000
 
+
+test_client:
+	$(MANAGE)  test --settings config.settings.kino_cms
+
+test_admin:
+	$(MANAGE)  test --settings config.settings.kino_admin

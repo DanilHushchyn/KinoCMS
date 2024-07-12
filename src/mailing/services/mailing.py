@@ -81,6 +81,7 @@ class MailingService:
         """
         Create template for mailing.
         """
+        print(file.content_type)
         if file.content_type != 'text/html':
             msg = _('Дозволено відправляти тільки html')
             raise UnprocessableEntityExceptionError(message=msg)
