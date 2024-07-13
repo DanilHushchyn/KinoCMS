@@ -151,7 +151,7 @@ class StatisticView(View):
 
 urlpatterns = [
     path('api/', admin_api.urls),
-    # path('statistic/', StatisticView.as_view())
+    path('statistic/', StatisticView.as_view())
 ]
 if settings.DEBUG:
     settings.INSTALLED_APPS += ["requests_tracker"]

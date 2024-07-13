@@ -263,44 +263,41 @@ class TestCustomTokenObtainPairController:
 
         assert response.status_code == expected_status
 
-    @pytest.mark.parametrize("payloads,expected_status",
+    @pytest.mark.parametrize("payload,expected_status",
                              [
                                  (
-                                         [
-                                             {
-                                                 "first_name": "Данил",
-                                                 "last_name": "Гущин",
-                                                 "nickname": "nickname",
-                                                 "man": True,
-                                                 "phone_number": "+380985671324",
-                                                 "email": "custom@example.com",
-                                                 "address": "string",
-                                                 "city": "інше",
-                                                 "birthday": "12.12.2012",
-                                                 "password1": "Sword123*",
-                                                 "password2": "Sword123*",
-                                             },
-                                             {
-                                                 "first_name": "Данил",
-                                                 "last_name": "Гущин",
-                                                 "nickname": "nickname",
-                                                 "man": True,
-                                                 "phone_number": "+380985671324",
-                                                 "email": "custom@example.com",
-                                                 "address": "string",
-                                                 "city": "інше",
-                                                 "birthday": "12.12.2012",
-                                                 "password1": "Sword123*",
-                                                 "password2": "Sword123*",
-                                             },
-                                         ],
-                                         409,
+
+                                         {
+                                             "email": "user@example.com",
+                                             "password": "Sword123*",
+                                         },
+                                         200,
+                                 ),
+                                 (
+
+                                         {
+                                             "email": "unknown@example.com",
+                                             "password": "Sword123*",
+                                         },
+                                         401,
+                                 ),
+                                 (
+
+                                         {
+                                             "email": "user@example.com",
+                                         },
+                                         400,
+                                 ),
+                                 (
+
+                                         {
+                                             "password": "Sword123*",
+                                         },
+                                         400,
                                  ),
                              ]
                              )
-    def test_login(self, payloads, expected_status):
-        for payload in payloads:
-            response = self.client.post("/register/", json=payload,
-                                        headers=self.headers)
+    def test_login(self, payload, expected_status):
+        response = self.client.post("/login", json=payload,)
 
         assert response.status_code == expected_status

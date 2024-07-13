@@ -117,6 +117,7 @@ def errors_to_docs(responses: dict) -> dict:
             result[status]["content"]["application/json"]["examples"][key] = \
                 {
                     "summary": error.code,
+                    "description": f"{error.code}",
                     "value": error.detail
                 }
     return result

@@ -8,7 +8,8 @@ from src.cinemas.schemas.cinema import (CinemaInSchema,
                                         CinemaUpdateSchema,
                                         CinemaOutSchema,
                                         CinemaContactOutSchema,
-                                        CinemaClientOutSchema, PaginatedContactsResponseSchema)
+                                        CinemaClientOutSchema,
+                                        PaginatedContactsResponseSchema)
 from src.cinemas.services.cinema import CinemaService
 from src.core.models import Image
 from src.core.schemas.base import (LangEnum, MessageOutSchema,

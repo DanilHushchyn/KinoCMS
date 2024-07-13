@@ -59,7 +59,10 @@
         <div class="container-fluid">
             <div class="row p-4">
                 <div class="col-md-4 text-center">
-                
+                <form id="myForm">
+                  <input type="file" id="file" name="file">
+                  <button type="submit">Upload</button>
+                </form>
                     <div class="card card-primary">
                         <div class="card-header">
                             <h3 class="card-title">Area Chart</h3>
@@ -137,7 +140,32 @@
     <script src="{% static 'admin_panel/adminlte/dist/js/adminlte.min.js' %}"></script>
     <script src="https://kit.fontawesome.com/cce590ac92.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-       <script type="application/javascript">
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>       <script type="application/javascript">
+           
+           $(document).ready(function() {
+              $("#myForm").submit(function(e) {
+                e.preventDefault(); // Prevent default form submission
+            
+                var formData = new FormData(this);
+            
+                $.ajax({
+                  url: "https://kinocms-panel.demodev.cc/api/mailing/template/", // Replace with your server-side script URL
+                  type: "POST",
+                  headers: {
+                        "Authorization":"Bearer admin",
+                  },
+                  data: formData,
+                  contentType: false, // Important! Don't set content type
+                  processData: false, // Don't process data 
+                  success: function(data) {
+                    console.log(data); // Handle successful upload response
+                  },
+                  error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("Error uploading file:", textStatus, errorThrown);
+                  }
+                });
+              });
+            });
             const ctx = document.getElementById('myChart');
             const data = {
               labels: [
