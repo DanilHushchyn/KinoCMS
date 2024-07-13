@@ -106,6 +106,7 @@ def errors_to_docs(responses: dict) -> dict:
     result = {}
     for status, errors in responses.items():
         result[status] = {
+            "description": f"{status}",
             "content": {
                 "application/json": {
                     "examples": {
