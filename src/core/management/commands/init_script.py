@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import base64
 import copy
 import json
 import os
@@ -9,7 +10,7 @@ from django.core.files import File
 from django.core.management.base import BaseCommand
 from faker import Faker
 from faker.providers import date_time, phone_number
-from src.booking.models import Seance, Ticket
+from src.booking.models import Seance
 from src.cinemas.models import Cinema, Hall
 from src.core.models import Image, Gallery
 from src.movies.models import (Movie, MovieParticipantRole,
@@ -21,6 +22,7 @@ from src.pages.models import (TopSlider, BottomSlider,
 from src.users.models import User
 from pytils.translit import slugify
 from django_countries.data import COUNTRIES
+from PIL import Image as pil_Image
 
 
 class Command(BaseCommand):
@@ -154,6 +156,21 @@ class Command(BaseCommand):
             image=File(image, "/media/" + image.name),
         )
         return image
+
+    @classmethod
+    def create_image_b64(cls, seed_path: str) -> str:
+        """
+        Create image in db
+        :param seed_path: path to seeds with images
+        :return: Image model instance
+        """
+        random_image = random.choice(os.listdir(
+            os.path.join("seed", seed_path)))
+        image = open(os.path.join("seed", seed_path, random_image), "rb")
+        name, format = image.name.split('.')
+        # img_path = os.path.join("seed", seed_path, random_image)
+        encoded_data = base64.b64encode(image.read()).decode("utf-8")
+        return f"data:image/{format};base64,{encoded_data}"
 
     @classmethod
     def _create_gallery(cls, seed_path: str) -> Gallery:
@@ -381,8 +398,6 @@ class Command(BaseCommand):
                                      movie=movie,
                                      hall_id=hall_id,
                                      price=price)
-
-
 
     @classmethod
     def _create_participants(cls) -> None:

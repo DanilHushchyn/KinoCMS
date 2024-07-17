@@ -428,11 +428,13 @@ class MovieUpdateSchema(ninja_schema.ModelSchema):
             'year',
             'trailer_link',
             'participants',
+            'legal_age',
             'genres',
             'gallery',
             'seo_title',
             'seo_image',
             'seo_description',
+            'card_img',
         ]
         optional = "__all__"
 

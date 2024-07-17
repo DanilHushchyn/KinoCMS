@@ -9,7 +9,7 @@ from src.core.services.gallery import GalleryService
 from src.core.services.images import ImageService
 from src.movies.schemas import *
 from django.utils.translation import gettext as _
-from pytils.translit import slugify
+from src.core.utils import make_slug
 from src.movies.models import MovieParticipantRole, Tech
 
 
@@ -47,7 +47,8 @@ class MovieService:
         movie = Movie.objects.create(
             name_uk=schema.name_uk,
             name_ru=schema.name_ru,
-            slug=slugify(schema.name_uk),
+            slug=make_slug(value=schema.name_uk,
+                           model=Movie),
             description_uk=schema.description_uk,
             description_ru=schema.description_ru,
             gallery=gallery,
@@ -93,7 +94,7 @@ class MovieService:
         self.image_service.update(schema.seo_image, movie.seo_image)
 
         self.gall_service.update(schemas=schema.gallery,
-                                 gallery=Movie.gallery)
+                                 gallery=movie.gallery)
         expt_list = ['card_img', 'seo_image', 'gallery', 'participants']
         for attr, value in schema.dict().items():
             if attr not in expt_list and value is not None:
@@ -102,7 +103,9 @@ class MovieService:
         if schema.participants is not None:
             movie.participants.set(schema.participants)
 
-        movie.slug = slugify(movie.name_uk)
+        movie.slug = make_slug(value=movie.name_uk,
+                               model=Movie,
+                               instance=movie)
         movie.save()
         return MessageOutSchema(detail=_('Фільм успішно оновлений'))
 

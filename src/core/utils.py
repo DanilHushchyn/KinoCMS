@@ -6,7 +6,7 @@ from django.core.paginator import EmptyPage, Paginator
 from django.http import HttpRequest
 
 from ninja.errors import HttpError
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Model
 from ninja.security import HttpBearer
 from ninja_jwt.authentication import JWTBaseAuthentication
 from phonenumber_field.validators import validate_international_phonenumber
@@ -16,6 +16,7 @@ from phonenumber_field.validators import (
 from django.utils.translation import gettext as _
 
 from django.core.exceptions import ValidationError
+from pytils.translit import slugify
 
 from src.core.errors import UnprocessableEntityExceptionError
 from src.users.models import User
@@ -79,3 +80,18 @@ def check_phone_number(phone_number: str) -> None:
     except ValidationError:
         msg = _("Введено некоректний номер телефону.")
         raise UnprocessableEntityExceptionError(message=msg)
+
+
+def make_slug(value: str, model: Model, instance: Model = None) -> str:
+    slug = slugify(value)
+    counter = 1
+    while True:
+        objs = model.objects.filter(slug=slug)
+        if instance:
+            objs = objs.exclude(id=instance.id)
+
+        if objs.count() == 0:
+            return slug
+
+        slug = f"{slug}-{counter}"
+        counter += 1

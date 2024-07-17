@@ -1,11 +1,11 @@
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from src.core.errors import NotFoundExceptionError
+from src.core.utils import make_slug
 from src.pages.models import NewsPromo, Tag
 from src.pages.schemas.news_promo import (NewsPromoInSchema,
                                           NewsPromoUpdateSchema)
 from django.utils.translation import gettext as _
-from pytils.translit import slugify
 
 from src.core.schemas.base import MessageOutSchema
 from src.core.services.core import CoreService
@@ -49,7 +49,8 @@ class NewsPromoService:
         news_promo = NewsPromo.objects.create(
             name_uk=schema.name_uk,
             name_ru=schema.name_ru,
-            slug=slugify(schema.name_uk),
+            slug=make_slug(value=schema.name_uk,
+                           model=NewsPromo),
             description_uk=schema.description_uk,
             description_ru=schema.description_ru,
             banner=banner,
@@ -94,7 +95,9 @@ class NewsPromoService:
         for attr, value in schema.dict().items():
             if attr not in expt_list and value is not None:
                 setattr(news_promo, attr, value)
-        news_promo.slug = slugify(news_promo.name_uk)
+        news_promo.slug = make_slug(value=news_promo.name_uk,
+                                    model=NewsPromo,
+                                    instance=news_promo)
         if schema.tags is not None:
             news_promo.tags.set(schema.tags)
 

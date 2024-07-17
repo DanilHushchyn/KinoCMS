@@ -45,6 +45,8 @@ fastapi-errors = "^0.0.6"
 babel = "^2.15.0"
 pymorphy2 = "^0.9.1"
 pymorphy2-dicts-uk = "^2.4.1.1.1460299261"
+requests-toolbelt = "^1.0.0"
+httpx = "^0.27.0"
 
 [build-system]
 requires = ["poetry-core"]

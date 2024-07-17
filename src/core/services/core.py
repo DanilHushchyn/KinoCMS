@@ -1,7 +1,6 @@
 from typing import Type
 
 from django.db.models import Model
-from django.http import HttpRequest
 from django.utils.translation import gettext as _
 
 from src.core.errors import NotUniqueFieldExceptionError

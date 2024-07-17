@@ -22,7 +22,7 @@ class Page(Seo):
     objects = PageManager()
 
     class Meta:
-        ordering = ['-date_created']
+        ordering = ['can_delete', '-date_created']
         verbose_name = 'Page'
         verbose_name_plural = 'Pages'
         db_table = 'pages'

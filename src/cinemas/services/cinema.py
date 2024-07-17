@@ -3,7 +3,7 @@ from django.http import HttpRequest
 from src.cinemas.models import Cinema
 from src.cinemas.schemas.cinema import CinemaInSchema, CinemaUpdateSchema
 from django.utils.translation import gettext as _
-from pytils.translit import slugify
+from src.core.utils import make_slug
 
 from src.core.schemas.base import MessageOutSchema
 from src.core.services.core import CoreService
@@ -47,7 +47,8 @@ class CinemaService:
         Cinema.objects.create(
             name_uk=schema.name_uk,
             name_ru=schema.name_ru,
-            slug=slugify(schema.name_uk),
+            slug=make_slug(value=schema.name_uk,
+                           model=Cinema),
             description_uk=schema.description_uk,
             description_ru=schema.description_ru,
             email=schema.email,
@@ -91,7 +92,9 @@ class CinemaService:
         for attr, value in schema.dict().items():
             if attr not in expt_list and value is not None:
                 setattr(cinema, attr, value)
-        cinema.slug = slugify(cinema.name_uk)
+        cinema.slug = make_slug(value=cinema.name_uk,
+                                model=Cinema,
+                                instance=cinema)
         cinema.save()
         return MessageOutSchema(detail=_('Кінотеатр успішно оновлений'))
 

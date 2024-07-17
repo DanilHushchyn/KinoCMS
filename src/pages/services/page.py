@@ -1,12 +1,12 @@
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from src.core.errors import NotFoundExceptionError
+from src.core.utils import make_slug
 from src.pages.errors import PageUnableToDeleteExceptionError
 from src.pages.models import Page
 from src.pages.schemas.page import (PageInSchema,
                                     PageUpdateSchema)
 from django.utils.translation import gettext as _
-from pytils.translit import slugify
 
 from src.core.schemas.base import MessageOutSchema
 from src.core.services.core import CoreService
@@ -39,8 +39,8 @@ class PageService:
             field_name='name_uk',
             model=Page)
         self.core_service.check_field_unique(
-            value=schema.name_uk,
-            field_name='name_uk',
+            value=schema.name_ru,
+            field_name='name_ru',
             model=Page)
         bodies = [schema.banner, schema.seo_image]
         banner, seo_image = (self.image_service
@@ -50,7 +50,8 @@ class PageService:
         Page.objects.create(
             name_uk=schema.name_uk,
             name_ru=schema.name_ru,
-            slug=slugify(schema.name_uk),
+            slug=make_slug(value=schema.name_uk,
+                           model=Page),
             content_uk=schema.content_uk,
             content_ru=schema.content_ru,
             banner=banner,
@@ -88,7 +89,9 @@ class PageService:
         for attr, value in schema.dict().items():
             if attr not in expt_list and value is not None:
                 setattr(page, attr, value)
-        page.slug = slugify(page.name_uk)
+        page.slug = make_slug(value=page.name_uk,
+                              model=Page,
+                              instance=page)
         page.save()
         return MessageOutSchema(detail=_('Сторінка успішно оновлена'))
 
