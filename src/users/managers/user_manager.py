@@ -107,7 +107,8 @@ class CustomUserManager(UserManager):
         """
         try:
             user = self.model.objects.get(id=user_id)
-            user.delete()
+            if not user.is_superuser:
+                user.delete()
         except self.model.DoesNotExist:
             msg = _("Не знайдено: немає збігів користувачів"
                     " на заданному запиті.")
