@@ -1,0 +1,1 @@
+"""Endpoints for pages app"""

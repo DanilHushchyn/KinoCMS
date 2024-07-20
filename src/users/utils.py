@@ -1,22 +1,26 @@
+"""Utils for app users"""
+
+from datetime import datetime
+
 import jwt
 from django.contrib.auth import get_user_model
-from datetime import datetime
 from django.shortcuts import get_object_or_404
 from jwt.exceptions import PyJWTError
+
 from config.settings import settings
 
 
 def get_current_user(token: str):
-    """
-    Check auth user.
-
-    """
+    """Check auth user."""
     try:
         code, token = token.split(" ")
         if code != "Bearer":
             raise ValueError
-        payload = jwt.decode(token, settings.NINJA_JWT["SIGNING_KEY"],
-                             algorithms=[settings.NINJA_JWT["ALGORITHM"]])
+        payload = jwt.decode(
+            token,
+            settings.NINJA_JWT["SIGNING_KEY"],
+            algorithms=[settings.NINJA_JWT["ALGORITHM"]],
+        )
     except (PyJWTError, ValueError):
         return None
 

@@ -1,0 +1,1 @@
+"""Endpoints for app booking"""

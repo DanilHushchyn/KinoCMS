@@ -1,3 +1,5 @@
+"""Errors that can be along working with pages"""
+
 from src.core.schemas.base import CustomAPIException
 
 

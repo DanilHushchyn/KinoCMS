@@ -1,206 +1,195 @@
-{%  load static %}
+{% load static %}
+
 {# Load the tag library #}
 {# Read the documentation for more information #}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>
-        {% block title %}
-
-        {% endblock %}
+      {% block title %}{% endblock %}
     </title>
-{#    <link href="{% static "node_modules/bootstrap/dist/css/bootstrap.min.css" %}" rel="stylesheet" >#}
-    <link rel="stylesheet" href="{% static 'adminlte/adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
-      <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-      <!-- Font Awesome -->
-    <link rel="stylesheet" href="{% static 'adminlte/plugins/fontawesome-free/css/all.min.css' %}">
-      <!-- Theme style -->
-    <link rel="stylesheet" href="{% static 'adminlte/dist/css/adminlte.css' %}">
-{#    <link rel="stylesheet" href="{% static 'adminlte/base.css' %}">#}
-    {% block head %}
-    {% endblock %}
-</head>
-<body>
-<div class="wrapper">
-  <!-- Navbar -->
-  <nav class="main-header navbar navbar-expand navbar-white navbar-light pb-1">
-    <!-- Left navbar links -->
-
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto d-flex flex-row align-items-center justify-content-center">
-      <!-- fullscreen -->
-      <!-- Notifications Dropdown Menu -->
-      <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="fa-solid fa-crown"></i></a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <div class="dropdown-item card card-widget widget-user p-0 m-0">
-              <!-- Add the bg color to the header using any of the bg-* classes -->
-              <div class="widget-user-image">
-
-                <img class="img-circle elevation-1" src="{% static 'admin_panel/imgs/user-avatar.jpg' %}" alt="User Avatar">
+    {#    <link href="{% static "node_modules/bootstrap/dist/css/bootstrap.min.css" %}" rel="stylesheet" >#}
+    <link rel="stylesheet"
+          href="{% static 'adminlte/adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}" />
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="{% static 'adminlte/plugins/fontawesome-free/css/all.min.css' %}" />
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'adminlte/dist/css/adminlte.css' %}" />
+    {#    <link rel="stylesheet" href="{% static 'adminlte/base.css' %}">#}
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <div class="wrapper">
+      <!-- Navbar -->
+      <nav class="main-header navbar navbar-expand navbar-white navbar-light pb-1">
+        <!-- Left navbar links -->
+        <!-- Right navbar links -->
+        <ul class="navbar-nav ml-auto d-flex flex-row align-items-center justify-content-center">
+          <!-- fullscreen -->
+          <!-- Notifications Dropdown Menu -->
+          <li class="nav-item dropdown">
+            <a class="nav-link" data-toggle="dropdown" href="#">
+              <i class="fa-solid fa-crown"></i></a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+              <div class="dropdown-item card card-widget widget-user p-0 m-0">
+                <!-- Add the bg color to the header using any of the bg-* classes -->
+                <div class="widget-user-image">
+                  <img class="img-circle elevation-1"
+                       src="{% static 'admin_panel/imgs/user-avatar.jpg' %}"
+                       alt="User Avatar" />
+                </div>
               </div>
             </div>
-        </div>
-      </li>
-
-
-
-    </ul>
-
-  </nav>
-  <!-- /.navbar -->
-
-  {% block content %}
-    <section class="content">
-        <div class="container-fluid">
+          </li>
+        </ul>
+      </nav>
+      <!-- /.navbar -->
+      {% block content %}
+        <section class="content">
+          <div class="container-fluid">
             <div class="row p-4">
-                <div class="col-md-4 text-center">
+              <div class="col-md-4 text-center">
                 <form id="myForm">
-                  <input type="file" id="file" name="file">
+                  <input type="file" id="file" name="file" />
                   <button type="submit">Upload</button>
                 </form>
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">Area Chart</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <button type="button" class="btn btn-tool" data-card-widget="remove">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body" style="height: 300px; width: 300px; margin: 0 auto">
-                              <canvas id="myChart" ></canvas>
-
-                        </div>
+                <div class="card card-primary">
+                  <div class="card-header">
+                    <h3 class="card-title">Area Chart</h3>
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                      </button>
+                      <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                      </button>
                     </div>
+                  </div>
+                  <div class="card-body" style="height: 300px; width: 300px; margin: 0 auto">
+                    <canvas id="myChart"></canvas>
+                  </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="small-box bg-warning p-3" style="width: 30rem; margin: 0 auto">
-                      <div class="inner">
-                        <h3>44</h3>
-                        <p>Кол-во пользователей</p>
-                      </div>
-                      <div class="icon">
-                        <i class="fa-solid fa-user"></i>
-                      </div>
-                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="small-box bg-warning p-3" style="width: 30rem; margin: 0 auto">
+                  <div class="inner">
+                    <h3>44</h3>
+                    <p>Кол-во пользователей</p>
+                  </div>
+                  <div class="icon">
+                    <i class="fa-solid fa-user"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="small-box bg-info p-3" style="width: 30rem; margin: 0 auto">
+                  <div class="inner">
+                    <h3>44</h3>
+                    <p>Прибыль в этом месяце</p>
+                    <strong class="font-medium">150 %</strong> в сравнении с прошлым месяцем
+                  </div>
+                  <div class="icon">
+                    <i class="fa-solid fa-money-bill"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+              </div>
+              <div class="col-md-4 text-center">
+                <div class="card card-primary">
+                  <div class="card-header">
+                    <h3 class="card-title">Area Chart 2</h3>
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                      </button>
+                      <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                      </button>
                     </div>
+                  </div>
+                  <div class="card-body" style="height: 300px; width: 300px; margin: 0 auto">
+                    <canvas id="myChart2"></canvas>
+                  </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="small-box bg-info p-3" style="width: 30rem; margin: 0 auto">
-                      <div class="inner">
-                        <h3>44</h3>
-
-                        <p>Прибыль в этом месяце</p> 
-                        <strong class="font-medium"> 150 % </strong> в сравнении с прошлым месяцем
-
-                      </div>
-                      <div class="icon">
-                        <i class="fa-solid fa-money-bill"></i>
-                      </div>
-                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-md-4 text-center">
-
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">Area Chart 2</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <button type="button" class="btn btn-tool" data-card-widget="remove">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body" style="height: 300px; width: 300px; margin: 0 auto">
-                              <canvas id="myChart2"></canvas>
-                        </div>
-                    
-                    </div>
-                </div>
+              </div>
             </div>
-        
-        </div>
-        
+          </div>
         </section>
-  {% endblock %}
-</div>
-{#    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js' %}" ></script>#}
+      {% endblock %}
+    </div>
+    {#    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js' %}" ></script>#}
     <script src="{% static 'admin_panel/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'admin_panel/adminlte/dist/js/adminlte.min.js' %}"></script>
-    <script src="https://kit.fontawesome.com/cce590ac92.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/cce590ac92.js"
+            crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>       <script type="application/javascript">
-           
-           $(document).ready(function() {
-              $("#myForm").submit(function(e) {
-                e.preventDefault(); // Prevent default form submission
-            
-                var formData = new FormData(this);
-            
-                $.ajax({
-                  url: "https://kinocms-panel.demodev.cc/api/mailing/template/", // Replace with your server-side script URL
-                  type: "POST",
-                  headers: {
-                        "Authorization":"Bearer admin",
-                  },
-                  data: formData,
-                  contentType: false, // Important! Don't set content type
-                  processData: false, // Don't process data 
-                  success: function(data) {
-                    console.log(data); // Handle successful upload response
-                  },
-                  error: function(jqXHR, textStatus, errorThrown) {
-                    console.error("Error uploading file:", textStatus, errorThrown);
-                  }
-                });
-              });
-            });
-            const ctx = document.getElementById('myChart');
-            const data = {
-              labels: [
-                'Women',
-                'Men',
-              ],
-              datasets: [{
-                data: [300, 50],
-                hoverOffset: 40
-              }]
-            };
-            const config = {
-              type: 'pie',
-              data: data,
-            };
-           new Chart(ctx, config);
-           
-           const ctx2 = document.getElementById('myChart2');
-            const data2 = {
-              labels: [
-                'Women',
-                'Men',
-              ],
-              datasets: [{
-                data: [300, 50],
-                hoverOffset: 40
-              }]
-            };
-            const config2 = {
-              type: 'pie',
-              data: data2,
-            };
-           new Chart(ctx2, config2);
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>       <script type="application/javascript">
+         $(document).ready(function() {
+           $("#myForm").submit(function(e) {
+             e.preventDefault(); // Prevent default form submission
+
+             var formData = new FormData(this);
+
+             $.ajax({
+               url: "https://kinocms-panel.demodev.cc/api/mailing/template/", // Replace with your server-side script URL
+               type: "POST",
+               headers: {
+                 "Authorization": "Bearer admin",
+               },
+               data: formData,
+               contentType: false, // Important! Don't set content type
+               processData: false, // Don't process data
+               success: function(data) {
+                 console.log(data); // Handle successful upload response
+               },
+               error: function(jqXHR, textStatus, errorThrown) {
+                 console.error("Error uploading file:", textStatus, errorThrown);
+               }
+             });
+           });
+         });
+         const ctx = document.getElementById('myChart');
+         const data = {
+           labels: [
+             'Women',
+             'Men',
+           ],
+           datasets: [{
+             data: [300, 50],
+             hoverOffset: 40
+           }]
+         };
+         const config = {
+           type: 'pie',
+           data: data,
+         };
+         new Chart(ctx, config);
+
+         const ctx2 = document.getElementById('myChart2');
+         const data2 = {
+           labels: [
+             'Women',
+             'Men',
+           ],
+           datasets: [{
+             data: [300, 50],
+             hoverOffset: 40
+           }]
+         };
+         const config2 = {
+           type: 'pie',
+           data: data2,
+         };
+         new Chart(ctx2, config2);
        </script>
-      {% block script %}
-      {% endblock %}
-</body>
+    {% block script %}
+    {% endblock %}
+  </body>
 </html>

@@ -1,34 +1,57 @@
+"""Endpoints for movie"""
+
 from typing import Any
+
 from django.db.models import QuerySet
 from django.http import HttpRequest
-from ninja_extra.controllers.base import api_controller, ControllerBase
-from ninja_extra.pagination.decorator import paginate
-from ninja_extra.schemas.response import PaginatedResponseSchema
-from src.core.errors import NotUniqueFieldExceptionError, \
-    InvalidTokenExceptionError
-from src.core.models import Image
-from src.core.schemas.base import (LangEnum, MessageOutSchema,
-                                   errors_to_docs)
-from ninja_extra.permissions import IsAdminUser
-from ninja_extra import http_get, http_post, http_patch, http_delete
+from django_countries.data import COUNTRIES
 from ninja import Header
+from ninja_extra import http_delete
+from ninja_extra import http_get
+from ninja_extra import http_patch
+from ninja_extra import http_post
+from ninja_extra.controllers.base import ControllerBase
+from ninja_extra.controllers.base import api_controller
+from ninja_extra.pagination.decorator import paginate
+from ninja_extra.permissions import IsAdminUser
+from ninja_extra.schemas.response import PaginatedResponseSchema
+
+from src.core.errors import InvalidTokenExceptionError
+from src.core.errors import NotFoundExceptionError
+from src.core.errors import NotUniqueFieldExceptionError
+from src.core.errors import UnprocessableEntityExceptionError
+from src.core.models import Image
+from src.core.schemas.base import LangEnum
+from src.core.schemas.base import MessageOutSchema
+from src.core.schemas.base import errors_to_docs
 from src.core.utils import CustomJWTAuth
-from src.movies.schemas import *
+from src.movies.models import Movie
+from src.movies.models import MovieParticipant
+from src.movies.models import Tech
+from src.movies.schemas import MovieCardOutSchema
+from src.movies.schemas import MovieClientOutSchema
+from src.movies.schemas import MovieInSchema
+from src.movies.schemas import MovieOutSchema
+from src.movies.schemas import MovieParticipantOutSchema
+from src.movies.schemas import MovieParticipantRoleOutSchema
+from src.movies.schemas import MovieScheduleFilterSchema
+from src.movies.schemas import MovieSearchOutSchema
+from src.movies.schemas import MovieUpdateSchema
+from src.movies.schemas import ReleaseEnum
+from src.movies.schemas import TechOutSchema
 from src.movies.service import MovieService
 
 
 @api_controller("/movie", tags=["movies"])
 class MovieController(ControllerBase):
-    """
-    A controller class for managing movie in system.
+    """A controller class for managing movie in system.
 
     This class provides endpoints for
     get, post, update, delete movie in the site
     """
 
     def __init__(self, movie_service: MovieService):
-        """
-        Use this method to inject "services" to MovieController.
+        """Use this method to inject "services" to MovieController.
 
         :param movie_service: variable for managing movies
         """
@@ -36,60 +59,58 @@ class MovieController(ControllerBase):
 
     @http_get(
         "/legal-ages/",
-        response=PaginatedResponseSchema[List],
+        response=PaginatedResponseSchema[list],
         openapi_extra={
             "operationId": "get_movie_legal_ages",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def get_movie_legal_ages(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
-    ) -> List:
-        """
-        Get movie legal ages for input.
+        self,
+        request: HttpRequest,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
+    ) -> list:
+        """Get movie legal ages for input.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.movie_service.get_legal_ages()
         return result
 
     @http_get(
         "/genres/",
-        response=PaginatedResponseSchema[List],
+        response=PaginatedResponseSchema[list],
         openapi_extra={
             "operationId": "get_movie_genres",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def get_movie_genres(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
-    ) -> List:
-        """
-        Get genres for input.
+        self,
+        request: HttpRequest,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
+    ) -> list:
+        """Get genres for input.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.movie_service.get_genres()
         return result
@@ -99,57 +120,55 @@ class MovieController(ControllerBase):
         response=PaginatedResponseSchema[TechOutSchema],
         openapi_extra={
             "operationId": "get_techs",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def get_techs(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> QuerySet[Tech]:
-        """
-        Get techs for input.
+        """Get techs for input.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.movie_service.get_techs()
         return result
 
     @http_get(
         "/countries/",
-        response=PaginatedResponseSchema[List],
+        response=PaginatedResponseSchema[list],
         openapi_extra={
             "operationId": "get_countries",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def get_countries(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> list[tuple[str, Any]]:
-        """
-        Get countries for input.
+        """Get countries for input.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         return list(COUNTRIES.items())
 
@@ -158,56 +177,54 @@ class MovieController(ControllerBase):
         response=PaginatedResponseSchema[MovieParticipantOutSchema],
         openapi_extra={
             "operationId": "get_participants",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def get_participants(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> QuerySet:
-        """
-        Get participants for input.
+        """Get participants for input.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.movie_service.get_participants()
         return result
 
     @http_get(
         "/participants-grouped/",
-        response=List[MovieParticipantRoleOutSchema],
+        response=list[MovieParticipantRoleOutSchema],
         openapi_extra={
             "operationId": "get_participants_grouped",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def get_participants_grouped(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> QuerySet:
-        """
-        Get participants for input.
+        """Get participants for input.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.movie_service.get_participants_grouped()
         return result
@@ -217,28 +234,27 @@ class MovieController(ControllerBase):
         response=PaginatedResponseSchema[MovieCardOutSchema],
         openapi_extra={
             "operationId": "get_all_movie_cards",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def get_all_movie_cards(
-            self,
-            request: HttpRequest,
-            release: ReleaseEnum = ReleaseEnum.Current,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default='uk'),
+        self,
+        request: HttpRequest,
+        release: ReleaseEnum = ReleaseEnum.Current,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> QuerySet:
-        """
-        Get all movie cards.
+        """Get all movie cards.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.movie_service.get_all(release=release.value)
         return result
@@ -250,41 +266,35 @@ class MovieController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "create_movie",
-            "responses": errors_to_docs({
-                401: [
-                    InvalidTokenExceptionError()
-                ],
-                404: [
-                    NotFoundExceptionError(cls_model=Movie),
-                    NotFoundExceptionError(cls_model=MovieParticipant,
-                                           field='participants'),
-                    NotFoundExceptionError(cls_model=Tech,
-                                           field='techs')
-                ],
-                409: [
-                    NotUniqueFieldExceptionError(field='name')
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    401: [InvalidTokenExceptionError()],
+                    404: [
+                        NotFoundExceptionError(cls_model=Movie),
+                        NotFoundExceptionError(
+                            cls_model=MovieParticipant, field="participants"
+                        ),
+                        NotFoundExceptionError(cls_model=Tech, field="techs"),
+                    ],
+                    409: [NotUniqueFieldExceptionError(field="name")],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def create_movie(
-            self,
-            request: HttpRequest,
-            body: MovieInSchema,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        body: MovieInSchema,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> MessageOutSchema:
-        """
-        Create movie.
+        """Create movie.
 
         Please provide:
           - **body**  body for creating new movie
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **409**: Error: Conflict.
             Причини: \n
@@ -315,6 +325,7 @@ class MovieController(ControllerBase):
                  b) filename is required if image is specified. Example: *filename.png* \n
                  c) optional alt. If you don't specify it, I'll take the value from filename \n
              4. Be sure to specify the field delete=false \n
+
         """
         result = self.movie_service.create(schema=body, request=request)
         return result
@@ -326,41 +337,36 @@ class MovieController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "update_movie",
-            "responses": errors_to_docs({
-                401: [
-                    InvalidTokenExceptionError()
-                ],
-                404: [
-                    NotFoundExceptionError(cls_model=Movie),
-                    NotFoundExceptionError(cls_model=Image),
-                    NotFoundExceptionError(cls_model=MovieParticipant,
-                                           field='participants'),
-                ],
-                409: [
-                    NotUniqueFieldExceptionError(field='name')
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    401: [InvalidTokenExceptionError()],
+                    404: [
+                        NotFoundExceptionError(cls_model=Movie),
+                        NotFoundExceptionError(cls_model=Image),
+                        NotFoundExceptionError(
+                            cls_model=MovieParticipant, field="participants"
+                        ),
+                    ],
+                    409: [NotUniqueFieldExceptionError(field="name")],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def update_movie(
-            self,
-            request: HttpRequest,
-            mv_slug: str,
-            body: MovieUpdateSchema,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        mv_slug: str,
+        body: MovieUpdateSchema,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> MessageOutSchema:
-        """
-        Update movie by slug.
+        """Update movie by slug.
 
         Please provide:
           - **body**  body for creating new movie
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **404**: Error: Not Found. \n
             Причини: \n
@@ -395,10 +401,11 @@ class MovieController(ControllerBase):
                  b) filename is required if image is specified. Example: *filename.png* \n
                  c) optional alt. If you don't specify it, I'll take the value from filename \n
              4. Be sure to specify the field delete=false \n
+
         """
-        result = self.movie_service.update(mv_slug=mv_slug,
-                                           schema=body,
-                                           request=request)
+        result = self.movie_service.update(
+            mv_slug=mv_slug, schema=body, request=request
+        )
         return result
 
     @http_get(
@@ -406,37 +413,34 @@ class MovieController(ControllerBase):
         response=MovieOutSchema,
         openapi_extra={
             "operationId": "get_movie_by_slug",
-            "responses": errors_to_docs({
-                404: [
-                    NotFoundExceptionError(cls_model=Movie)
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    404: [NotFoundExceptionError(cls_model=Movie)],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def get_movie_by_slug(
-            self,
-            request: HttpRequest,
-            mv_slug: str,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        mv_slug: str,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> Movie:
-        """
-        Get movie by slug.
+        """Get movie by slug.
 
         Please provide:
           - **mv_slug**  slug of movie
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **404**: Error: Not Found. \n
             Причини: \n
                 1) Не знайдено: немає збігів фільмів
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.movie_service.get_by_slug(mv_slug=mv_slug)
         return result
@@ -448,40 +452,35 @@ class MovieController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "delete_movie_by_slug",
-            "responses": errors_to_docs({
-                401: [
-                    InvalidTokenExceptionError()
-                ],
-                404: [
-                    NotFoundExceptionError(cls_model=Movie)
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    401: [InvalidTokenExceptionError()],
+                    404: [NotFoundExceptionError(cls_model=Movie)],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def delete_movie_by_slug(
-            self,
-            request: HttpRequest,
-            mv_slug: str,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        mv_slug: str,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> MessageOutSchema:
-        """
-        Delete movie by slug.
+        """Delete movie by slug.
 
         Please provide:
           - **mv_slug**  slug of movie
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **404**: Error: Forbidden. \n
             Причини: \n
                 1) Не знайдено: немає збігів фільмів
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.movie_service.delete_by_slug(mv_slug=mv_slug)
         return result
@@ -489,16 +488,14 @@ class MovieController(ControllerBase):
 
 @api_controller("/movie", tags=["movies"])
 class MovieClientController(ControllerBase):
-    """
-    A controller class for managing movie in client site.
+    """A controller class for managing movie in client site.
 
     This class provides endpoints for
     get, movie in the site
     """
 
     def __init__(self, movie_service: MovieService):
-        """
-        Use this method to inject "services" to MovieClientController.
+        """Use this method to inject "services" to MovieClientController.
 
         :param movie_service: variable for managing movies
         """
@@ -509,27 +506,26 @@ class MovieClientController(ControllerBase):
         response=PaginatedResponseSchema[MovieScheduleFilterSchema],
         openapi_extra={
             "operationId": "get_movie_schedule_filter",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def get_movie_schedule_filter(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default='uk'),
+        self,
+        request: HttpRequest,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> QuerySet[Movie]:
-        """
-        Get all movie cards.
+        """Get all movie cards.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.movie_service.get_schedule_filter()
         return result
@@ -543,28 +539,27 @@ class MovieClientController(ControllerBase):
         response=PaginatedResponseSchema[MovieSearchOutSchema],
         openapi_extra={
             "operationId": "search_movies",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def search_movies(
-            self,
-            request: HttpRequest,
-            search_line: str,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        search_line: str,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> QuerySet[Movie]:
-        """
-        Search movies by search line.
+        """Search movies by search line.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.movie_service.search(search_line)
         return result
@@ -574,27 +569,26 @@ class MovieClientController(ControllerBase):
         response=PaginatedResponseSchema[MovieCardOutSchema],
         openapi_extra={
             "operationId": "get_movie_today_cards",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def get_movie_today_cards(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> QuerySet[Movie]:
-        """
-        Search movies by search line.
+        """Search movies by search line.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.movie_service.get_today_movies()
         return result
@@ -606,37 +600,34 @@ class MovieClientController(ControllerBase):
         response=MovieClientOutSchema,
         openapi_extra={
             "operationId": "get_movie_by_slug",
-            "responses": errors_to_docs({
-                404: [
-                    NotFoundExceptionError(cls_model=Movie)
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    404: [NotFoundExceptionError(cls_model=Movie)],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def get_movie_by_slug(
-            self,
-            request: HttpRequest,
-            mv_slug: str,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        mv_slug: str,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> Movie:
-        """
-        Get movie by slug.
+        """Get movie by slug.
 
         Please provide:
           - **mv_slug**  slug of movie
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **404**: Error: Forbidden. \n
             Причини: \n
                 1) Не знайдено: немає збігів фільмів
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.movie_service.get_by_slug(mv_slug=mv_slug)
         return result

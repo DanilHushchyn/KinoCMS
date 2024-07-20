@@ -1,44 +1,45 @@
 from django.http import HttpRequest
-from ninja_extra.controllers.base import api_controller, ControllerBase
-from ninja_extra.pagination.decorator import paginate
-from ninja_extra.schemas.response import PaginatedResponseSchema
-from src.cinemas.models import Cinema
-from src.cinemas.schemas.cinema import (CinemaInSchema,
-                                        CinemaCardOutSchema,
-                                        CinemaUpdateSchema,
-                                        CinemaOutSchema,
-                                        CinemaContactOutSchema,
-                                        CinemaClientOutSchema,
-                                        PaginatedContactsResponseSchema)
-from src.cinemas.services.cinema import CinemaService
-from src.core.models import Image
-from src.core.schemas.base import (LangEnum, MessageOutSchema,
-                                   errors_to_docs)
-from src.core.errors import (NotUniqueFieldExceptionError,
-                             NotFoundExceptionError,
-                             UnprocessableEntityExceptionError,
-                             )
-from ninja_extra.permissions import IsAdminUser
-from ninja_extra import (http_get, http_post, http_patch,
-                         http_delete, )
-from ninja import Header
 from django.utils.translation import gettext as _
+from ninja import Header
+from ninja_extra import http_delete
+from ninja_extra import http_get
+from ninja_extra import http_patch
+from ninja_extra import http_post
+from ninja_extra.controllers.base import ControllerBase
+from ninja_extra.controllers.base import api_controller
+from ninja_extra.pagination.decorator import paginate
+from ninja_extra.permissions import IsAdminUser
+from ninja_extra.schemas.response import PaginatedResponseSchema
 
+from src.cinemas.models import Cinema
+from src.cinemas.schemas.cinema import CinemaCardOutSchema
+from src.cinemas.schemas.cinema import CinemaClientOutSchema
+from src.cinemas.schemas.cinema import CinemaContactOutSchema
+from src.cinemas.schemas.cinema import CinemaInSchema
+from src.cinemas.schemas.cinema import CinemaOutSchema
+from src.cinemas.schemas.cinema import CinemaUpdateSchema
+from src.cinemas.schemas.cinema import PaginatedContactsResponseSchema
+from src.cinemas.services.cinema import CinemaService
+from src.core.errors import NotFoundExceptionError
+from src.core.errors import NotUniqueFieldExceptionError
+from src.core.errors import UnprocessableEntityExceptionError
+from src.core.models import Image
+from src.core.schemas.base import LangEnum
+from src.core.schemas.base import MessageOutSchema
+from src.core.schemas.base import errors_to_docs
 from src.core.utils import CustomJWTAuth
 
 
 @api_controller("/cinema", tags=["cinemas"])
 class CinemaController(ControllerBase):
-    """
-    A controller class for managing cinema in admin site.
+    """A controller class for managing cinema in admin site.
 
     This class provides endpoints for
     get, post, update, delete cinema in the site
     """
 
     def __init__(self, cinema_service: CinemaService):
-        """
-        Use this method to inject "services" to CinemaController.
+        """Use this method to inject "services" to CinemaController.
 
         :param cinema_service: variable for managing cinemas
         """
@@ -49,27 +50,26 @@ class CinemaController(ControllerBase):
         response=PaginatedResponseSchema[CinemaCardOutSchema],
         openapi_extra={
             "operationId": "get_all_cinema_cards",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def get_all_cinema_cards(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> Cinema:
-        """
-        Get all cinema cards.
+        """Get all cinema cards.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.cinema_service.get_all()
         return result
@@ -81,34 +81,30 @@ class CinemaController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "create_cinema",
-            "responses": errors_to_docs({
-                404: [
-                    NotFoundExceptionError(cls_model=Cinema)
-                ],
-                409: [
-                    NotUniqueFieldExceptionError(field="name"),
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    404: [NotFoundExceptionError(cls_model=Cinema)],
+                    409: [
+                        NotUniqueFieldExceptionError(field="name"),
+                    ],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def create_cinema(
-            self,
-            request: HttpRequest,
-            body: CinemaInSchema,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        body: CinemaInSchema,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> MessageOutSchema:
-        """
-        Create cinema.
+        """Create cinema.
 
         Please provide:
           - **body**  body for creating new cinema
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **409**: Error: Conflict.
             Причини: \n
@@ -140,6 +136,7 @@ class CinemaController(ControllerBase):
                  b) filename is required if image is specified. Example: *filename.png* \n
                  c) optional alt. If you don't specify it, I'll take the value from filename \n
              4. Be sure to specify the field delete=false \n
+
         """
         result = self.cinema_service.create(request=request, schema=body)
         return result
@@ -151,36 +148,32 @@ class CinemaController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "update_cinema",
-            "responses": errors_to_docs({
-                404: [
-                    NotFoundExceptionError(cls_model=Cinema),
-                    NotFoundExceptionError(cls_model=Image)
-                ],
-                409: [
-                    NotUniqueFieldExceptionError(field='name')
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    404: [
+                        NotFoundExceptionError(cls_model=Cinema),
+                        NotFoundExceptionError(cls_model=Image),
+                    ],
+                    409: [NotUniqueFieldExceptionError(field="name")],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def update_cinema(
-            self,
-            request: HttpRequest,
-            cnm_slug: str,
-            body: CinemaUpdateSchema,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        cnm_slug: str,
+        body: CinemaUpdateSchema,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> MessageOutSchema:
-        """
-        Update cinema.
+        """Update cinema.
 
         Please provide:
           - **body**  body for creating new cinema
 
         Returns
+        -------
           - **200**: Success response with the data.
           - **404**: Error: Forbidden. \n
             Причини: \n
@@ -212,42 +205,37 @@ class CinemaController(ControllerBase):
                  b) filename is required if image is specified. Example: *filename.png* \n
                  c) optional alt. If you don't specify it, I'll take the value from filename \n
              4. Be sure to specify the field delete=false \n
+
         """
-        self.cinema_service.update(request=request,
-                                   cnm_slug=cnm_slug,
-                                   schema=body)
-        return MessageOutSchema(detail=_('Кінотеатр успішно оновлений'))
+        self.cinema_service.update(request=request, cnm_slug=cnm_slug, schema=body)
+        return MessageOutSchema(detail=_("Кінотеатр успішно оновлений"))
 
     @http_get(
         "/{cnm_slug}/",
         response=CinemaOutSchema,
         openapi_extra={
             "operationId": "get_cinema_by_slug",
-            "responses": errors_to_docs({
-                404: [
-                    NotFoundExceptionError(cls_model=Cinema)
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    404: [NotFoundExceptionError(cls_model=Cinema)],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def get_cinema_by_slug(
-            self,
-            request: HttpRequest,
-            cnm_slug: str,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        cnm_slug: str,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> Cinema:
-        """
-        Create cinema.
+        """Create cinema.
 
         Please provide:
           - **cnm_slug**  slug of cinema
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **404**: Error: Forbidden. \n
             Причини: \n
@@ -256,6 +244,7 @@ class CinemaController(ControllerBase):
                 2) Не знайдено: немає збігів картинок
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.cinema_service.get_by_slug(cnm_slug=cnm_slug)
         return result
@@ -267,31 +256,27 @@ class CinemaController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "delete_cinema_by_slug",
-            "responses": errors_to_docs({
-                404: [
-                    NotFoundExceptionError(cls_model=Cinema)
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    404: [NotFoundExceptionError(cls_model=Cinema)],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def delete_cinema_by_slug(
-            self,
-            request: HttpRequest,
-            cnm_slug: str,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        cnm_slug: str,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> MessageOutSchema:
-        """
-        Delete cinema by id.
+        """Delete cinema by id.
 
         Please provide:
           - **cnm_slug**  slug of cinema
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **404**: Error: Found. \n
             Причини: \n
@@ -300,6 +285,7 @@ class CinemaController(ControllerBase):
                 2) Не знайдено: немає збігів картинок
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.cinema_service.delete_by_slug(cnm_slug=cnm_slug)
         return result
@@ -307,16 +293,14 @@ class CinemaController(ControllerBase):
 
 @api_controller("/cinema", tags=["cinemas"])
 class CinemaClientController(ControllerBase):
-    """
-    A controller class for managing cinema in client site.
+    """A controller class for managing cinema in client site.
 
     This class provides endpoints for
     get, cinema in the site
     """
 
     def __init__(self, cinema_service: CinemaService):
-        """
-        Use this method to inject "services" to CinemaController.
+        """Use this method to inject "services" to CinemaController.
 
         :param cinema_service: variable for managing cinemas
         """
@@ -329,27 +313,26 @@ class CinemaClientController(ControllerBase):
         response=PaginatedContactsResponseSchema[CinemaContactOutSchema],
         openapi_extra={
             "operationId": "get_all_cinema_contacts",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def get_all_cinema_contacts(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> Cinema:
-        """
-        Get all cinema cards.
+        """Get all cinema cards.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.cinema_service.get_all()
         return result
@@ -359,31 +342,27 @@ class CinemaClientController(ControllerBase):
         response=CinemaClientOutSchema,
         openapi_extra={
             "operationId": "get_cinema_by_slug",
-            "responses": errors_to_docs({
-                404: [
-                    NotFoundExceptionError(cls_model=Cinema)
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    404: [NotFoundExceptionError(cls_model=Cinema)],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def get_cinema_by_slug(
-            self,
-            request: HttpRequest,
-            cnm_slug: str,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        cnm_slug: str,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> Cinema:
-        """
-        Create cinema.
+        """Create cinema.
 
         Please provide:
           - **cnm_slug**  slug of cinema
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **404**: Error: Not Found. \n
             Причини: \n
@@ -392,6 +371,7 @@ class CinemaClientController(ControllerBase):
                 2) Не знайдено: немає збігів картинок
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.cinema_service.get_by_slug(cnm_slug=cnm_slug)
         return result

@@ -4,12 +4,12 @@ from src.users.models import User
 
 
 class UserTestOutSchema(ModelSchema):
-    """
-    Pydantic schema for User.
+    """Pydantic schema for User.
 
     Purpose of this schema to return user's
     personal data
     """
+
     date_joined: str
     birthday: str
 
@@ -27,4 +27,5 @@ class UserTestOutSchema(ModelSchema):
             "email",
             "address",
             "is_superuser",
-            "birthday", ]
+            "birthday",
+        ]

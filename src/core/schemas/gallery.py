@@ -1,87 +1,92 @@
+"""Module with core schemas and enums for project"""
+
 import re
-from typing import List
+
 import ninja_schema
-from pydantic.functional_validators import field_validator
 from django.utils.translation import gettext as _
+from ninja import ModelSchema
+from pydantic.functional_validators import field_validator
+
 from config.settings.settings import ABSOLUTE_URL
 from src.core.errors import UnprocessableEntityExceptionError
-from src.core.models import Gallery, Image
-from ninja import ModelSchema
+from src.core.models import Gallery
+from src.core.models import Image
 from src.core.schemas.images import ImageOutSchema
 
 
 class GalleryInSchema(ninja_schema.ModelSchema):
-    """
-    Pydantic schema for uploading image to server side.
-    """
+    """Pydantic schema for uploading image to server side."""
 
-    @ninja_schema.model_validator('images')
+    @ninja_schema.model_validator("images")
     def clean_images(cls, images) -> list:
         Image.objects.check_of_ids(images)
         return images
 
     class Config:
         model = Gallery
-        include = ['images']
+        include = ["images"]
 
 
 class GalleryMinOutSchema(ModelSchema):
-    """
-    Pydantic schema for return image to client side.
-    """
+    """Pydantic schema for return image to client side."""
 
     class Meta:
         model = Gallery
-        fields = '__all__'
+        fields = "__all__"
 
 
 class GalleryOutSchema(ModelSchema):
-    """
-    Pydantic schema for return image to client side.
-    """
-    images: List[ImageOutSchema]
+    """Pydantic schema for return image to client side."""
+
+    images: list[ImageOutSchema]
 
     class Meta:
         model = Gallery
-        fields = '__all__'
+        fields = "__all__"
 
 
 class GalleryItemSchema(ninja_schema.ModelSchema):
-    """
-    Pydantic schema for uploading image to server side.
-    """
+    """Pydantic schema for uploading image to server side."""
+
     delete: bool
     filename: str = None
 
-    @field_validator('filename')
+    @field_validator("filename")
     def clean_filename(cls, filename: str) -> str:
-        image_types = ['jpeg', 'jpg', 'png',
-                       'svg', 'webp', ]
-        pattern = r'^[a-zA-Z0-9_-]{1,255}\.[a-zA-Z0-9]+$'
+        image_types = [
+            "jpeg",
+            "jpg",
+            "png",
+            "svg",
+            "webp",
+        ]
+        pattern = r"^[a-zA-Z0-9_-]{1,255}\.[a-zA-Z0-9]+$"
         if re.match(pattern, filename) is None:
-            msg = _("Поле filename не підходить, "
-                    "filename має відповідати "
-                    "наступному регулярному виразу "
-                    "{pattern}").format(pattern=pattern)
+            msg = _(
+                "Поле filename не підходить, "
+                "filename має відповідати "
+                "наступному регулярному виразу "
+                "{pattern}"
+            ).format(pattern=pattern)
             raise UnprocessableEntityExceptionError(msg, field="filename")
-        name, extension = filename.split('.')
+        name, extension = filename.split(".")
         if extension not in image_types:
-            msg = (_('Дозволено відправляти тільки {image_types}')
-                   .format(image_types=image_types))
+            msg = _("Дозволено відправляти тільки {image_types}").format(
+                image_types=image_types
+            )
             raise UnprocessableEntityExceptionError(msg, field="filename")
 
         return filename
 
     class Config:
         model = Image
-        include = ['id', 'image', 'alt']
-        optional = ['id', 'alt', 'image']
+        include = ["id", "image", "alt"]
+        optional = ["id", "alt", "image"]
 
 
 class GalleryItemOutSchema(ModelSchema):
-    """
-    Pydantic schema for return gallery images to client side.
-    """
+    """Pydantic schema for return gallery images to client side."""
+
     image: str
     image_webp: str
 
@@ -91,12 +96,12 @@ class GalleryItemOutSchema(ModelSchema):
 
     @staticmethod
     def resolve_image_webp(obj: Image):
-        extension = obj.image.name.split('.')[-1]
-        if extension != 'svg':
+        extension = obj.image.name.split(".")[-1]
+        if extension != "svg":
             return ABSOLUTE_URL + str(obj.image_webp.url)
         else:
             return ABSOLUTE_URL + str(obj.image.url)
 
     class Meta:
         model = Image
-        fields = '__all__'
+        fields = "__all__"

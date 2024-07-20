@@ -1,3 +1,5 @@
+"""All custom possible error along mailing process"""
+
 from src.core.schemas.base import CustomAPIException
 
 

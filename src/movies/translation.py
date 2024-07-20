@@ -1,9 +1,11 @@
-# -*- coding: utf-8 -*-
-from modeltranslation.translator import TranslationOptions, register
+"""Module for translating essences from movie app"""
 
-from src.movies.models import (Movie,
-                               MovieParticipantPerson,
-                               MovieParticipantRole)
+from modeltranslation.translator import TranslationOptions
+from modeltranslation.translator import register
+
+from src.movies.models import Movie
+from src.movies.models import MovieParticipantPerson
+from src.movies.models import MovieParticipantRole
 
 
 @register(Movie)

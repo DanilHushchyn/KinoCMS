@@ -1,40 +1,48 @@
+"""Page essence endpoints"""
+
 from django.db.models import QuerySet
 from django.http import HttpRequest
-from ninja_extra.controllers.base import api_controller, ControllerBase
+from ninja import Header
+from ninja_extra import http_delete
+from ninja_extra import http_get
+from ninja_extra import http_patch
+from ninja_extra import http_post
+from ninja_extra.controllers.base import ControllerBase
+from ninja_extra.controllers.base import api_controller
 from ninja_extra.pagination.decorator import paginate
+from ninja_extra.permissions import IsAdminUser
 from ninja_extra.schemas.response import PaginatedResponseSchema
 
-from src.core.errors import UnprocessableEntityExceptionError, InvalidTokenExceptionError, NotFoundExceptionError, \
-    NotUniqueFieldExceptionError
+from src.core.errors import InvalidTokenExceptionError
+from src.core.errors import NotFoundExceptionError
+from src.core.errors import NotUniqueFieldExceptionError
+from src.core.errors import UnprocessableEntityExceptionError
 from src.core.models import Image
-from src.pages.errors import PageUnableToDeleteExceptionError
-from src.pages.schemas.page import (PageInSchema,
-                                    PageCardOutSchema,
-                                    PageUpdateSchema,
-                                    PageOutSchema, PageClientOutSchema,
-                                    PageCardClientOutSchema)
-from src.core.schemas.base import LangEnum, MessageOutSchema, errors_to_docs
-from ninja_extra.permissions import IsAdminUser
-from ninja_extra import http_get, http_post, http_patch, http_delete
-from ninja import Header
-
+from src.core.schemas.base import LangEnum
+from src.core.schemas.base import MessageOutSchema
+from src.core.schemas.base import errors_to_docs
 from src.core.utils import CustomJWTAuth
+from src.pages.errors import PageUnableToDeleteExceptionError
 from src.pages.models import Page
+from src.pages.schemas.page import PageCardClientOutSchema
+from src.pages.schemas.page import PageCardOutSchema
+from src.pages.schemas.page import PageClientOutSchema
+from src.pages.schemas.page import PageInSchema
+from src.pages.schemas.page import PageOutSchema
+from src.pages.schemas.page import PageUpdateSchema
 from src.pages.services.page import PageService
 
 
 @api_controller("/page", tags=["pages"])
 class PageController(ControllerBase):
-    """
-    A controller class for managing pages in system.
+    """A controller class for managing pages in system.
 
     This class provides endpoints for
     get, post, update, delete page in the site
     """
 
     def __init__(self, page_service: PageService):
-        """
-        Use this method to inject "services" to PageController.
+        """Use this method to inject "services" to PageController.
 
         :param page_service: variable for managing pages
         """
@@ -47,30 +55,27 @@ class PageController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "get_all_page_cards",
-            "responses": errors_to_docs({
-                401: [
-                    InvalidTokenExceptionError()
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    401: [InvalidTokenExceptionError()],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def get_all_page_cards(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> QuerySet[Page]:
-        """
-        Get all page cards.
+        """Get all page cards.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.page_service.get_all()
         return result
@@ -82,34 +87,28 @@ class PageController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "create_page",
-            "responses": errors_to_docs({
-                401: [
-                    InvalidTokenExceptionError()
-                ],
-                409: [
-                    NotUniqueFieldExceptionError(field='name')
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    401: [InvalidTokenExceptionError()],
+                    409: [NotUniqueFieldExceptionError(field="name")],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def create_page(
-            self,
-            request: HttpRequest,
-            body: PageInSchema,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        body: PageInSchema,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> MessageOutSchema:
-        """
-        Create page.
+        """Create page.
 
         Please provide:
           - **body**  body for creating new page
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **409**: Error: Conflict.
             Причини: \n
@@ -140,6 +139,7 @@ class PageController(ControllerBase):
                  b) filename is required if image is specified. Example: *filename.png* \n
                  c) optional alt. If you don't specify it, I'll take the value from filename \n
              4. Be sure to specify the field delete=false \n
+
         """
         result = self.page_service.create(request=request, schema=body)
         return result
@@ -151,39 +151,33 @@ class PageController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "update_page",
-            "responses": errors_to_docs({
-                401: [
-                    InvalidTokenExceptionError()
-                ],
-                404: [
-                    NotFoundExceptionError(cls_model=Page),
-                    NotFoundExceptionError(cls_model=Image)
-                ],
-                409: [
-                    NotUniqueFieldExceptionError(field='name')
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    401: [InvalidTokenExceptionError()],
+                    404: [
+                        NotFoundExceptionError(cls_model=Page),
+                        NotFoundExceptionError(cls_model=Image),
+                    ],
+                    409: [NotUniqueFieldExceptionError(field="name")],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def update_page(
-            self,
-            request: HttpRequest,
-            pg_slug: str,
-            body: PageUpdateSchema,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        pg_slug: str,
+        body: PageUpdateSchema,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> MessageOutSchema:
-        """
-        Update page.
+        """Update page.
 
         Please provide:
           - **body**  body for creating new page
 
         Returns
+        -------
           - **200**: Success response with the data.
           - **409**: Error: Conflict. \n
             Причини: \n
@@ -214,10 +208,9 @@ class PageController(ControllerBase):
                  b) filename is required if image is specified. Example: *filename.png* \n
                  c) optional alt. If you don't specify it, I'll take the value from filename \n
              4. Be sure to specify the field delete=false \n
+
         """
-        result = self.page_service.update(request=request,
-                                          pg_slug=pg_slug,
-                                          schema=body)
+        result = self.page_service.update(request=request, pg_slug=pg_slug, schema=body)
         return result
 
     @http_get(
@@ -229,40 +222,35 @@ class PageController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "get_page_by_slug",
-            "responses": errors_to_docs({
-                401: [
-                    InvalidTokenExceptionError()
-                ],
-                404: [
-                    NotFoundExceptionError(cls_model=Page)
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    401: [InvalidTokenExceptionError()],
+                    404: [NotFoundExceptionError(cls_model=Page)],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def get_page_by_slug(
-            self,
-            request: HttpRequest,
-            pg_slug: str,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        pg_slug: str,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> Page:
-        """
-        Create page.
+        """Create page.
 
         Please provide:
           - **pg_slug**  slug of page
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **404**: Error: Forbidden. \n
             Причини: \n
                 1) Не знайдено: немає збігів сторінок
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.page_service.get_by_slug(pg_slug=pg_slug)
         return result
@@ -274,37 +262,29 @@ class PageController(ControllerBase):
         auth=CustomJWTAuth(),
         openapi_extra={
             "operationId": "delete_page_by_slug",
-            "responses": errors_to_docs({
-                401: [
-                    InvalidTokenExceptionError()
-                ],
-                404: [
-                    NotFoundExceptionError(cls_model=Page)
-                ],
-                406: [
-                    PageUnableToDeleteExceptionError()
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    401: [InvalidTokenExceptionError()],
+                    404: [NotFoundExceptionError(cls_model=Page)],
+                    406: [PageUnableToDeleteExceptionError()],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def delete_page_by_slug(
-            self,
-            request: HttpRequest,
-            pg_slug: str,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        pg_slug: str,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> MessageOutSchema:
-        """
-        Delete page by slug.
+        """Delete page by slug.
 
         Please provide:
           - **pg_slug**  slug of page
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data. \n
           - **406**: Error: Conflict. \n
             Причини: \n
@@ -314,6 +294,7 @@ class PageController(ControllerBase):
                 1) Не знайдено: немає збігів сторінок
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.page_service.delete_by_slug(pg_slug=pg_slug)
         return result
@@ -321,16 +302,14 @@ class PageController(ControllerBase):
 
 @api_controller("/page", tags=["pages"])
 class PageClientController(ControllerBase):
-    """
-    A controller class for managing pages in system.
+    """A controller class for managing pages in system.
 
     This class provides endpoints for
     get, post, update, delete page in the site
     """
 
     def __init__(self, page_service: PageService):
-        """
-        Use this method to inject "services" to PageController.
+        """Use this method to inject "services" to PageController.
 
         :param page_service: variable for managing pages
         """
@@ -341,27 +320,26 @@ class PageClientController(ControllerBase):
         response=PaginatedResponseSchema[PageCardClientOutSchema],
         openapi_extra={
             "operationId": "get_all_page_cards",
-            "responses": errors_to_docs({
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     @paginate()
     def get_all_page_cards(
-            self,
-            request: HttpRequest,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> QuerySet[Page]:
-        """
-        Get all page cards.
+        """Get all page cards.
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.page_service.get_all_active()
         return result
@@ -371,37 +349,34 @@ class PageClientController(ControllerBase):
         response=PageClientOutSchema,
         openapi_extra={
             "operationId": "get_page_by_slug",
-            "responses": errors_to_docs({
-                404: [
-                    NotFoundExceptionError(cls_model=Page)
-                ],
-                422: [
-                    UnprocessableEntityExceptionError()
-                ],
-            }),
+            "responses": errors_to_docs(
+                {
+                    404: [NotFoundExceptionError(cls_model=Page)],
+                    422: [UnprocessableEntityExceptionError()],
+                }
+            ),
         },
     )
     def get_page_by_slug(
-            self,
-            request: HttpRequest,
-            pg_slug: str,
-            accept_lang: LangEnum =
-            Header(alias="Accept-Language",
-                   default="uk"),
+        self,
+        request: HttpRequest,
+        pg_slug: str,
+        accept_lang: LangEnum = Header(alias="Accept-Language", default="uk"),
     ) -> Page:
-        """
-        Create page.
+        """Create page.
 
         Please provide:
           - **pg_slug**  slug of page
 
-        Returns:
+        Returns
+        -------
           - **200**: Success response with the data.
           - **404**: Error: Forbidden. \n
             Причини: \n
                 1) Не знайдено: немає збігів сторінок
                    на заданному запиті. \n
           - **500**: Internal server error if an unexpected error occurs.
+
         """
         result = self.page_service.get_active_by_slug(pg_slug=pg_slug)
         return result

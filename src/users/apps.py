@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-    Application configuration for the users Django app.
-"""
+"""Application configuration for the users Django app."""
+
 from django.apps import AppConfig
 
 

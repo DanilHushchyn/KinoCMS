@@ -1,3 +1,7 @@
+"""Errors for app users that can be
+along managing this(users) essence
+"""
+
 from src.core.schemas.base import CustomAPIException
 
 

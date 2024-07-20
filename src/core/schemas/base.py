@@ -1,11 +1,13 @@
+"""Module with core schemas and enums for project"""
+
 from enum import Enum
+
 from ninja import Schema
 from ninja_extra.exceptions import APIException
 
 
 class MessageOutSchema(Schema):
-    """
-    Pydantic schema for return message to client side.
+    """Pydantic schema for return message to client side.
 
     Purpose of this schema just say that operation
     has been successful or failed
@@ -63,9 +65,12 @@ class CustomAPIException(APIException):
     field: str
     location: str
 
-    def __init__(self, message: str | None = None,
-                 field: str | None = None,
-                 code: str | None = None) -> None:
+    def __init__(
+        self,
+        message: str | None = None,
+        field: str | None = None,
+        code: str | None = None,
+    ) -> None:
         """Initialize exception."""
         if message is not None:
             self.message = message
@@ -94,11 +99,8 @@ class CustomAPIException(APIException):
 
     def __dict__(self):
         return {
-            'summary': self.code,
-            'value': {
-                "status": self.status_code,
-                "error": self.error_detail
-            }
+            "summary": self.code,
+            "value": {"status": self.status_code, "error": self.error_detail},
         }
 
 
@@ -107,18 +109,12 @@ def errors_to_docs(responses: dict) -> dict:
     for status, errors in responses.items():
         result[status] = {
             "description": f"{status}",
-            "content": {
-                "application/json": {
-                    "examples": {
-                    }
-                }
-            },
+            "content": {"application/json": {"examples": {}}},
         }
         for key, error in enumerate(errors):
-            result[status]["content"]["application/json"]["examples"][key] = \
-                {
-                    "summary": error.code,
-                    "description": f"{error.code}",
-                    "value": error.detail
-                }
+            result[status]["content"]["application/json"]["examples"][key] = {
+                "summary": error.code,
+                "description": f"{error.code}",
+                "value": error.detail,
+            }
     return result

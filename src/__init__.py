@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Package Initialization Module.
+"""Package Initialization Module.
 
 This module serves as the entry point
 for the package and contains initialization code

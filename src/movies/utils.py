@@ -1,10 +1,11 @@
-from multiselectfield import MultiSelectField as MSField
+"""Common utils for movie app"""
+
 from django.db import models
+from multiselectfield import MultiSelectField as MSField
 
 
 class MultiSelectField(MSField):
-    """
-    Custom Implementation of MultiSelectField
+    """Custom Implementation of MultiSelectField
     to achieve Django 5.0 compatibility
 
     See:
@@ -12,6 +13,9 @@ class MultiSelectField(MSField):
     """
 
     def _get_flatchoices(self):
+        """Some method for adapting MultiselectField to Django 5.0+
+        :return:
+        """
         flat_choices = super(models.CharField, self).flatchoices
 
         class MSFFlatchoices(list):

@@ -1,6 +1,8 @@
+"""App for implementing mailing"""
+
 from django.apps import AppConfig
 
 
 class MailingConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'src.mailing'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "src.mailing"

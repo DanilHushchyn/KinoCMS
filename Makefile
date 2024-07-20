@@ -18,6 +18,9 @@ worker:
 beat:
 	celery -A config beat
 
+linter:
+	pre-commit run --all-files
+
 dumpdata:
 	$(MANAGE) dumpdata > db.json
 

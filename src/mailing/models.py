@@ -1,3 +1,5 @@
+"""Model for mailing"""
+
 from django.db import models
 
 from src.core.utils import get_timestamp_path
@@ -10,7 +12,7 @@ class MailTemplate(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-date_created']
+        ordering = ["-date_created"]
         verbose_name = "MailTemplate"
         verbose_name_plural = "MailTemplates"
-        db_table = 'mail_templates'
+        db_table = "mail_templates"
