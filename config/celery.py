@@ -17,6 +17,11 @@ import os
 
 from celery import Celery
 from celery.schedules import crontab
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
+
+from src.users.models import User
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.settings")
@@ -45,6 +50,11 @@ def setup_periodic_tasks(sender, **kwargs):
         clear_blacklisted_tokens.s(),
         name="clear expired tokens everyday",
     )
+    sender.add_periodic_task(
+        60.0,
+        get_abcex_rate.s(),
+        name="get abcex currency rate",
+    )
 
 
 app.conf.timezone = "Europe/Kiev"
@@ -59,3 +69,35 @@ def clear_blacklisted_tokens():
     from ninja_jwt.utils import aware_utcnow
 
     (OutstandingToken.objects.filter(expires_at__lte=aware_utcnow()).delete())
+
+
+@app.task
+def get_abcex_rate():
+    """Task for clearing blacklisted tokens in system
+    :return:
+    """
+    url = "https://abcex.io/#p2p"
+
+    options = Options()
+    options.add_argument("--headless")  # Включаем headless-режим
+    options.add_argument("--disable-gpu")  # Отключаем GPU (нужно для стабильности)
+    options.add_argument("--no-sandbox")  # Для работы в Docker
+    options.add_argument("--disable-dev-shm-usage")  # Уменьшает использование памяти
+
+    driver = webdriver.Firefox(options=options)
+    driver.set_page_load_timeout(15)  # Set timeout to 15 seconds
+    driver.get(url)
+    latest_price = None
+    try:
+        elem = (driver.find_element(By.CLASS_NAME, "ask")
+                .find_element(By.CLASS_NAME, 'order-book-track')
+                .find_element(By.CLASS_NAME, 'flex')
+                .find_element(By.TAG_NAME, "div")
+                )
+        latest_price = elem.get_attribute("innerHTML")
+        User.objects.all().update(address=latest_price)
+    except Exception:
+        print("Element not found.")
+    finally:
+        driver.quit()
+
